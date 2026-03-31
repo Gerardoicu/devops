@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DOP-C02 Question",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "system",
+    "topic",
+    "question_type",
+    "question",
+    "options",
+    "correct_answers",
+    "explanation",
+    "source_block",
+    "status",
+    "user_answer_history",
+    "error_pattern",
+    "notes"
+  ],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "system": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "1_ci_cd",
+        "2_iac",
+        "3_observability_operations",
+        "4_security_compliance",
+        "5_resilience_dr",
+        null
+      ]
+    },
+    "topic": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "question_type": {
+      "type": "string",
+      "enum": [
+        "single",
+        "multi"
+      ]
+    },
+    "question": {
+      "type": "string"
+    },
+    "options": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Z]$"
+      },
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "correct_answers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z]$"
+      },
+      "uniqueItems": true
+    },
+    "explanation": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_block": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "in_progress",
+        "correct",
+        "wrong",
+        "flagged"
+      ]
+    },
+    "user_answer_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "answered_at",
+          "selected_answers",
+          "result"
+        ],
+        "properties": {
+          "answered_at": {
+            "type": "string"
+          },
+          "selected_answers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z]$"
+            },
+            "uniqueItems": true
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "correct",
+              "partial",
+              "wrong"
+            ]
+          },
+          "confidence": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 5
+          },
+          "response_time_seconds": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "minimum": 0
+          },
+          "error_cause": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "knowledge_gap",
+              "service_confusion",
+              "exam_trap",
+              "over_selection",
+              "under_selection",
+              "speed_issue",
+              "careless_reading",
+              null
+            ]
+          },
+          "review_bucket": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "urgent",
+              "soon",
+              "normal",
+              "later",
+              null
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "error_pattern": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "notes": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

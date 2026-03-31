@@ -1,0 +1,337 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DOP-C02 Study State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "current_question_id",
+    "completed_questions",
+    "correct_questions",
+    "wrong_questions",
+    "flagged_questions",
+    "weak_patterns",
+    "confidence_history",
+    "response_time_history",
+    "mistake_clusters",
+    "trap_patterns",
+    "mastery_by_system",
+    "mastery_by_topic",
+    "question_review_schedule",
+    "preferred_explanation_style",
+    "session_metrics",
+    "last_session_summary"
+  ],
+  "properties": {
+    "current_question_id": {
+      "type": [
+        "integer",
+        "null"
+      ],
+      "minimum": 1
+    },
+    "completed_questions": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "uniqueItems": true
+    },
+    "correct_questions": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "uniqueItems": true
+    },
+    "wrong_questions": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "uniqueItems": true
+    },
+    "flagged_questions": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "uniqueItems": true
+    },
+    "weak_patterns": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "confidence_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "question_id",
+          "confidence"
+        ],
+        "properties": {
+          "question_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "confidence": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "recorded_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "response_time_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "question_id",
+          "response_time_seconds"
+        ],
+        "properties": {
+          "question_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "response_time_seconds": {
+            "type": "number",
+            "minimum": 0
+          },
+          "recorded_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "mistake_clusters": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "trap_patterns": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0
+      }
+    },
+    "mastery_by_system": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "answered",
+          "correct",
+          "partial",
+          "wrong",
+          "mastery_score"
+        ],
+        "properties": {
+          "answered": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "correct": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "partial": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "wrong": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "mastery_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "mastery_by_topic": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "answered",
+          "correct",
+          "partial",
+          "wrong",
+          "mastery_score"
+        ],
+        "properties": {
+          "answered": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "correct": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "partial": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "wrong": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "mastery_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "question_review_schedule": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^\\d+$"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "priority",
+          "review_bucket"
+        ],
+        "properties": {
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "review_bucket": {
+            "type": "string",
+            "enum": [
+              "urgent",
+              "soon",
+              "normal",
+              "later"
+            ]
+          },
+          "reason": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_reviewed_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      }
+    },
+    "preferred_explanation_style": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "depth",
+        "compare_similar_services",
+        "focus_on_exam_traps",
+        "use_architecture_reasoning"
+      ],
+      "properties": {
+        "depth": {
+          "type": "string",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "compare_similar_services": {
+          "type": "boolean"
+        },
+        "focus_on_exam_traps": {
+          "type": "boolean"
+        },
+        "use_architecture_reasoning": {
+          "type": "boolean"
+        }
+      }
+    },
+    "session_metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "total_answered",
+        "total_correct",
+        "total_partial",
+        "total_wrong",
+        "average_confidence",
+        "average_response_time_seconds"
+      ],
+      "properties": {
+        "total_answered": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_correct": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_partial": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_wrong": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "average_confidence": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 1,
+          "maximum": 5
+        },
+        "average_response_time_seconds": {
+          "type": [
+            "number",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    },
+    "last_session_summary": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}
