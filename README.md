@@ -1,51 +1,135 @@
-# AWS DOP-C02 Study Workspace
+# AWS DevOps DOP-C02 Study Workspace
 
-Proyecto base para administrar un banco de preguntas de `AWS Certified DevOps Engineer - Professional (DOP-C02)` con persistencia local.
+Workspace privado para preparar `AWS Certified DevOps Engineer - Professional (DOP-C02)` con:
 
-## Estructura
+- banco de preguntas verificado
+- notas de estudio curadas
+- app Angular de microaprendizaje
+- simulador completo de examen
 
-- `prompts/devops.md`: prompt operativo principal del mentor/agente.
-- `prompts/preguntas.md`: banco fuente en Markdown.
-- `data/question_bank.json`: banco de preguntas normalizado.
-- `data/study_state.json`: estado de progreso, repaso y patrones de aprendizaje.
-- `data/session_history.json`: historial resumido de sesiones.
-- `data/error_patterns_catalog.json`: catálogo inicial de trampas/patrones frecuentes.
-- `notes/conceptos-clave-dop-c02.md`: glosario corto de conceptos y trampas de alto valor para el examen.
-- `schemas/question.schema.json`: contrato JSON para preguntas.
-- `schemas/study_state.schema.json`: contrato JSON para estado de estudio.
+## Que incluye
 
-## Convención de trabajo
+### 1. Banco de estudio
 
-1. Las preguntas nuevas se convierten primero a JSON.
-2. Se propone rango de IDs antes de cargar.
-3. El progreso se actualiza sin reiniciar el banco.
-4. Las repeticiones ocurren solo por repaso útil o petición explícita.
-5. En modo estudio, las opciones pueden mostrarse en orden aleatorio, pero cada letra y respuesta correcta interna se mantiene intacta.
+- [data/question_bank.json](data/question_bank.json)
+  Banco principal normalizado. Es la fuente del simulador verificado.
 
-## Cómo empezar cada sesión
+### 2. Notas de estudio
 
-Usa uno de estos mensajes al abrir el agente:
+- [1. Conceptos-clave.md](notes/1.%20Conceptos-clave.md)
+- [2. Matriz-decision-dop-c02.md](notes/2.%20Matriz-decision-dop-c02.md)
+- [3. Patrones-y-trampas-del-examen.md](notes/3.%20Patrones-y-trampas-del-examen.md)
+- [huecos-temario-oficial.md](notes/huecos-temario-oficial.md)
 
-- `reanuda desde la última sesión`
-- `hazme la siguiente`
-- `repasemos solo las falladas`
-- `muéstrame mis patrones de error`
-- `simulador de 10 preguntas`
+Estas notas son la base del material didáctico de la app.
 
-## Formato recomendado al responder
+### 3. App de estudio
 
-Para que el agente aprenda mejor de ti, responde así cuando puedas:
+- [study-app](study-app)
 
-- `B`
-- `A y D`
-- `Creo que C, confianza 2/5`
-- `B, tardé 40s`
-- `A y E, confianza 4/5`
+Incluye:
 
-## Flujo mínimo recomendado
+- microcards de conceptos, decisiones y trampas
+- mini quiz
+- repaso de errores
+- lectura de notas dentro de la app
+- links oficiales de apoyo
+- simulador completo de examen AWS DevOps
 
-1. Empieza con `reanuda desde la última sesión`.
-2. Responde una pregunta por turno.
-3. Si dudaste, indica confianza.
-4. Si una explicación te ayudó o no, dilo.
-5. Cierra con `muéstrame mis debilidades actuales`.
+## Estructura del repo
+
+- `data/`
+  Banco de preguntas y datos fuente.
+- `notes/`
+  Material de estudio consolidado.
+- `prompts/`
+  Prompts de apoyo para agentes y mantenimiento.
+- `study-app/`
+  Aplicación Angular para estudiar y simular examen.
+- `.run/`
+  Configuraciones compartidas para WebStorm.
+
+## Como arrancar la app
+
+Desde `study-app/`:
+
+```powershell
+npm install
+npm run start
+```
+
+Abrir en:
+
+```text
+http://localhost:4200
+```
+
+## Como exponerla en tu red local
+
+```powershell
+cd study-app
+npm run start:lan
+```
+
+Luego abrir desde otro dispositivo en la misma red:
+
+```text
+http://TU_IP_LOCAL:4200
+```
+
+Guia corta:
+
+- [LOCAL-NETWORK.md](study-app/LOCAL-NETWORK.md)
+
+## Modos de estudio de la app
+
+- `Solo aprender`
+  Feed corto para asimilar conceptos y comparaciones.
+- `Sesion rapida`
+  Mezcla aprendizaje y respuesta.
+- `Mini quiz`
+  Solo cards de evaluacion.
+- `Repasar errores`
+  Prioriza cards marcadas a repaso.
+- `Examen completo`
+  Simulador cronometrado de 75 preguntas.
+
+## Bancos del simulador
+
+### Banco verificado
+
+Generado desde:
+
+- [question_bank.json](data/question_bank.json)
+
+Asset resultante:
+
+- [simulator-bank.json](study-app/public/assets/simulator-bank.json)
+
+### Banco publico suplementario
+
+- [simulator-bank-public.json](study-app/public/assets/simulator-bank-public.json)
+
+Es un banco adicional para practicar mas. No sustituye al verificado.
+
+## Scripts utiles
+
+Desde `study-app/`:
+
+```powershell
+npm run build
+node .\scripts\audit-simulator-banks.js
+node .\scripts\sync-notes-assets.js
+```
+
+## Criterio del proyecto
+
+- priorizar calidad del material sobre features
+- evitar sobreingenieria
+- estudiar con formato de atencion corta
+- mantener el simulador alineado al banco principal
+- no mezclar progreso real con medicion engañosa
+
+## Estado
+
+`v1` utilizable para estudio diario serio.
