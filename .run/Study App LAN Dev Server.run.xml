@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Study App LAN Dev Server" type="js.build_tools.npm" factoryName="npm">
+    <package-json value="$PROJECT_DIR$/study-app/package.json" />
+    <command value="run" />
+    <scripts>
+      <script value="start:lan" />
+    </scripts>
+    <node-interpreter value="project" />
+    <envs />
+    <method v="2" />
+  </configuration>
+</component>

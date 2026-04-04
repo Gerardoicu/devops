@@ -1,0 +1,86 @@
+[
+  {
+    "id": "dop-c02-exam-page",
+    "title": "AWS Certified DevOps Engineer - Professional",
+    "category": "Examen",
+    "description": "Pagina oficial del examen con formato, duracion y plan de preparacion.",
+    "url": "https://aws.amazon.com/es/certification/certified-devops-engineer-professional/"
+  },
+  {
+    "id": "dop-c02-exam-guide-es",
+    "title": "Guia oficial DOP-C02 en espanol",
+    "category": "Examen",
+    "description": "Guia oficial del examen con dominios, alcance y servicios evaluados.",
+    "url": "https://docs.aws.amazon.com/es_es/aws-certification/latest/devops-engineer-professional-02/devops-engineer-professional-02.html"
+  },
+  {
+    "id": "dop-c02-in-scope-services",
+    "title": "Servicios dentro del alcance del examen",
+    "category": "Examen",
+    "description": "Lista oficial de servicios y features dentro del alcance de DOP-C02.",
+    "url": "https://docs.aws.amazon.com/es_es/aws-certification/latest/devops-engineer-professional-02/eses-dop-02-in-scope-services.html"
+  },
+  {
+    "id": "dop-c02-domain6",
+    "title": "Dominio 6: Security and Compliance",
+    "category": "Examen",
+    "description": "Objetivos oficiales del dominio 6 del examen.",
+    "url": "https://docs.aws.amazon.com/es_es/aws-certification/latest/devops-engineer-professional-02/eses-devops-engineer-professional-02-domain6.html"
+  },
+  {
+    "id": "dop-c02-domain5",
+    "title": "Dominio 5: Incident and Event Response",
+    "category": "Examen",
+    "description": "Objetivos oficiales del dominio 5 del examen.",
+    "url": "https://docs.aws.amazon.com/aws-certification/latest/devops-engineer-professional-02/devops-engineer-professional-02-domain5.html"
+  },
+  {
+    "id": "config-what-is",
+    "title": "Que es AWS Config",
+    "category": "Config",
+    "description": "Vista general oficial de AWS Config y su enfoque de cumplimiento.",
+    "url": "https://docs.aws.amazon.com/es_es/config/latest/developerguide/WhatIsConfig.html"
+  },
+  {
+    "id": "config-how-it-works",
+    "title": "Como funciona AWS Config",
+    "category": "Config",
+    "description": "Funcionamiento interno de registrador, reglas y canal de entrega.",
+    "url": "https://docs.aws.amazon.com/es_es/config/latest/developerguide/how-does-config-work.html"
+  },
+  {
+    "id": "cloudformation-overview",
+    "title": "Funcionamiento de CloudFormation",
+    "category": "IaC",
+    "description": "Conceptos clave de stacks, templates y change sets.",
+    "url": "https://docs.aws.amazon.com/es_es/AWSCloudFormation/latest/UserGuide/cloudformation-overview.html"
+  },
+  {
+    "id": "cloudwatch-metric-filters",
+    "title": "Metric filters en CloudWatch Logs",
+    "category": "Observabilidad",
+    "description": "Creacion de metricas a partir de logs usando filtros.",
+    "url": "https://docs.aws.amazon.com/es_es/AmazonCloudWatch/latest/logs/MonitoringLogData.html"
+  },
+  {
+    "id": "codedeploy-devops-intro",
+    "title": "AWS CodeDeploy - Introduccion DevOps a AWS",
+    "category": "CI/CD",
+    "description": "Resumen oficial de CodeDeploy y su papel en despliegues automatizados.",
+    "url": "https://docs.aws.amazon.com/es_es/whitepapers/latest/introduction-devops-aws/aws-codedeploy.html"
+  },
+  {
+    "id": "ssm-automation",
+    "title": "AWS Systems Manager Automation",
+    "category": "Operaciones",
+    "description": "Manual oficial de Automation, runbooks y flujos operativos.",
+    "url": "https://docs.aws.amazon.com/es_es/systems-manager/latest/userguide/systems-manager-automation.html"
+  },
+  {
+    "id": "ssm-automation-setup",
+    "title": "Configuracion de Automation",
+    "category": "Operaciones",
+    "description": "Requisitos de roles y permisos para usar Systems Manager Automation.",
+    "url": "https://docs.aws.amazon.com/es_es/systems-manager/latest/userguide/automation-setup.html"
+  }
+]

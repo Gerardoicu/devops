@@ -1,0 +1,302 @@
+[
+  {
+    "id": 1001,
+    "questionType": "single",
+    "question": "Una empresa quiere asegurarse de que todos los buckets S3 mantengan una configuracion requerida de forma continua y corregir automaticamente cualquier desviacion. ¿Que servicio debe evaluar primero el estado de cumplimiento?",
+    "options": {
+      "A": "Amazon EventBridge",
+      "B": "AWS Config",
+      "C": "Amazon CloudWatch",
+      "D": "AWS Trusted Advisor"
+    },
+    "correctAnswers": ["B"],
+    "explanation": "AWS Config evalua el estado de los recursos a lo largo del tiempo. EventBridge reacciona a eventos puntuales, pero no sustituye el cumplimiento continuo.",
+    "domainName": "Security and Compliance",
+    "topic": "AWS Config"
+  },
+  {
+    "id": 1002,
+    "questionType": "single",
+    "question": "Los logs de una aplicacion ya se encuentran en CloudWatch Logs. El equipo necesita alertar cuando aparezca la palabra CRITICAL, con la menor complejidad posible. ¿Que patron es el mas adecuado?",
+    "options": {
+      "A": "Subscription filter a Lambda y luego SNS",
+      "B": "Metric filter, custom metric, alarm y SNS",
+      "C": "CloudWatch dashboard y revision manual",
+      "D": "Exportar logs a S3 y consultar con Athena"
+    },
+    "correctAnswers": ["B"],
+    "explanation": "Cuando los logs ya estan en CloudWatch Logs y solo se requiere alertar por un patron, metric filter + alarm + SNS es la ruta nativa y mas corta.",
+    "domainName": "Monitoring and Logging",
+    "topic": "CloudWatch Logs"
+  },
+  {
+    "id": 1003,
+    "questionType": "single",
+    "question": "Un pipeline central debe desplegar en una cuenta destino y necesita acceso a recursos de esa cuenta. ¿Que elemento define quien puede asumir el rol destino?",
+    "options": {
+      "A": "Permissions policy del rol origen",
+      "B": "Bucket policy del artifact bucket",
+      "C": "Trust policy del rol destino",
+      "D": "Security group del proyecto CodeBuild"
+    },
+    "correctAnswers": ["C"],
+    "explanation": "En escenarios cross-account, la trust policy del rol destino define quien puede asumirlo. Las permissions policies controlan lo que puede hacer una vez asumido.",
+    "domainName": "Security and Compliance",
+    "topic": "IAM and STS"
+  },
+  {
+    "id": 1004,
+    "questionType": "single",
+    "question": "Una funcion Lambda sensible a latencia sufre cold starts en horas pico. El equipo no quiere rediseñar la aplicacion. ¿Que deberia configurar?",
+    "options": {
+      "A": "Reserved concurrency",
+      "B": "Provisioned concurrency",
+      "C": "Lambda Layers",
+      "D": "Mas almacenamiento efimero"
+    },
+    "correctAnswers": ["B"],
+    "explanation": "Provisioned concurrency mantiene entornos de ejecucion ya inicializados. Reserved concurrency no elimina cold starts.",
+    "domainName": "Resilient Cloud Solutions",
+    "topic": "Lambda"
+  },
+  {
+    "id": 1005,
+    "questionType": "single",
+    "question": "Una organizacion necesita desplegar automaticamente la misma infraestructura comun en nuevas cuentas y retirarla cuando una cuenta salga de la organizacion. ¿Que servicio de IaC encaja mejor?",
+    "options": {
+      "A": "AWS CloudFormation StackSets con service-managed permissions",
+      "B": "AWS Systems Manager State Manager",
+      "C": "Amazon EventBridge con Lambda personalizada",
+      "D": "AWS Service Catalog"
+    },
+    "correctAnswers": ["A"],
+    "explanation": "StackSets con permisos administrados por el servicio es el patron nativo para despliegues multi-cuenta y retiro automatico ligado a Organizations.",
+    "domainName": "Configuration Management and IaC",
+    "topic": "CloudFormation StackSets"
+  },
+  {
+    "id": 1006,
+    "questionType": "single",
+    "question": "Un despliegue de CodeDeploy debe hacer rollback si una senal operativa empeora despues de redirigir trafico. ¿Que necesita realmente CodeDeploy para decidir el rollback?",
+    "options": {
+      "A": "Una metrica de CloudWatch sin alarma",
+      "B": "Una CloudWatch alarm asociada al deployment",
+      "C": "Un dashboard de CloudWatch",
+      "D": "Un log stream en CloudWatch Logs"
+    },
+    "correctAnswers": ["B"],
+    "explanation": "CodeDeploy reacciona a CloudWatch alarms, no a metricas sueltas ni dashboards.",
+    "domainName": "SDLC Automation",
+    "topic": "CodeDeploy"
+  },
+  {
+    "id": 1007,
+    "questionType": "single",
+    "question": "Una empresa necesita secretos con rotacion administrada y uso centralizado por varias aplicaciones. ¿Que servicio deberia elegir primero?",
+    "options": {
+      "A": "AWS Systems Manager Parameter Store",
+      "B": "Amazon S3 con SSE-KMS",
+      "C": "AWS Secrets Manager",
+      "D": "AWS Config"
+    },
+    "correctAnswers": ["C"],
+    "explanation": "Cuando el requisito clave es rotacion nativa de secretos, Secrets Manager gana sobre Parameter Store.",
+    "domainName": "Security and Compliance",
+    "topic": "Secrets Manager"
+  },
+  {
+    "id": 1008,
+    "questionType": "single",
+    "question": "Un equipo quiere detectar actividad sospechosa como uso anomalo de credenciales en AWS. ¿Que servicio es el mas adecuado?",
+    "options": {
+      "A": "Amazon Inspector",
+      "B": "AWS GuardDuty",
+      "C": "AWS Config",
+      "D": "AWS CloudTrail Lake"
+    },
+    "correctAnswers": ["B"],
+    "explanation": "GuardDuty se enfoca en threat detection. Inspector se enfoca en vulnerabilidades y exposicion.",
+    "domainName": "Security and Compliance",
+    "topic": "GuardDuty"
+  },
+  {
+    "id": 1009,
+    "questionType": "single",
+    "question": "Una aplicacion global debe dirigir a los usuarios a la region con menor latencia observada. ¿Que politica de Route 53 es la mas adecuada?",
+    "options": {
+      "A": "Failover routing",
+      "B": "Weighted routing",
+      "C": "Latency-based routing",
+      "D": "Geolocation routing"
+    },
+    "correctAnswers": ["C"],
+    "explanation": "Latency-based routing selecciona la region con menor latencia. Failover es primario/secundario; geolocation se basa en ubicacion, no latencia.",
+    "domainName": "Resilient Cloud Solutions",
+    "topic": "Route 53"
+  },
+  {
+    "id": 1010,
+    "questionType": "single",
+    "question": "Produccion debe desplegar estrictamente desde production branch, mientras desarrollo y staging siguen desde master. ¿Que decision es la correcta?",
+    "options": {
+      "A": "Usar una sola pipeline y agregar aprobacion manual antes de produccion",
+      "B": "Tener una pipeline cuyo source apunte a production branch para produccion",
+      "C": "Cambiar el artefacto a mano despues del stage de staging",
+      "D": "Confiar en pull requests sin modificar el source de la pipeline"
+    },
+    "correctAnswers": ["B"],
+    "explanation": "La aprobacion manual no cambia el artefacto origen. La branch configurada como source es la que manda.",
+    "domainName": "SDLC Automation",
+    "topic": "CodePipeline"
+  },
+  {
+    "id": 1011,
+    "questionType": "single",
+    "question": "Un entorno ECS necesita blue/green con traffic shifting controlado durante despliegues. ¿Que integracion encaja mejor?",
+    "options": {
+      "A": "ECS rolling update sin servicios adicionales",
+      "B": "CodeDeploy para ECS blue/green",
+      "C": "Elastic Beanstalk worker tier",
+      "D": "AWS Config con remediation"
+    },
+    "correctAnswers": ["B"],
+    "explanation": "Cuando el requisito explicito es ECS blue/green, CodeDeploy para ECS es el patron adecuado.",
+    "domainName": "SDLC Automation",
+    "topic": "ECS and CodeDeploy"
+  },
+  {
+    "id": 1012,
+    "questionType": "single",
+    "question": "Un stack debe conservar recursos cuando se elimina para luego importarlos en un stack con otro nombre. ¿Que atributo de CloudFormation es clave?",
+    "options": {
+      "A": "DependsOn",
+      "B": "UpdateReplacePolicy",
+      "C": "DeletionPolicy: Retain",
+      "D": "Metadata"
+    },
+    "correctAnswers": ["C"],
+    "explanation": "DeletionPolicy Retain conserva el recurso al eliminar el stack y permite importarlo despues.",
+    "domainName": "Configuration Management and IaC",
+    "topic": "CloudFormation"
+  },
+  {
+    "id": 1013,
+    "questionType": "single",
+    "question": "Un grupo Auto Scaling debe mantener una metrica alrededor de un valor objetivo cuando cambia la carga. ¿Que politica de escalado encaja mejor?",
+    "options": {
+      "A": "Scheduled scaling",
+      "B": "Target tracking scaling",
+      "C": "Manual scaling",
+      "D": "Lifecycle hooks"
+    },
+    "correctAnswers": ["B"],
+    "explanation": "Target tracking se usa cuando quieres mantener una metrica cerca de un valor objetivo. Scheduled scaling es para patrones temporales predecibles.",
+    "domainName": "Resilient Cloud Solutions",
+    "topic": "Auto Scaling"
+  },
+  {
+    "id": 1014,
+    "questionType": "single",
+    "question": "Una empresa necesita parcheo administrado y programado sobre su flota EC2. ¿Que capacidad de Systems Manager deberia evaluar primero?",
+    "options": {
+      "A": "State Manager",
+      "B": "Automation",
+      "C": "Patch Manager",
+      "D": "Parameter Store"
+    },
+    "correctAnswers": ["C"],
+    "explanation": "Patch Manager existe especificamente para administrar estrategia de parcheo sobre instancias.",
+    "domainName": "Incident and Event Response",
+    "topic": "Systems Manager Patch Manager"
+  },
+  {
+    "id": 1015,
+    "questionType": "single",
+    "question": "Quieres centralizar auditoria de llamadas API para todas las cuentas de la organizacion. ¿Que deberias usar primero?",
+    "options": {
+      "A": "AWS Config organization rules",
+      "B": "CloudTrail organization trails",
+      "C": "Amazon Athena federated queries",
+      "D": "AWS Trusted Advisor"
+    },
+    "correctAnswers": ["B"],
+    "explanation": "CloudTrail organization trails resuelven auditoria centralizada. Config organization rules evalua compliance, no auditoria API.",
+    "domainName": "Security and Compliance",
+    "topic": "CloudTrail"
+  },
+  {
+    "id": 1016,
+    "questionType": "single",
+    "question": "Una imagen en ECR no debe cambiar de forma ambigua entre despliegues. ¿Que referencia es mas inmutable?",
+    "options": {
+      "A": "Tag latest",
+      "B": "Tag semantic version mutable",
+      "C": "Digest de imagen",
+      "D": "Nombre del repositorio"
+    },
+    "correctAnswers": ["C"],
+    "explanation": "El digest identifica de forma inmutable el artefacto exacto. Un tag puede moverse.",
+    "domainName": "SDLC Automation",
+    "topic": "ECR"
+  },
+  {
+    "id": 1017,
+    "questionType": "single",
+    "question": "Un sitio estatico publicado detras de CloudFront despliega nuevos assets y los usuarios siguen viendo contenido viejo. ¿Que accion resuelve mejor el problema inmediato?",
+    "options": {
+      "A": "Reducir el TTL de Route 53",
+      "B": "Crear una invalidacion de CloudFront",
+      "C": "Recrear el bucket S3",
+      "D": "Mover los assets a EFS"
+    },
+    "correctAnswers": ["B"],
+    "explanation": "Cuando CloudFront sigue sirviendo contenido cacheado, una invalidacion fuerza la renovacion.",
+    "domainName": "SDLC Automation",
+    "topic": "CloudFront"
+  },
+  {
+    "id": 1018,
+    "questionType": "single",
+    "question": "Un workflow tarda varias horas, tiene aprobacion externa y debe mantener estado entre pasos. ¿Que servicio encaja mejor?",
+    "options": {
+      "A": "Amazon EventBridge",
+      "B": "AWS Lambda sola",
+      "C": "AWS Step Functions",
+      "D": "AWS Config"
+    },
+    "correctAnswers": ["C"],
+    "explanation": "Step Functions coordina workflows largos con estado, esperas y manejo de fallos. EventBridge por si solo no sustituye eso.",
+    "domainName": "Incident and Event Response",
+    "topic": "Step Functions"
+  },
+  {
+    "id": 1019,
+    "questionType": "single",
+    "question": "Quieres analizar trazas distribuidas para seguir una solicitud entre varios servicios y encontrar latencia. ¿Que servicio deberias elegir?",
+    "options": {
+      "A": "AWS X-Ray",
+      "B": "CloudTrail",
+      "C": "Config",
+      "D": "AWS Budgets"
+    },
+    "correctAnswers": ["A"],
+    "explanation": "X-Ray se usa para tracing distribuido y analisis de la ruta de una solicitud entre servicios.",
+    "domainName": "Monitoring and Logging",
+    "topic": "X-Ray"
+  },
+  {
+    "id": 1020,
+    "questionType": "single",
+    "question": "Un proyecto CodeBuild en una cuenta central necesita desplegar en un cluster EKS de otra cuenta. Ademas del rol correcto, ¿que configuracion del cluster suele ser indispensable?",
+    "options": {
+      "A": "Agregar el rol al aws-auth del cluster",
+      "B": "Crear un target group adicional en el ALB",
+      "C": "Habilitar Contributor Insights",
+      "D": "Agregar un lifecycle hook al ASG"
+    },
+    "correctAnswers": ["A"],
+    "explanation": "En EKS cross-account no basta asumir el rol; el cluster debe mapearlo via aws-auth para autorizarlo en Kubernetes.",
+    "domainName": "Security and Compliance",
+    "topic": "EKS"
+  }
+]

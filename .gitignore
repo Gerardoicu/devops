@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local temp artifacts for this repo
+data/*_tmp.csv
+*.tmp

@@ -1,0 +1,381 @@
+<main class="shell">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">DOP-C02 microaprendizaje</p>
+      <h1>Decision rapida, trampa fina, mini quiz.</h1>
+      <p class="lede">
+        Entrena como feed corto, pero con criterio de examen. Entra, haz una sesion clara y sal con
+        un resultado claro.
+      </p>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="label">Cards vistas</span>
+        <strong>{{ seenCount() }}/{{ totalCards() }}</strong>
+      </div>
+      <div class="stat">
+        <span class="label">Accuracy quiz</span>
+        <strong>{{ quizAccuracy() }}%</strong>
+      </div>
+      <div class="stat">
+        <span class="label">Repaso</span>
+        <strong>{{ reviewCount() }}</strong>
+      </div>
+    </div>
+  </section>
+
+  @if (phase() === 'home') {
+    <section class="home-grid">
+      <article class="mode-card mode-card-simulator">
+        <p class="mode-kicker">Simulador AWS</p>
+        <h2>Examen completo</h2>
+        <p>
+          Ejecuta un simulador cronometrado y elige el origen del banco antes de empezar.
+        </p>
+        <div class="simulator-bank-actions">
+          <button type="button" class="primary" (click)="startSimulator('verified')">
+            Banco verificado
+          </button>
+          <button type="button" class="secondary" (click)="startSimulator('public')">
+            Banco publico
+          </button>
+        </div>
+      </article>
+
+      <article class="mode-card">
+        <p class="mode-kicker">Notas</p>
+        <h2>Leer apuntes</h2>
+        <p>
+          Abre tus notas clave dentro de la app para repasar conceptos, matriz de decision y
+          trampas sin salirte del flujo.
+        </p>
+        <div class="notes-list">
+          @for (note of notes(); track note.id) {
+            <button type="button" class="ghost note-link" (click)="openNote(note)">
+              {{ note.title }}
+            </button>
+          }
+        </div>
+      </article>
+
+      <article class="mode-card">
+        <p class="mode-kicker">Lectura oficial</p>
+        <h2>Links AWS en espanol</h2>
+        <p>
+          Abre documentacion oficial y lectura de apoyo en espanol para reforzar conceptos del
+          examen.
+        </p>
+        <button type="button" class="secondary" (click)="openOfficialLinks()">
+          Ver links oficiales
+        </button>
+      </article>
+
+      @for (mode of sessionModes; track mode) {
+        <article class="mode-card">
+          <p class="mode-kicker">{{ modeMeta[mode].subtitle }}</p>
+          <h2>{{ modeMeta[mode].title }}</h2>
+          <p>{{ modeMeta[mode].description }}</p>
+          <button type="button" class="primary" (click)="startSession(mode)">
+            {{ modeMeta[mode].cta }}
+          </button>
+        </article>
+      }
+    </section>
+  }
+
+  @if (phase() === 'notes') {
+    <section class="session-meta">
+      <button type="button" class="back-link" (click)="goHome()">Volver</button>
+      <div class="session-status">
+        <span class="pill">notas</span>
+      </div>
+    </section>
+
+    <article class="card notes-card">
+      <header class="card-header">
+        <h2>{{ activeNote()?.title }}</h2>
+      </header>
+      <div class="notes-content">{{ activeNoteContent() }}</div>
+    </article>
+  }
+
+  @if (phase() === 'official-links') {
+    <section class="session-meta">
+      <button type="button" class="back-link" (click)="goHome()">Volver</button>
+      <div class="session-status">
+        <span class="pill">aws oficial</span>
+      </div>
+    </section>
+
+    <article class="card notes-card">
+      <header class="card-header">
+        <h2>Lectura oficial de apoyo</h2>
+      </header>
+      <div class="official-links-list">
+        @for (link of officialLinks(); track link.id) {
+          <a class="official-link-card" [href]="link.url" target="_blank" rel="noopener noreferrer">
+            <span class="tag tag-system">{{ link.category }}</span>
+            <h3>{{ link.title }}</h3>
+            <p>{{ link.description }}</p>
+            <span class="official-url">{{ link.url }}</span>
+          </a>
+        }
+      </div>
+    </article>
+  }
+
+  @if (phase() === 'simulator' && currentSimulatorQuestion(); as question) {
+    <section class="session-meta">
+      <button type="button" class="back-link" (click)="goHome()">Salir</button>
+      <div class="session-status">
+        <span class="pill">simulador</span>
+        <span class="session-count">{{ simulatorPosition() }}/{{ simulatorTotal() }}</span>
+      </div>
+    </section>
+
+    <div class="progress-rail" aria-hidden="true">
+      <div class="progress-fill" [style.width.%]="simulatorProgress()"></div>
+    </div>
+
+    <article class="card simulator-card">
+      <header class="card-header simulator-header">
+        <div>
+          <h2>Pregunta {{ simulatorPosition() }}</h2>
+          <p class="mode-kicker">
+            {{ simulatorBankType() === 'verified' ? 'Banco verificado' : 'Banco publico suplementario' }}
+          </p>
+          @if (question.topic) {
+            <p class="body">{{ question.topic }}</p>
+          }
+        </div>
+        <div class="timer-box">
+          <span class="label">Tiempo restante</span>
+          <strong>{{ formattedRemainingTime() }}</strong>
+        </div>
+      </header>
+
+      <div class="card-body">
+        <p class="prompt question-text">{{ question.question }}</p>
+        <p class="body">
+          @if (question.questionType === 'multi') {
+            Selecciona todas las que apliquen.
+          } @else {
+            Selecciona una opcion.
+          }
+        </p>
+      </div>
+
+      <div class="options">
+        @for (optionKey of simulatorOptionKeys(question); track optionKey) {
+          <button
+            type="button"
+            class="option"
+            [class.selected]="isSimulatorSelected(question.id, optionKey)"
+            (click)="selectSimulatorOption(question, optionKey)"
+          >
+            <span class="option-id">{{ optionKey }}</span>
+            <span>{{ question.options[optionKey] }}</span>
+          </button>
+        }
+      </div>
+
+      <div class="simulator-nav-grid">
+        @for (simQuestion of simulatorQueue(); track simQuestion.id; let idx = $index) {
+          <button
+            type="button"
+            class="sim-nav-pill"
+            [class.current]="simulatorQuestionState(idx) === 'current'"
+            [class.answered]="simulatorQuestionState(idx) === 'answered'"
+            (click)="goToSimulatorQuestion(idx)"
+          >
+            {{ idx + 1 }}
+          </button>
+        }
+      </div>
+
+      <footer class="card-footer simulator-footer">
+        <span class="feed-hint">Respondidas: {{ simulatorAnsweredCount() }}/{{ simulatorTotal() }}</span>
+        <div class="simulator-actions">
+          <button type="button" class="secondary" [disabled]="simulatorPosition() === 1" (click)="prevSimulatorQuestion()">
+            Anterior
+          </button>
+          <button type="button" class="ghost" (click)="finishSimulator()">Entregar</button>
+          <button type="button" class="next" (click)="nextSimulatorQuestion()">
+            {{ simulatorPosition() === simulatorTotal() ? 'Finalizar' : 'Siguiente' }}
+          </button>
+        </div>
+      </footer>
+    </article>
+  }
+
+  @if (phase() === 'simulator-complete' && simulatorSummary(); as simSummary) {
+    <section class="summary-card">
+      <p class="eyebrow">Simulador terminado</p>
+      <h2>Resultado bruto</h2>
+      <p class="summary-copy">
+        Banco usado:
+        {{ simSummary.bankType === 'verified' ? 'verificado' : 'publico suplementario' }}.
+        Este resultado es una referencia de entrenamiento y no equivale al score escalado oficial
+        de AWS.
+      </p>
+
+      <div class="summary-stats">
+        <div class="stat">
+          <span class="label">Correctas</span>
+          <strong>{{ simSummary.correct }}/{{ simSummary.total }}</strong>
+        </div>
+        <div class="stat">
+          <span class="label">Calificacion</span>
+          <strong>{{ simSummary.scorePercent }}%</strong>
+        </div>
+        <div class="stat">
+          <span class="label">Sin responder</span>
+          <strong>{{ simSummary.unanswered }}</strong>
+        </div>
+      </div>
+
+      <div class="summary-actions">
+        <button type="button" class="primary" (click)="startSimulator(simSummary.bankType)">Repetir simulador</button>
+        <button type="button" class="ghost" (click)="toggleSimulatorReview()">
+          {{ showSimulatorReview() ? 'Ocultar correccion' : 'Ver correccion' }}
+        </button>
+        <button type="button" class="secondary" (click)="goHome()">Volver al inicio</button>
+      </div>
+    </section>
+
+    @if (showSimulatorReview()) {
+      <section class="review-list">
+        @for (item of simulatorReviewItems(); track item.question.id) {
+          <article class="review-card" [class.review-correct]="item.isCorrect" [class.review-wrong]="!item.isCorrect">
+            <div class="review-head">
+              <span class="pill">Pregunta {{ item.question.id }}</span>
+              <span class="pill">{{ item.isCorrect ? 'correcta' : 'revisar' }}</span>
+            </div>
+            <h3>{{ item.question.topic || 'Sin tema' }}</h3>
+            <p class="prompt question-text">{{ item.question.question }}</p>
+            <p class="body">Tu respuesta: {{ item.selected.length ? item.selected.join(', ') : 'Sin responder' }}</p>
+            <p class="body">Correcta: {{ item.expected.join(', ') }}</p>
+            <p class="body">{{ item.question.explanation }}</p>
+          </article>
+        }
+      </section>
+    }
+  }
+
+  @if (phase() === 'session' && currentCard(); as card) {
+    <section class="session-meta">
+      <button type="button" class="back-link" (click)="goHome()">Volver</button>
+      <div class="session-status">
+        <span class="pill">{{ card.type }}</span>
+        <span class="session-count">{{ sessionPosition() }}/{{ sessionQueue().length }}</span>
+      </div>
+    </section>
+
+    <div class="progress-rail" aria-hidden="true">
+      <div class="progress-fill" [style.width.%]="sessionProgress()"></div>
+    </div>
+
+    <article class="card">
+      <header class="card-header">
+        <h2>{{ card.title }}</h2>
+        <div class="tag-row">
+          @for (tag of currentCardSystemTags(); track tag) {
+            <span class="tag tag-system">{{ tag }}</span>
+          }
+          @for (tag of currentCardConceptTags(); track tag) {
+            <span class="tag">{{ tag }}</span>
+          }
+        </div>
+      </header>
+
+      <div class="card-body">
+        <p class="prompt">{{ card.prompt }}</p>
+        @if (card.body) {
+          <p class="body">{{ card.body }}</p>
+        }
+      </div>
+
+      @if (card.options?.length) {
+        <div class="options">
+          @for (option of card.options; track option.id) {
+            <button
+              type="button"
+              class="option"
+              [class.correct]="optionClass(option.id) === 'correct'"
+              [class.incorrect]="optionClass(option.id) === 'incorrect'"
+              [disabled]="revealed()"
+              (click)="selectAnswer(option.id)"
+            >
+              <span class="option-id">{{ option.id }}</span>
+              <span>{{ option.label }}</span>
+            </button>
+          }
+        </div>
+      } @else {
+        <div class="learn-actions">
+          <button type="button" class="primary" [disabled]="revealed()" (click)="markLearned(true)">
+            Lo tengo
+          </button>
+          <button type="button" class="secondary" [disabled]="revealed()" (click)="markLearned(false)">
+            Mandar a repaso
+          </button>
+        </div>
+      }
+
+      @if (revealed()) {
+        <section class="feedback" [class.success]="currentResult() === 'correct'" [class.warn]="currentResult() !== 'correct'">
+          <p class="feedback-title">
+            @if (!isAnswerCard()) {
+              {{ currentResult() === 'correct' ? 'Marcada como entendida' : 'Mandada a repaso' }}
+            } @else {
+              {{ isCorrect() ? 'Correcta' : 'Ojo con esta' }}
+            }
+          </p>
+          <p>{{ card.explanation }}</p>
+          @if (card.questionIds.length) {
+            <p class="source">Banco: {{ card.questionIds.join(', ') }}</p>
+          }
+        </section>
+      }
+
+      <footer class="card-footer">
+        <span class="feed-hint">@if (canGoNext()) { toca siguiente } @else { responde para avanzar }</span>
+        <button type="button" class="next" [disabled]="!canGoNext()" (click)="nextCard()">
+          {{ sessionPosition() === sessionQueue().length ? 'Cerrar sesion' : 'Siguiente' }}
+        </button>
+      </footer>
+    </article>
+  }
+
+  @if (phase() === 'complete' && sessionSummary(); as summary) {
+    <section class="summary-card">
+      <p class="eyebrow">Sesion terminada</p>
+      <h2>{{ modeMeta[summary.mode].title }}</h2>
+      <p class="summary-copy">
+        Terminaste una sesion de {{ summary.total }} cards. Ahora decide si repites, cambias de modo o vuelves al inicio.
+      </p>
+
+      <div class="summary-stats">
+        <div class="stat">
+          <span class="label">{{ summary.mode === 'learn' ? 'Entendidas' : 'Correctas' }}</span>
+          <strong>{{ summary.correct }}</strong>
+        </div>
+        <div class="stat">
+          <span class="label">{{ summary.mode === 'learn' ? 'Nuevas dudas' : 'Incorrectas' }}</span>
+          <strong>{{ summary.incorrect }}</strong>
+        </div>
+        <div class="stat">
+          <span class="label">A repaso</span>
+          <strong>{{ summary.review }}</strong>
+        </div>
+      </div>
+
+      <div class="summary-actions">
+        <button type="button" class="primary" (click)="startSession(summary.mode)">Repetir modo</button>
+        <button type="button" class="secondary" (click)="goHome()">Volver al inicio</button>
+        <button type="button" class="ghost" (click)="startSession('review')">Ir a repaso</button>
+      </div>
+    </section>
+  }
+</main>
