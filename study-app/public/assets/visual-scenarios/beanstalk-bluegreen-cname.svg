@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 340" role="img" aria-label="Beanstalk Blue Green CNAME swap">
+  <rect width="1200" height="340" fill="#0f1218"/>
+  <text x="34" y="40" fill="#f1b356" font-family="Arial, sans-serif" font-size="26" font-weight="700">Beanstalk Blue/Green con CNAME swap</text>
+  <g font-family="Arial, sans-serif">
+    <rect x="500" y="60" width="200" height="70" rx="18" fill="#17304a" stroke="#8fc3ff"/>
+    <text x="600" y="102" fill="#fff" font-size="24" text-anchor="middle">CNAME</text>
+    <rect x="80" y="170" width="420" height="120" rx="22" fill="#152032" stroke="#8fc3ff"/>
+    <text x="290" y="205" fill="#cfe6ff" font-size="22" text-anchor="middle">Entorno Blue</text>
+    <rect x="150" y="225" width="140" height="40" rx="12" fill="#1a2f23" stroke="#9fe3b1"/><text x="220" y="251" fill="#fff" font-size="17" text-anchor="middle">App estable</text>
+    <rect x="310" y="225" width="140" height="40" rx="12" fill="#17304a" stroke="#8fc3ff"/><text x="380" y="251" fill="#fff" font-size="17" text-anchor="middle">Health OK</text>
+    <rect x="700" y="170" width="420" height="120" rx="22" fill="#22171a" stroke="#f1b356"/>
+    <text x="910" y="205" fill="#ffe0c0" font-size="22" text-anchor="middle">Entorno Green</text>
+    <rect x="770" y="225" width="140" height="40" rx="12" fill="#1a2f23" stroke="#9fe3b1"/><text x="840" y="251" fill="#fff" font-size="17" text-anchor="middle">Nueva version</text>
+    <rect x="930" y="225" width="140" height="40" rx="12" fill="#3a2415" stroke="#f1b356"/><text x="1000" y="251" fill="#fff" font-size="17" text-anchor="middle">Swap</text>
+  </g>
+  <path d="M600 130 V170" stroke="#9fd1ff" stroke-width="6"/>
+  <path d="M600 170 H500" stroke="#9fd1ff" stroke-width="6" marker-end="url(#a)"/>
+  <path d="M600 170 H700" stroke="#9fd1ff" stroke-width="6" marker-end="url(#a)"/>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#9fd1ff"/></marker></defs>
+</svg>

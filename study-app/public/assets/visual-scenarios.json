@@ -1,0 +1,132 @@
+[
+  {
+    "id": "config-eventbridge-sns",
+    "title": "Config -> EventBridge -> SNS",
+    "category": "Compliance",
+    "summary": "Escenario tipico donde AWS Config detecta incumplimiento, EventBridge reacciona y SNS notifica.",
+    "decision": "Config evalua cumplimiento; EventBridge enruta el evento exacto; SNS solo distribuye.",
+    "trap": "Filtrar tarde en SNS o mezclar ERROR con NON_COMPLIANT.",
+    "questionIds": [15, 18],
+    "imageUrl": "/assets/visual-scenarios/config-eventbridge-sns.svg"
+  },
+  {
+    "id": "logs-metricfilter-alarm-sns",
+    "title": "CloudWatch Logs -> metric filter -> alarm -> SNS",
+    "category": "Observabilidad",
+    "summary": "Patron tipico para detectar una palabra o severidad en logs ya centralizados.",
+    "decision": "Si los logs ya estan en CloudWatch Logs y quieres alerta, empieza por metric filter.",
+    "trap": "Meter Firehose o Lambda cuando solo piden alerta por patron.",
+    "questionIds": [16],
+    "imageUrl": "/assets/visual-scenarios/logs-metricfilter-alarm-sns.svg"
+  },
+  {
+    "id": "codepipeline-codebuild-codedeploy",
+    "title": "CodePipeline -> CodeBuild -> CodeDeploy",
+    "category": "CI/CD",
+    "summary": "Separacion clasica entre orquestacion, build/test y despliegue controlado.",
+    "decision": "CodePipeline orquesta; CodeBuild compila y prueba; CodeDeploy hace el deployment.",
+    "trap": "Confundir el source real de la branch o mezclar build con deploy.",
+    "questionIds": [30, 39, 54, 72, 120],
+    "imageUrl": "/assets/visual-scenarios/codepipeline-codebuild-codedeploy.svg"
+  },
+  {
+    "id": "cross-account-eks",
+    "title": "Cuenta DevOps -> AssumeRole -> Cuenta App -> EKS",
+    "category": "Cross-account",
+    "summary": "Despliegue centralizado desde una cuenta DevOps hacia un cluster EKS en otra cuenta.",
+    "decision": "Trust policy y AssumeRole en la cuenta destino, mas permisos del rol y aws-auth en el cluster.",
+    "trap": "Invertir la direccion de la confianza o olvidar mapear el rol en aws-auth.",
+    "questionIds": [20],
+    "imageUrl": "/assets/visual-scenarios/cross-account-eks.svg"
+  },
+  {
+    "id": "regional-dr-route53-rds",
+    "title": "Route 53 -> Region primaria/secundaria -> RDS replica",
+    "category": "DR",
+    "summary": "Escenario tipico de resiliencia/DR donde RTO, RPO y costo deciden entre replica y standby.",
+    "decision": "Mira como resuelven replica, failover y tiempo real de recuperacion, no solo el nombre de la estrategia.",
+    "trap": "Confundir alta disponibilidad local con DR regional o elegir solo por la etiqueta Pilot Light/Warm Standby.",
+    "questionIds": [17, 82],
+    "imageUrl": "/assets/visual-scenarios/regional-dr-route53-rds.svg"
+  },
+  {
+    "id": "devops-flow-end-to-end",
+    "title": "Flujo DevOps end-to-end",
+    "category": "CI/CD",
+    "summary": "Repositorio, build, artefacto versionado, despliegue controlado y monitoreo con rollback.",
+    "decision": "Separa source, build, artifact store, deploy y observabilidad. Si el flujo mezcla SSH o pasos manuales, sospecha.",
+    "trap": "Confundir build con deploy, ignorar el artefacto versionado o olvidar el rollback por alarma.",
+    "questionIds": [5, 30, 39, 54, 68, 72, 97, 120],
+    "imageUrl": "/assets/visual-scenarios/devops-flow-end-to-end.svg"
+  },
+  {
+    "id": "iac-multi-account-stacksets",
+    "title": "IaC multi-cuenta con StackSets",
+    "category": "IaC",
+    "summary": "Cuenta central, Organizations y despliegue declarativo hacia varias cuentas o regiones.",
+    "decision": "Si el problema es IaC repetible en multi-cuenta, piensa en CloudFormation + StackSets antes que scripts por cuenta.",
+    "trap": "Cambios manuales, drift y asumir que Organizations por sí solo despliega o da acceso.",
+    "questionIds": [1, 2, 22, 34, 35, 65, 94],
+    "imageUrl": "/assets/visual-scenarios/iac-multi-account-stacksets.svg"
+  },
+  {
+    "id": "security-compliance-loop",
+    "title": "Seguridad y compliance automatizados",
+    "category": "Seguridad",
+    "summary": "Auditoria, cumplimiento, hallazgos y remediacion automatizada en capas distintas.",
+    "decision": "CloudTrail audita, Config evalua cumplimiento, Security Hub agrega hallazgos y SSM remedia cuando aplica.",
+    "trap": "Usar un solo servicio para todo o confundir auditoria con compliance continuo.",
+    "questionIds": [1, 12, 15, 18, 26, 70, 85, 98, 119],
+    "imageUrl": "/assets/visual-scenarios/security-compliance-loop.svg"
+  },
+  {
+    "id": "beanstalk-bluegreen-cname",
+    "title": "Beanstalk Blue/Green con CNAME swap",
+    "category": "CI/CD",
+    "summary": "Dos entornos completos y un cambio de CNAME para pasar tráfico al nuevo.",
+    "decision": "Si la pregunta habla de entornos y CNAME swap, piensa primero en Elastic Beanstalk, no en CodeDeploy.",
+    "trap": "Resolverlo como si fuera deployment groups, hooks o traffic shifting de CodeDeploy.",
+    "questionIds": [61, 62, 69, 75, 76],
+    "imageUrl": "/assets/visual-scenarios/beanstalk-bluegreen-cname.svg"
+  },
+  {
+    "id": "cloudformation-retain-import",
+    "title": "CloudFormation con Retain + import",
+    "category": "IaC",
+    "summary": "Patron para preservar recursos gestionados y luego importarlos a otro stack o estructura.",
+    "decision": "Si el objetivo es no perder recursos al reorganizar stacks, piensa en DeletionPolicy Retain mas import.",
+    "trap": "Recrear recursos o intentar resolverlo con scripts externos cuando CloudFormation ya soporta el patron.",
+    "questionIds": [2, 35, 94],
+    "imageUrl": "/assets/visual-scenarios/cloudformation-retain-import.svg"
+  },
+  {
+    "id": "kms-cross-account",
+    "title": "KMS cross-account",
+    "category": "Seguridad",
+    "summary": "Principal, recurso cifrado y llave en cuentas distintas con doble capa de permisos.",
+    "decision": "Separa key policy, IAM policy y permisos del servicio que consume el artefacto o secreto.",
+    "trap": "Arreglar solo IAM y olvidar que la key policy sigue bloqueando el acceso.",
+    "questionIds": [23, 24, 43, 47, 82, 98],
+    "imageUrl": "/assets/visual-scenarios/kms-cross-account.svg"
+  },
+  {
+    "id": "asg-mixed-rebalance",
+    "title": "Auto Scaling con mixed instances y rebalance",
+    "category": "Resiliencia",
+    "summary": "Comportamiento tipico donde rebalancing y mixed instances rompen la intuicion de balance perfecto.",
+    "decision": "Si la pregunta habla de scale-in raro o exceso temporal de capacidad, piensa en la logica interna del ASG.",
+    "trap": "Responder segun intuicion humana de que instancia deberia morir o que AZ deberia quedar igual.",
+    "questionIds": [6, 14, 46, 59, 73, 74, 87, 105, 116],
+    "imageUrl": "/assets/visual-scenarios/asg-mixed-rebalance.svg"
+  },
+  {
+    "id": "route53-routing-policies",
+    "title": "Route 53: failover, weighted y latency-based",
+    "category": "Red",
+    "summary": "Comparacion visual de politicas para no mezclar primario/secundario con reparto o latencia.",
+    "decision": "La politica correcta sale de la restriccion: failover, reparto porcentual o menor latencia.",
+    "trap": "Marcar una politica DNS buena en abstracto, pero no la exacta que pide el escenario.",
+    "questionIds": [17, 41, 59, 74, 82, 84, 86],
+    "imageUrl": "/assets/visual-scenarios/route53-routing-policies.svg"
+  }
+]

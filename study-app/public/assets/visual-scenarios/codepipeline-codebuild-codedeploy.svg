@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 320" role="img" aria-label="CodePipeline CodeBuild CodeDeploy">
+  <rect width="1100" height="320" fill="#0f1218"/>
+  <text x="35" y="42" fill="#f1b356" font-family="Arial, sans-serif" font-size="24" font-weight="700">CodePipeline - CodeBuild - CodeDeploy</text>
+  <rect x="35" y="105" width="200" height="100" rx="18" fill="#17304a" stroke="#8fc3ff"/>
+  <text x="135" y="145" fill="#fff" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">CodeCommit</text>
+  <text x="135" y="172" fill="#d6e8ff" font-family="Arial, sans-serif" font-size="15" text-anchor="middle">Source / branch</text>
+  <rect x="285" y="90" width="530" height="130" rx="20" fill="#152032" stroke="#9fd1ff"/>
+  <text x="550" y="120" fill="#cfe6ff" font-family="Arial, sans-serif" font-size="20" text-anchor="middle">CodePipeline</text>
+  <rect x="330" y="135" width="180" height="60" rx="14" fill="#1a2f23" stroke="#9fe3b1"/>
+  <text x="420" y="170" fill="#fff" font-family="Arial, sans-serif" font-size="22" text-anchor="middle">CodeBuild</text>
+  <rect x="590" y="135" width="180" height="60" rx="14" fill="#3a2415" stroke="#f1b356"/>
+  <text x="680" y="170" fill="#fff" font-family="Arial, sans-serif" font-size="22" text-anchor="middle">CodeDeploy</text>
+  <rect x="865" y="105" width="200" height="100" rx="18" fill="#2c2310" stroke="#f1d37a"/>
+  <text x="965" y="145" fill="#fff" font-family="Arial, sans-serif" font-size="24" text-anchor="middle">Destino</text>
+  <text x="965" y="172" fill="#fff0c2" font-family="Arial, sans-serif" font-size="15" text-anchor="middle">EC2 / ECS / Lambda</text>
+  <path d="M235 155 H285 M510 165 H590 M770 165 H865" stroke="#9fd1ff" stroke-width="6" marker-end="url(#a)"/>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#9fd1ff"/></marker></defs>
+</svg>

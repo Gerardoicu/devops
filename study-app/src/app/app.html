@@ -2,26 +2,12 @@
   <section class="hero">
     <div>
       <p class="eyebrow">DOP-C02 microaprendizaje</p>
-      <h1>Decision rapida, trampa fina, mini quiz.</h1>
+      <h1>Preparacion DOP-C02 con conceptos, quiz y simuladores.</h1>
+      <p class="version-pill">Version {{ appVersion }}</p>
       <p class="lede">
         Entrena como feed corto, pero con criterio de examen. Entra, haz una sesion clara y sal con
         un resultado claro.
       </p>
-    </div>
-
-    <div class="stats">
-      <div class="stat">
-        <span class="label">Cards vistas</span>
-        <strong>{{ seenCount() }}/{{ totalCards() }}</strong>
-      </div>
-      <div class="stat">
-        <span class="label">Accuracy quiz</span>
-        <strong>{{ quizAccuracy() }}%</strong>
-      </div>
-      <div class="stat">
-        <span class="label">Repaso</span>
-        <strong>{{ reviewCount() }}</strong>
-      </div>
     </div>
   </section>
 
@@ -33,6 +19,30 @@
         <p>
           Ejecuta un simulador cronometrado y elige el origen del banco antes de empezar.
         </p>
+        <div class="simulator-home-stats">
+          <div class="simulator-home-stat">
+            <span class="label">Verificado</span>
+            <strong>
+              @if (verifiedExamHistory().lastScorePercent !== null) {
+                {{ verifiedExamHistory().lastScorePercent }}%
+              } @else {
+                Sin intento
+              }
+            </strong>
+            <span class="meta">Intentos: {{ verifiedExamHistory().attempts }}</span>
+          </div>
+          <div class="simulator-home-stat">
+            <span class="label">Publico</span>
+            <strong>
+              @if (publicExamHistory().lastScorePercent !== null) {
+                {{ publicExamHistory().lastScorePercent }}%
+              } @else {
+                Sin intento
+              }
+            </strong>
+            <span class="meta">Intentos: {{ publicExamHistory().attempts }}</span>
+          </div>
+        </div>
         <div class="simulator-bank-actions">
           <button type="button" class="primary" (click)="startSimulator('verified')">
             Banco verificado
@@ -42,6 +52,28 @@
           </button>
         </div>
       </article>
+
+      <article class="mode-card">
+        <p class="mode-kicker">Quiz</p>
+        <h2>Quiz rapido</h2>
+        <p>
+          Preguntas cortas, aleatorias y con feedback inmediato. Pensado para rondas rapidas de 2 a 5 minutos.
+        </p>
+        <button type="button" class="primary" (click)="startQuickQuiz()">
+          Empezar quiz de 100
+        </button>
+      </article>
+
+      @for (mode of sessionModes; track mode) {
+        <article class="mode-card">
+          <p class="mode-kicker">{{ modeMeta[mode].subtitle }}</p>
+          <h2>{{ modeMeta[mode].title }}</h2>
+          <p>{{ modeMeta[mode].description }}</p>
+          <button type="button" class="primary" (click)="startSession(mode)">
+            {{ modeMeta[mode].cta }}
+          </button>
+        </article>
+      }
 
       <article class="mode-card">
         <p class="mode-kicker">Notas</p>
@@ -71,16 +103,32 @@
         </button>
       </article>
 
-      @for (mode of sessionModes; track mode) {
-        <article class="mode-card">
-          <p class="mode-kicker">{{ modeMeta[mode].subtitle }}</p>
-          <h2>{{ modeMeta[mode].title }}</h2>
-          <p>{{ modeMeta[mode].description }}</p>
-          <button type="button" class="primary" (click)="startSession(mode)">
-            {{ modeMeta[mode].cta }}
-          </button>
-        </article>
-      }
+      <article class="mode-card">
+        <p class="mode-kicker">Visual</p>
+        <h2>Escenarios visuales</h2>
+        <p>
+          Revisa arquitecturas clave del banco con capas, flujo entre servicios, decision y trampa.
+        </p>
+        <button type="button" class="secondary" (click)="openVisualScenarios()">
+          Ver escenarios
+        </button>
+      </article>
+
+      <article class="mode-card">
+        <p class="mode-kicker">Glosario</p>
+        <h2>Definiciones clave</h2>
+        <p>
+          Consulta servicios y terminos que aparecen mas en preguntas y simuladores.
+        </p>
+        <button
+          type="button"
+          class="secondary"
+          (click)="openGlossaryBrowser()"
+          [disabled]="!glossaryEntries().length"
+        >
+          Abrir glosario
+        </button>
+      </article>
     </section>
   }
 
@@ -96,7 +144,53 @@
       <header class="card-header">
         <h2>{{ activeNote()?.title }}</h2>
       </header>
-      <div class="notes-content">{{ activeNoteContent() }}</div>
+      <div class="notes-content rendered-note" [innerHTML]="activeNoteRendered()"></div>
+    </article>
+  }
+
+  @if (phase() === 'visual-scenarios') {
+    <section class="session-meta">
+      <button type="button" class="back-link" (click)="goHome()">Volver</button>
+      <div class="session-status">
+        <span class="pill">visual</span>
+      </div>
+    </section>
+
+    <article class="card notes-card">
+      <header class="card-header">
+        <h2>Escenarios visuales del banco</h2>
+        <p class="body">
+          Referencias visuales para entender capas, flujo entre servicios y punto de decision.
+        </p>
+      </header>
+
+      <div class="visual-scenarios-list">
+        @if (visualScenarioQuestionFilter() !== null) {
+          <div class="visual-filter-banner">
+            <span class="body">Mostrando escenarios relacionados con la pregunta {{ visualScenarioQuestionFilter() }}.</span>
+            <button type="button" class="ghost" (click)="openVisualScenarios()">Ver todos</button>
+          </div>
+        }
+        @for (scenario of filteredVisualScenarios(); track scenario.id) {
+          <section class="visual-scenario-card">
+            <div class="visual-scenario-meta">
+              <span class="tag tag-system">{{ scenario.category }}</span>
+              <div class="tag-row">
+                @for (questionId of scenario.questionIds; track questionId) {
+                  <button type="button" class="inline-scenario-tag" (click)="openVerifiedQuestion(questionId)">
+                    Q{{ questionId }}
+                  </button>
+                }
+              </div>
+            </div>
+            <h3>{{ scenario.title }}</h3>
+            <p class="body">{{ scenario.summary }}</p>
+            <img class="visual-scenario-image" [src]="scenario.imageUrl" [alt]="scenario.title" />
+            <p class="body"><strong>Decision:</strong> {{ scenario.decision }}</p>
+            <p class="body"><strong>Trampa:</strong> {{ scenario.trap }}</p>
+          </section>
+        }
+      </div>
     </article>
   }
 
@@ -113,13 +207,80 @@
         <h2>Lectura oficial de apoyo</h2>
       </header>
       <div class="official-links-list">
-        @for (link of officialLinks(); track link.id) {
-          <a class="official-link-card" [href]="link.url" target="_blank" rel="noopener noreferrer">
-            <span class="tag tag-system">{{ link.category }}</span>
-            <h3>{{ link.title }}</h3>
-            <p>{{ link.description }}</p>
-            <span class="official-url">{{ link.url }}</span>
-          </a>
+        @for (group of officialLinksByCategory(); track group.category) {
+          <section class="official-link-group">
+            <h3 class="official-group-title">{{ group.category }}</h3>
+            <div class="official-links-list">
+              @for (link of group.links; track link.id) {
+                <a class="official-link-card" [href]="link.url" target="_blank" rel="noopener noreferrer">
+                  <span class="tag tag-system">{{ link.category }}</span>
+                  <h3>{{ link.title }}</h3>
+                  <p>{{ link.description }}</p>
+                  <span class="official-url">{{ link.url }}</span>
+                </a>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    </article>
+  }
+
+  @if (phase() === 'glossary') {
+    <section class="session-meta">
+      <button type="button" class="back-link" (click)="closeGlossary()">Volver</button>
+      <div class="session-status">
+        <span class="pill">glosario</span>
+      </div>
+    </section>
+
+    <article class="card notes-card">
+      <div class="glossary-toolbar">
+        <input
+          type="text"
+          class="glossary-search"
+          [value]="glossaryQuery()"
+          (input)="glossaryQuery.set($any($event.target).value)"
+          placeholder="Buscar servicio o termino"
+        />
+      </div>
+      @if (activeGlossaryEntry(); as entry) {
+        <header class="card-header">
+          <h2>{{ entry.title }}</h2>
+          <div class="tag-row">
+            @for (tag of entry.tags; track tag) {
+              <span class="tag tag-system">{{ tag }}</span>
+            }
+          </div>
+        </header>
+        <div class="notes-content">
+          <p class="prompt">{{ entry.summary }}</p>
+          @for (detail of entry.details; track detail) {
+            <p class="body">- {{ detail }}</p>
+          }
+        </div>
+      } @else {
+        <header class="card-header">
+          <h2>Glosario de servicios y conceptos</h2>
+        </header>
+        <div class="notes-content">
+          <p class="prompt">Busca un servicio o concepto y luego abre su definicion.</p>
+          <p class="body">
+            Este glosario esta pensado para examen: definicion corta, cuando gana y con que no debes
+            confundirlo.
+          </p>
+        </div>
+      }
+      <div class="official-links-list glossary-list">
+        @for (glossaryEntry of filteredGlossaryEntries(); track glossaryEntry.id) {
+          <button
+            type="button"
+            class="ghost note-link"
+            [class.selected-glossary]="glossaryEntry.id === activeGlossaryEntry()?.id"
+            (click)="openGlossary(glossaryEntry)"
+          >
+            {{ glossaryEntry.title }}
+          </button>
         }
       </div>
     </article>
@@ -127,7 +288,7 @@
 
   @if (phase() === 'simulator' && currentSimulatorQuestion(); as question) {
     <section class="session-meta">
-      <button type="button" class="back-link" (click)="goHome()">Salir</button>
+      <button type="button" class="back-link exit-link" (click)="goHome()">Salir</button>
       <div class="session-status">
         <span class="pill">simulador</span>
         <span class="session-count">{{ simulatorPosition() }}/{{ simulatorTotal() }}</span>
@@ -139,24 +300,49 @@
     </div>
 
     <article class="card simulator-card">
-      <header class="card-header simulator-header">
-        <div>
-          <h2>Pregunta {{ simulatorPosition() }}</h2>
-          <p class="mode-kicker">
-            {{ simulatorBankType() === 'verified' ? 'Banco verificado' : 'Banco publico suplementario' }}
-          </p>
-          @if (question.topic) {
-            <p class="body">{{ question.topic }}</p>
-          }
+        <header class="card-header simulator-header">
+          <div>
+            <h2>{{ isQuickQuiz() ? 'Quiz rapido' : 'Pregunta ' + simulatorPosition() }}</h2>
+            <p class="mode-kicker">
+              @if (isQuickQuiz()) {
+                Banco rapido derivado
+              } @else {
+                {{ simulatorBankType() === 'verified' ? 'Banco verificado' : 'Banco publico suplementario' }}
+              }
+            </p>
+            <p class="body">ID {{ question.id }}</p>
+            @if (question.topic) {
+              <p class="body">{{ question.topic }}</p>
+            }
         </div>
-        <div class="timer-box">
-          <span class="label">Tiempo restante</span>
-          <strong>{{ formattedRemainingTime() }}</strong>
-        </div>
+        @if (!isQuickQuiz()) {
+          <div class="timer-box">
+            <span class="label">Tiempo restante</span>
+            <strong>{{ formattedRemainingTime() }}</strong>
+          </div>
+        }
       </header>
 
       <div class="card-body">
         <p class="prompt question-text">{{ question.question }}</p>
+        @if (currentSimulatorGlossaryEntries().length) {
+          <div class="tag-row glossary-links-row">
+            @for (entry of currentSimulatorGlossaryEntries(); track entry.id) {
+              <button type="button" class="inline-glossary-tag" (click)="openGlossary(entry)">
+                {{ entry.title }} *
+              </button>
+            }
+          </div>
+        }
+        @if (relatedVisualScenarios().length) {
+          <div class="tag-row glossary-links-row">
+            @for (scenario of relatedVisualScenarios(); track scenario.id) {
+              <button type="button" class="inline-scenario-tag" (click)="openVisualScenariosForQuestion(question.id)">
+                {{ scenario.title }}
+              </button>
+            }
+          </div>
+        }
         <p class="body">
           @if (question.questionType === 'multi') {
             Selecciona todas las que apliquen.
@@ -171,7 +357,9 @@
           <button
             type="button"
             class="option"
-            [class.selected]="isSimulatorSelected(question.id, optionKey)"
+            [class.selected]="!isQuickQuiz() && isSimulatorSelected(question.id, optionKey)"
+            [class.correct]="simulatorOptionClass(question, optionKey) === 'correct'"
+            [class.incorrect]="simulatorOptionClass(question, optionKey) === 'incorrect'"
             (click)="selectSimulatorOption(question, optionKey)"
           >
             <span class="option-id">{{ optionKey }}</span>
@@ -180,44 +368,78 @@
         }
       </div>
 
-      <div class="simulator-nav-grid">
-        @for (simQuestion of simulatorQueue(); track simQuestion.id; let idx = $index) {
-          <button
-            type="button"
-            class="sim-nav-pill"
-            [class.current]="simulatorQuestionState(idx) === 'current'"
-            [class.answered]="simulatorQuestionState(idx) === 'answered'"
-            (click)="goToSimulatorQuestion(idx)"
-          >
-            {{ idx + 1 }}
-          </button>
-        }
-      </div>
+      @if (isQuickQuiz() && quickQuizRevealed()) {
+        <section class="answer-feedback" [class.feedback-correct]="quickQuizLastCorrect()" [class.feedback-incorrect]="quickQuizLastCorrect() === false">
+          <p class="eyebrow">{{ quickQuizLastCorrect() ? 'Bien' : 'No era esa' }}</p>
+          <p class="body">
+            @if (quickQuizLastCorrect()) {
+              Acertaste. Este patron conviene fijarlo rapido.
+            } @else {
+              La correcta era
+              <strong>{{ question.correctAnswers.join(', ') }}</strong>.
+            }
+          </p>
+          <p class="body">{{ question.explanation }}</p>
+        </section>
+      }
+
+      @if (!isQuickQuiz()) {
+        <div class="simulator-nav-grid">
+          @for (simQuestion of simulatorQueue(); track simQuestion.id; let idx = $index) {
+            <button
+              type="button"
+              class="sim-nav-pill"
+              [class.current]="simulatorQuestionState(idx) === 'current'"
+              [class.answered]="simulatorQuestionState(idx) === 'answered'"
+              (click)="goToSimulatorQuestion(idx)"
+            >
+              {{ idx + 1 }}
+            </button>
+          }
+        </div>
+      }
 
       <footer class="card-footer simulator-footer">
-        <span class="feed-hint">Respondidas: {{ simulatorAnsweredCount() }}/{{ simulatorTotal() }}</span>
-        <div class="simulator-actions">
-          <button type="button" class="secondary" [disabled]="simulatorPosition() === 1" (click)="prevSimulatorQuestion()">
-            Anterior
-          </button>
-          <button type="button" class="ghost" (click)="finishSimulator()">Entregar</button>
-          <button type="button" class="next" (click)="nextSimulatorQuestion()">
-            {{ simulatorPosition() === simulatorTotal() ? 'Finalizar' : 'Siguiente' }}
-          </button>
-        </div>
+        @if (isQuickQuiz()) {
+          <span class="feed-hint">
+            Bien: {{ quickQuizCorrectCount() }} | Mal: {{ quickQuizIncorrectCount() }} | Respondidas:
+            {{ simulatorAnsweredCount() }}/{{ simulatorTotal() }}
+          </span>
+          <div class="simulator-actions">
+            <button type="button" class="ghost" (click)="finishSimulator()">Terminar ronda</button>
+            <button type="button" class="next" [disabled]="!quickQuizRevealed()" (click)="nextSimulatorQuestion()">
+              {{ simulatorPosition() === simulatorTotal() ? 'Ver resultado' : 'Siguiente' }}
+            </button>
+          </div>
+        } @else {
+          <span class="feed-hint">Respondidas: {{ simulatorAnsweredCount() }}/{{ simulatorTotal() }}</span>
+          <div class="simulator-actions">
+            <button type="button" class="secondary" [disabled]="simulatorPosition() === 1" (click)="prevSimulatorQuestion()">
+              Anterior
+            </button>
+            <button type="button" class="ghost" (click)="finishSimulator()">Entregar</button>
+            <button type="button" class="next" (click)="nextSimulatorQuestion()">
+              {{ simulatorPosition() === simulatorTotal() ? 'Finalizar' : 'Siguiente' }}
+            </button>
+          </div>
+        }
       </footer>
     </article>
   }
 
   @if (phase() === 'simulator-complete' && simulatorSummary(); as simSummary) {
     <section class="summary-card">
-      <p class="eyebrow">Simulador terminado</p>
-      <h2>Resultado bruto</h2>
+      <p class="eyebrow">{{ isQuickQuiz() ? 'Quiz terminado' : 'Simulador terminado' }}</p>
+      <h2>{{ isQuickQuiz() ? 'Resultado del quiz' : 'Resultado bruto' }}</h2>
       <p class="summary-copy">
-        Banco usado:
-        {{ simSummary.bankType === 'verified' ? 'verificado' : 'publico suplementario' }}.
-        Este resultado es una referencia de entrenamiento y no equivale al score escalado oficial
-        de AWS.
+        @if (isQuickQuiz()) {
+          Quiz de 100 micro-preguntas derivadas para aprendizaje rapido. No reemplaza el simulador verificado.
+        } @else {
+          Banco usado:
+          {{ simSummary.bankType === 'verified' ? 'verificado' : 'publico suplementario' }}.
+          Este resultado es una referencia de entrenamiento y no equivale al score escalado oficial
+          de AWS.
+        }
       </p>
 
       <div class="summary-stats">
@@ -235,8 +457,36 @@
         </div>
       </div>
 
+      @if (!isQuickQuiz() && simSummary.bySystem.length) {
+        <section class="system-breakdown">
+          <div class="system-breakdown-head">
+            <h3>Porcentaje por sistema</h3>
+            <p class="body">Ordenado de peor a mejor para detectar donde reforzar.</p>
+          </div>
+          <div class="system-breakdown-list">
+            @for (item of simSummary.bySystem; track item.system) {
+              <article class="system-breakdown-item">
+                <div class="system-breakdown-row">
+                  <strong>{{ item.system }}</strong>
+                  <span>{{ item.scorePercent }}%</span>
+                </div>
+                <div class="progress-rail mini-rail" aria-hidden="true">
+                  <div class="progress-fill" [style.width.%]="item.scorePercent"></div>
+                </div>
+                <p class="body">
+                  {{ item.correct }}/{{ item.total }} correctas · {{ item.incorrect }} incorrectas ·
+                  {{ item.unanswered }} sin responder
+                </p>
+              </article>
+            }
+          </div>
+        </section>
+      }
+
       <div class="summary-actions">
-        <button type="button" class="primary" (click)="startSimulator(simSummary.bankType)">Repetir simulador</button>
+        <button type="button" class="primary" (click)="isQuickQuiz() ? startQuickQuiz() : startSimulator(simSummary.bankType)">
+          {{ isQuickQuiz() ? 'Repetir quiz' : 'Repetir simulador' }}
+        </button>
         <button type="button" class="ghost" (click)="toggleSimulatorReview()">
           {{ showSimulatorReview() ? 'Ocultar correccion' : 'Ver correccion' }}
         </button>
@@ -254,6 +504,15 @@
             </div>
             <h3>{{ item.question.topic || 'Sin tema' }}</h3>
             <p class="prompt question-text">{{ item.question.question }}</p>
+            @if (findGlossaryEntriesForQuestion(item.question).length) {
+              <div class="tag-row glossary-links-row">
+                @for (entry of findGlossaryEntriesForQuestion(item.question); track entry.id) {
+                  <button type="button" class="inline-glossary-tag" (click)="openGlossary(entry)">
+                    {{ entry.title }} *
+                  </button>
+                }
+              </div>
+            }
             <p class="body">Tu respuesta: {{ item.selected.length ? item.selected.join(', ') : 'Sin responder' }}</p>
             <p class="body">Correcta: {{ item.expected.join(', ') }}</p>
             <p class="body">{{ item.question.explanation }}</p>
@@ -291,6 +550,15 @@
 
       <div class="card-body">
         <p class="prompt">{{ card.prompt }}</p>
+        @if (currentCardGlossaryEntries().length) {
+          <div class="tag-row glossary-links-row">
+            @for (entry of currentCardGlossaryEntries(); track entry.id) {
+              <button type="button" class="inline-glossary-tag" (click)="openGlossary(entry)">
+                {{ entry.title }} *
+              </button>
+            }
+          </div>
+        }
         @if (card.body) {
           <p class="body">{{ card.body }}</p>
         }

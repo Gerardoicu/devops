@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1360 360" role="img" aria-label="Seguridad y compliance automatizados">
+  <rect width="1360" height="360" fill="#0f1218"/>
+  <text x="34" y="40" fill="#f1b356" font-family="Arial, sans-serif" font-size="26" font-weight="700">Seguridad y compliance automatizados</text>
+  <g font-family="Arial, sans-serif">
+    <rect x="34" y="120" width="180" height="90" rx="18" fill="#17304a" stroke="#8fc3ff"/>
+    <text x="124" y="156" fill="#fff" font-size="24" text-anchor="middle">CloudTrail</text>
+    <text x="124" y="181" fill="#d6e8ff" font-size="15" text-anchor="middle">Auditoria API</text>
+
+    <rect x="264" y="120" width="180" height="90" rx="18" fill="#1a2f23" stroke="#9fe3b1"/>
+    <text x="354" y="156" fill="#fff" font-size="24" text-anchor="middle">AWS Config</text>
+    <text x="354" y="181" fill="#dff5e6" font-size="15" text-anchor="middle">Cumplimiento</text>
+
+    <rect x="494" y="120" width="180" height="90" rx="18" fill="#3d2f12" stroke="#f1d37a"/>
+    <text x="584" y="156" fill="#fff" font-size="24" text-anchor="middle">Security Hub</text>
+    <text x="584" y="181" fill="#fff0c2" font-size="15" text-anchor="middle">Hallazgos</text>
+
+    <rect x="724" y="120" width="180" height="90" rx="18" fill="#3a2415" stroke="#f1b356"/>
+    <text x="814" y="156" fill="#fff" font-size="24" text-anchor="middle">EventBridge</text>
+    <text x="814" y="181" fill="#ffe8c2" font-size="15" text-anchor="middle">Evento exacto</text>
+
+    <rect x="954" y="120" width="180" height="90" rx="18" fill="#22171a" stroke="#ff9f9f"/>
+    <text x="1044" y="156" fill="#fff" font-size="24" text-anchor="middle">SSM Automation</text>
+    <text x="1044" y="181" fill="#ffd8d8" font-size="15" text-anchor="middle">Remediacion</text>
+
+    <rect x="1184" y="120" width="140" height="90" rx="18" fill="#2d2611" stroke="#f1d37a"/>
+    <text x="1254" y="156" fill="#fff" font-size="24" text-anchor="middle">SNS</text>
+    <text x="1254" y="181" fill="#fff0c2" font-size="15" text-anchor="middle">Alerta</text>
+  </g>
+  <path d="M214 165 H264 M444 165 H494 M674 165 H724 M904 165 H954 M1134 165 H1184" stroke="#9fd1ff" stroke-width="6" marker-end="url(#a)"/>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#9fd1ff"/>
+    </marker>
+  </defs>
+</svg>

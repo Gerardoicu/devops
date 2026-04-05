@@ -1,0 +1,2403 @@
+[
+  {
+    "id": "amplify",
+    "title": "AWS Amplify",
+    "aliases": [
+      "Amplify",
+      "AWS Amplify"
+    ],
+    "summary": "Conjunto de herramientas y hosting para aplicaciones web y moviles full-stack.",
+    "details": [
+      "Aparece con frontends, hosting, autenticacion y despliegue rapido."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "api-gateway",
+    "title": "Amazon API Gateway",
+    "aliases": [
+      "API Gateway",
+      "Amazon API Gateway"
+    ],
+    "summary": "Servicio administrado para crear, publicar y proteger APIs.",
+    "details": [
+      "Suele aparecer con Lambda, Cognito y despliegues serverless.",
+      "No reemplaza Step Functions si el problema real es orquestacion con estado."
+    ],
+    "tags": [
+      "serverless",
+      "service"
+    ]
+  },
+  {
+    "id": "appconfig",
+    "title": "Amazon AppConfig",
+    "aliases": [
+      "AppConfig",
+      "Amazon AppConfig"
+    ],
+    "summary": "Servicio para despliegue controlado y validacion de configuracion de aplicaciones.",
+    "details": [
+      "Gana cuando la pista es configuracion runtime, feature flags o cambios de config sin redeploy completo."
+    ],
+    "tags": [
+      "operations",
+      "service"
+    ]
+  },
+  {
+    "id": "appflow",
+    "title": "Amazon AppFlow",
+    "aliases": [
+      "AppFlow",
+      "Amazon AppFlow"
+    ],
+    "summary": "Servicio de integracion administrada para mover datos entre SaaS y AWS.",
+    "details": [
+      "Suele aparecer cuando el problema es ingestion/integracion sin construir pipelines custom."
+    ],
+    "tags": [
+      "data",
+      "service"
+    ]
+  },
+  {
+    "id": "alb",
+    "title": "Application Load Balancer",
+    "aliases": [
+      "Application Load Balancer",
+      "ALB"
+    ],
+    "summary": "Balanceador L7 para HTTP/HTTPS con reglas, health checks y target groups.",
+    "details": [
+      "En despliegues suele aparecer con health checks, traffic shifting y target groups.",
+      "No confundas un problema de ruteo interno del ALB con uno de DNS."
+    ],
+    "tags": [
+      "networking",
+      "resilience",
+      "service"
+    ]
+  },
+  {
+    "id": "app-runner",
+    "title": "Amazon App Runner",
+    "aliases": [
+      "App Runner",
+      "Amazon App Runner"
+    ],
+    "summary": "Servicio para desplegar aplicaciones web y APIs desde codigo o contenedores sin administrar infraestructura.",
+    "details": [
+      "No es lo mismo que ECS/EKS; abstrae mas infraestructura."
+    ],
+    "tags": [
+      "service",
+      "containers"
+    ]
+  },
+  {
+    "id": "appstream-2",
+    "title": "Amazon AppStream 2.0",
+    "aliases": [
+      "AppStream 2.0",
+      "Amazon AppStream 2.0"
+    ],
+    "summary": "Servicio de streaming de aplicaciones de escritorio hacia usuarios finales.",
+    "details": [
+      "Suele aparecer en virtualizacion de aplicaciones, no en CI/CD comun."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "artifact",
+    "title": "AWS Artifact",
+    "aliases": [
+      "Artifact",
+      "AWS Artifact"
+    ],
+    "summary": "Portal para descargar reportes de compliance y acuerdos de AWS.",
+    "details": [
+      "No es un servicio de runtime; se usa para evidencia y cumplimiento."
+    ],
+    "tags": [
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "athena",
+    "title": "Amazon Athena",
+    "aliases": [
+      "Athena",
+      "Amazon Athena"
+    ],
+    "summary": "Servicio de consulta SQL sobre datos en S3.",
+    "details": [
+      "Gana cuando la pregunta habla de logs en S3 y consultas ad hoc sin infraestructura propia.",
+      "No consulta directamente CloudWatch Logs."
+    ],
+    "tags": [
+      "observability",
+      "service"
+    ]
+  },
+  {
+    "id": "audit-manager",
+    "title": "AWS Audit Manager",
+    "aliases": [
+      "Audit Manager",
+      "AWS Audit Manager"
+    ],
+    "summary": "Servicio para recopilar evidencia y automatizar evaluaciones de auditoria.",
+    "details": [
+      "Gana con marcos de auditoria y evidencia continua, no con metricas operativas."
+    ],
+    "tags": [
+      "security",
+      "compliance",
+      "service"
+    ]
+  },
+  {
+    "id": "aurora",
+    "title": "Amazon Aurora",
+    "aliases": [
+      "Aurora",
+      "Amazon Aurora"
+    ],
+    "summary": "Motor relacional compatible con MySQL/PostgreSQL diseñado para alta disponibilidad y escalado.",
+    "details": [
+      "En examen debes separar writer endpoint, reader endpoint, replicas y failover.",
+      "No es lo mismo que una instancia RDS tradicional."
+    ],
+    "tags": [
+      "resilience",
+      "data",
+      "service"
+    ]
+  },
+  {
+    "id": "aurora-reader-endpoint",
+    "title": "Aurora reader endpoint",
+    "aliases": [
+      "reader endpoint",
+      "Aurora reader endpoint"
+    ],
+    "summary": "Endpoint de Aurora para balancear conexiones de lectura entre replicas.",
+    "details": [
+      "Gana cuando la pista dice consultas de solo lectura o repartir carga de lectura.",
+      "Balancea conexiones, no queries individuales."
+    ],
+    "tags": [
+      "data",
+      "concept"
+    ]
+  },
+  {
+    "id": "backup",
+    "title": "AWS Backup",
+    "aliases": [
+      "AWS Backup",
+      "Backup"
+    ],
+    "summary": "Servicio administrado para centralizar y automatizar backups de multiples servicios AWS.",
+    "details": [
+      "Gana cuando la pista es politicas de backup centralizadas o multi-cuenta.",
+      "No basta con tener backups; el examen suele valorar restauracion probada, politicas y cobertura consistente."
+    ],
+    "tags": [
+      "resilience",
+      "service"
+    ]
+  },
+  {
+    "id": "batch",
+    "title": "AWS Batch",
+    "aliases": [
+      "Batch",
+      "AWS Batch"
+    ],
+    "summary": "Servicio para ejecutar trabajos por lotes a gran escala sobre capacidad administrada.",
+    "details": [
+      "No es lo mismo que Step Functions ni Lambda."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "before-allow-traffic",
+    "title": "BeforeAllowTraffic",
+    "aliases": [
+      "BeforeAllowTraffic"
+    ],
+    "summary": "Hook de despliegue ejecutado antes de enviar trafico real a la nueva version.",
+    "details": [
+      "Gana cuando el problema es validar algo antes de exponer trafico de produccion."
+    ],
+    "tags": [
+      "ci-cd",
+      "concept"
+    ]
+  },
+  {
+    "id": "braket",
+    "title": "Amazon Braket",
+    "aliases": [
+      "Braket",
+      "Amazon Braket"
+    ],
+    "summary": "Servicio para explorar computacion cuantica.",
+    "details": [
+      "Fuera del centro del examen, pero debe ubicarse como servicio especializado."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "cdk",
+    "title": "AWS CDK",
+    "aliases": [
+      "CDK",
+      "AWS CDK"
+    ],
+    "summary": "Framework para definir infraestructura con lenguajes de programacion y sintetizar a CloudFormation.",
+    "details": [
+      "No reemplaza CloudFormation; lo genera."
+    ],
+    "tags": [
+      "iac",
+      "service"
+    ]
+  },
+  {
+    "id": "cloudformation",
+    "title": "AWS CloudFormation",
+    "aliases": [
+      "CloudFormation",
+      "AWS CloudFormation"
+    ],
+    "summary": "Servicio de infraestructura como codigo para modelar y desplegar recursos como stacks.",
+    "details": [
+      "Debes dominar stack, template, change sets, import, drift y DeletionPolicy.",
+      "No confundas validacion declarativa con validacion funcional en runtime.",
+      "Cuando la pista es multi-cuenta o multi-region, suele aparecer StackSets, no ejecucion manual repetida."
+    ],
+    "tags": [
+      "iac",
+      "service"
+    ]
+  },
+  {
+    "id": "stacksets",
+    "title": "CloudFormation StackSets",
+    "aliases": [
+      "StackSets",
+      "CloudFormation StackSets",
+      "AWS CloudFormation StackSets"
+    ],
+    "summary": "Capacidad de CloudFormation para desplegar stacks en multiples cuentas y regiones.",
+    "details": [
+      "Con service-managed permissions encaja muy bien con Organizations.",
+      "Gana cuando la pista es despliegue centralizado multi-cuenta."
+    ],
+    "tags": [
+      "iac",
+      "organizations",
+      "service"
+    ]
+  },
+  {
+    "id": "cloudfront",
+    "title": "Amazon CloudFront",
+    "aliases": [
+      "CloudFront",
+      "Amazon CloudFront"
+    ],
+    "summary": "CDN de AWS para distribuir contenido con cache en edge locations.",
+    "details": [
+      "Suele aparecer con contenido estatico, cache, invalidaciones y baja latencia global."
+    ],
+    "tags": [
+      "edge",
+      "service"
+    ]
+  },
+  {
+    "id": "cloudfront-invalidation",
+    "title": "CloudFront invalidation",
+    "aliases": [
+      "CloudFront invalidation",
+      "invalidation"
+    ],
+    "summary": "Operacion para invalidar objetos cacheados y forzar que CloudFront recargue contenido.",
+    "details": [
+      "Gana cuando el problema inmediato es que usuarios siguen viendo contenido viejo."
+    ],
+    "tags": [
+      "edge",
+      "concept"
+    ]
+  },
+  {
+    "id": "cloudtrail",
+    "title": "AWS CloudTrail",
+    "aliases": [
+      "CloudTrail",
+      "AWS CloudTrail",
+      "Amazon CloudTrail"
+    ],
+    "summary": "Servicio de auditoria para llamadas API y actividad de cuenta en AWS.",
+    "details": [
+      "Responde 'quien hizo que y cuando'.",
+      "No es lo mismo que Config, que responde si la configuracion cumple o no cumple."
+    ],
+    "tags": [
+      "security",
+      "observability",
+      "service"
+    ]
+  },
+  {
+    "id": "cloudtrail-organization-trails",
+    "title": "CloudTrail organization trails",
+    "aliases": [
+      "organization trails",
+      "CloudTrail organization trails"
+    ],
+    "summary": "Trails de CloudTrail aplicados a toda la organizacion para auditoria centralizada.",
+    "details": [
+      "Ganan cuando la pista es auditoria de API para todas las cuentas de Organizations."
+    ],
+    "tags": [
+      "security",
+      "organizations",
+      "concept"
+    ]
+  },
+  {
+    "id": "cloudwatch",
+    "title": "Amazon CloudWatch",
+    "aliases": [
+      "CloudWatch",
+      "Amazon CloudWatch"
+    ],
+    "summary": "Servicio de observabilidad para metricas, logs, alarmas y dashboards.",
+    "details": [
+      "Sirve para monitorear salud operativa, comportamiento de logs y acciones automatizadas sobre metricas.",
+      "En examen debes separar bien Logs, metric filter, alarm y dashboard.",
+      "CloudWatch no reemplaza Config para compliance continuo ni CloudTrail para auditoria de API."
+    ],
+    "tags": [
+      "observability",
+      "service"
+    ]
+  },
+  {
+    "id": "cloudwatch-alarm",
+    "title": "CloudWatch alarm",
+    "aliases": [
+      "CloudWatch alarm",
+      "Alarm",
+      "Alarmas de CloudWatch"
+    ],
+    "summary": "Evalua una metrica y dispara una accion o cambia de estado segun umbrales.",
+    "details": [
+      "CodeDeploy reacciona a alarms, no a metricas sueltas.",
+      "Una metrica sola no toma decisiones operativas."
+    ],
+    "tags": [
+      "observability",
+      "concept"
+    ]
+  },
+  {
+    "id": "contributor-insights",
+    "title": "CloudWatch Contributor Insights",
+    "aliases": [
+      "Contributor Insights",
+      "CloudWatch Contributor Insights"
+    ],
+    "summary": "Analisis para encontrar top contributors y patrones agregados en logs o metrics.",
+    "details": [
+      "Gana cuando necesitas identificar top talkers o patrones agregados rapidamente."
+    ],
+    "tags": [
+      "observability",
+      "service"
+    ]
+  },
+  {
+    "id": "cloudwatch-logs",
+    "title": "CloudWatch Logs",
+    "aliases": [
+      "CloudWatch Logs",
+      "Logs"
+    ],
+    "summary": "Almacenamiento y consulta de logs de aplicaciones y servicios AWS.",
+    "details": [
+      "Si el requisito dice 'los logs ya estan en CloudWatch Logs', sospecha de metric filters, Insights o alarms.",
+      "No es lo mismo que un stream o una alarma."
+    ],
+    "tags": [
+      "observability",
+      "concept"
+    ]
+  },
+  {
+    "id": "metric-filter",
+    "title": "CloudWatch metric filter",
+    "aliases": [
+      "metric filter",
+      "Metric Filter",
+      "Metric Filters"
+    ],
+    "summary": "Convierte patrones en logs en metricas de CloudWatch.",
+    "details": [
+      "Gana cuando quieres alertar por texto o patron dentro de logs ya cargados.",
+      "Despues del metric filter normalmente viene una alarm y luego SNS."
+    ],
+    "tags": [
+      "observability",
+      "concept"
+    ]
+  },
+  {
+    "id": "metric-math",
+    "title": "CloudWatch metric math",
+    "aliases": [
+      "metric math",
+      "CloudWatch metric math"
+    ],
+    "summary": "Capacidad para combinar o transformar metricas en expresiones matematicas.",
+    "details": [
+      "Gana cuando necesitas alertar o visualizar derivaciones de varias metricas."
+    ],
+    "tags": [
+      "observability",
+      "concept"
+    ]
+  },
+  {
+    "id": "subscription-filter",
+    "title": "CloudWatch subscription filter",
+    "aliases": [
+      "subscription filter",
+      "Subscription filter"
+    ],
+    "summary": "Envia eventos de logs coincidentes a un destino como Lambda, Kinesis o Firehose.",
+    "details": [
+      "Es para procesamiento o enrute en tiempo real de logs.",
+      "No reemplaza metric filter si solo quieres una alarma operacional."
+    ],
+    "tags": [
+      "observability",
+      "concept"
+    ]
+  },
+  {
+    "id": "cname-swap",
+    "title": "CNAME swap",
+    "aliases": [
+      "CNAME swap"
+    ],
+    "summary": "Cambio de CNAME entre entornos Beanstalk para mover trafico sin redeploy completo.",
+    "details": [
+      "Es una pista fuerte de blue/green nativo en Elastic Beanstalk."
+    ],
+    "tags": [
+      "ci-cd",
+      "concept"
+    ]
+  },
+  {
+    "id": "codeartifact",
+    "title": "AWS CodeArtifact",
+    "aliases": [
+      "CodeArtifact",
+      "AWS CodeArtifact"
+    ],
+    "summary": "Servicio de repositorios de paquetes para dependencias de software.",
+    "details": [
+      "Suele aparecer con Maven, npm, pip y gestion de paquetes en pipelines."
+    ],
+    "tags": [
+      "ci-cd",
+      "service"
+    ]
+  },
+  {
+    "id": "codebuild",
+    "title": "AWS CodeBuild",
+    "aliases": [
+      "CodeBuild",
+      "AWS CodeBuild"
+    ],
+    "summary": "Servicio administrado de build en la nube que compila codigo, corre pruebas y genera artefactos.",
+    "details": [
+      "Gana cuando el requisito es build/test, no orquestacion total del pipeline.",
+      "En cross-account suele tocar IAM, KMS y permisos del recurso destino."
+    ],
+    "tags": [
+      "ci-cd",
+      "service"
+    ]
+  },
+  {
+    "id": "codecommit",
+    "title": "AWS CodeCommit",
+    "aliases": [
+      "CodeCommit",
+      "AWS CodeCommit"
+    ],
+    "summary": "Repositorio administrado de codigo fuente.",
+    "details": [
+      "Suele aparecer en preguntas de ramas, PRs, source stage y triggers."
+    ],
+    "tags": [
+      "ci-cd",
+      "service"
+    ]
+  },
+  {
+    "id": "codedeploy",
+    "title": "AWS CodeDeploy",
+    "aliases": [
+      "CodeDeploy",
+      "AWS CodeDeploy"
+    ],
+    "summary": "Servicio de despliegue automatizado para EC2, on-premises, Lambda y ECS.",
+    "details": [
+      "Debes dominar traffic shifting, hooks, blue/green y rollback con alarms.",
+      "No lo confundas con Elastic Beanstalk."
+    ],
+    "tags": [
+      "ci-cd",
+      "service"
+    ]
+  },
+  {
+    "id": "codepipeline",
+    "title": "AWS CodePipeline",
+    "aliases": [
+      "CodePipeline",
+      "AWS CodePipeline"
+    ],
+    "summary": "Servicio de entrega continua que automatiza build, test y despliegue a traves de stages.",
+    "details": [
+      "En examen, la branch del source stage define el artefacto real.",
+      "La aprobacion manual no cambia la branch origen."
+    ],
+    "tags": [
+      "ci-cd",
+      "service"
+    ]
+  },
+  {
+    "id": "codestar",
+    "title": "AWS CodeStar",
+    "aliases": [
+      "CodeStar",
+      "AWS CodeStar"
+    ],
+    "summary": "Servicio historico para experiencia unificada de desarrollo y proyectos AWS.",
+    "details": [
+      "Suele aparecer como distractor o por legado frente a servicios mas especificos."
+    ],
+    "tags": [
+      "ci-cd",
+      "service"
+    ]
+  },
+  {
+    "id": "cognito",
+    "title": "Amazon Cognito",
+    "aliases": [
+      "Cognito",
+      "Amazon Cognito"
+    ],
+    "summary": "Servicio de identidad para autenticacion de usuarios y federacion.",
+    "details": [
+      "Suele aparecer con API Gateway, apps serverless y control de acceso de usuarios finales."
+    ],
+    "tags": [
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "aws-config",
+    "title": "AWS Config",
+    "aliases": [
+      "AWS Config",
+      "Config"
+    ],
+    "summary": "Servicio para registrar, evaluar y auditar la configuracion de recursos de AWS a lo largo del tiempo.",
+    "details": [
+      "Gana cuando la pregunta pide cumplimiento continuo, NON_COMPLIANT, reglas administradas o remediacion automatica.",
+      "Tambien sirve para historial de configuracion, relaciones entre recursos y evidencia de auditoria.",
+      "No sustituye CloudWatch para metricas ni EventBridge para eventos puntuales."
+    ],
+    "tags": [
+      "security",
+      "compliance",
+      "service"
+    ]
+  },
+  {
+    "id": "control-tower",
+    "title": "AWS Control Tower",
+    "aliases": [
+      "Control Tower",
+      "AWS Control Tower"
+    ],
+    "summary": "Capa de orquestacion y gobernanza para entornos multi-cuenta basada en mejores practicas.",
+    "details": [
+      "Se apoya en Organizations, Service Catalog e IAM Identity Center.",
+      "Gana cuando la pista es landing zone, Account Factory o controles de gobernanza."
+    ],
+    "tags": [
+      "governance",
+      "organizations",
+      "service"
+    ]
+  },
+  {
+    "id": "cost-explorer",
+    "title": "AWS Cost Explorer",
+    "aliases": [
+      "Cost Explorer",
+      "AWS Cost Explorer"
+    ],
+    "summary": "Herramienta para analizar costos y uso en AWS.",
+    "details": [
+      "No sustituye Budgets ni Trusted Advisor, pero sirve para analisis de gasto."
+    ],
+    "tags": [
+      "operations",
+      "service"
+    ]
+  },
+  {
+    "id": "data-exchange",
+    "title": "AWS Data Exchange",
+    "aliases": [
+      "Data Exchange",
+      "AWS Data Exchange"
+    ],
+    "summary": "Servicio para encontrar, suscribirse y consumir datasets de terceros.",
+    "details": [
+      "No es una base de datos ni un ETL general."
+    ],
+    "tags": [
+      "data",
+      "service"
+    ]
+  },
+  {
+    "id": "data-pipeline",
+    "title": "AWS Data Pipeline",
+    "aliases": [
+      "Data Pipeline",
+      "AWS Data Pipeline"
+    ],
+    "summary": "Servicio historico para mover y transformar datos entre servicios y recursos de computo.",
+    "details": [
+      "Suele aparecer como servicio legado o distractor frente a Glue/Step Functions/EventBridge."
+    ],
+    "tags": [
+      "data",
+      "service"
+    ]
+  },
+  {
+    "id": "deletion-policy-retain",
+    "title": "DeletionPolicy Retain",
+    "aliases": [
+      "DeletionPolicy",
+      "Retain",
+      "DeletionPolicy Retain"
+    ],
+    "summary": "Atributo de CloudFormation para conservar un recurso cuando el stack se elimina.",
+    "details": [
+      "Clave para renombrar stacks sin perder recursos y luego importarlos."
+    ],
+    "tags": [
+      "iac",
+      "concept"
+    ]
+  },
+  {
+    "id": "detective",
+    "title": "Amazon Detective",
+    "aliases": [
+      "Detective",
+      "Amazon Detective"
+    ],
+    "summary": "Servicio para investigar y analizar hallazgos de seguridad usando datos relacionados.",
+    "details": [
+      "Complementa GuardDuty; no lo reemplaza."
+    ],
+    "tags": [
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "device-farm",
+    "title": "AWS Device Farm",
+    "aliases": [
+      "Device Farm",
+      "AWS Device Farm"
+    ],
+    "summary": "Servicio para probar apps en dispositivos reales o emulados.",
+    "details": [
+      "Aparece en pipelines de pruebas de apps moviles."
+    ],
+    "tags": [
+      "ci-cd",
+      "service"
+    ]
+  },
+  {
+    "id": "dynamodb",
+    "title": "Amazon DynamoDB",
+    "aliases": [
+      "DynamoDB",
+      "Amazon DynamoDB"
+    ],
+    "summary": "Base de datos NoSQL clave-valor/documento de baja latencia.",
+    "details": [
+      "En el banco aparece con indices, metadata, estados de pipeline y Global Tables."
+    ],
+    "tags": [
+      "data",
+      "service"
+    ]
+  },
+  {
+    "id": "dynamodb-global-tables",
+    "title": "DynamoDB Global Tables",
+    "aliases": [
+      "Global Tables",
+      "DynamoDB Global Tables"
+    ],
+    "summary": "Replicacion multi-region activa para tablas DynamoDB.",
+    "details": [
+      "Suele aparecer con requisitos globales de baja latencia y resiliencia regional."
+    ],
+    "tags": [
+      "data",
+      "resilience",
+      "concept"
+    ]
+  },
+  {
+    "id": "ec2",
+    "title": "Amazon EC2",
+    "aliases": [
+      "EC2",
+      "Amazon EC2"
+    ],
+    "summary": "Servicio de computo con instancias virtuales.",
+    "details": [
+      "Base de muchas preguntas de ASG, CodeDeploy, logs y sistemas legacy."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "ec2-auto-scaling",
+    "title": "EC2 Auto Scaling",
+    "aliases": [
+      "Auto Scaling",
+      "EC2 Auto Scaling",
+      "Auto Scaling Group",
+      "ASG",
+      "Amazon EC2 Auto Scaling",
+      "AWS Auto Scaling"
+    ],
+    "summary": "Servicio para ajustar y reemplazar capacidad EC2 automaticamente.",
+    "details": [
+      "Debes separar target tracking, scheduled scaling, mixed instances, rebalance y scale in.",
+      "No siempre se comporta como tu intuicion humana esperaria.",
+      "El examen castiga mucho interpretar comportamiento valido del ASG como si fuera un bug."
+    ],
+    "tags": [
+      "resilience",
+      "service"
+    ]
+  },
+  {
+    "id": "ecr",
+    "title": "Amazon ECR",
+    "aliases": [
+      "ECR",
+      "Amazon ECR",
+      "Elastic Container Registry",
+      "Amazon ECR (Elastic Container Registry)"
+    ],
+    "summary": "Registro administrado de imagenes de contenedor seguro y escalable.",
+    "details": [
+      "Debes separar tags movibles de digests inmutables."
+    ],
+    "tags": [
+      "containers",
+      "service"
+    ]
+  },
+  {
+    "id": "ecr-image-digest",
+    "title": "ECR image digest",
+    "aliases": [
+      "image digest",
+      "digest de imagen",
+      "ECR digest"
+    ],
+    "summary": "Identificador inmutable de una imagen de contenedor.",
+    "details": [
+      "Gana cuando la pregunta busca consistencia exacta de artefacto entre despliegues."
+    ],
+    "tags": [
+      "containers",
+      "concept"
+    ]
+  },
+  {
+    "id": "ecs",
+    "title": "Amazon ECS",
+    "aliases": [
+      "ECS",
+      "Amazon ECS",
+      "Elastic Container Service",
+      "Amazon ECS (Elastic Container Service)"
+    ],
+    "summary": "Servicio administrado de orquestacion de contenedores.",
+    "details": [
+      "Suele aparecer con blue/green via CodeDeploy, task definitions y despliegues de servicios."
+    ],
+    "tags": [
+      "containers",
+      "service"
+    ]
+  },
+  {
+    "id": "efs",
+    "title": "Amazon EFS",
+    "aliases": [
+      "EFS",
+      "Amazon EFS",
+      "Amazon EFS (Elastic File System)"
+    ],
+    "summary": "Sistema de archivos NFS administrado y elastico para Linux.",
+    "details": [
+      "Suele aparecer con comparticion de archivos entre instancias o contenedores."
+    ],
+    "tags": [
+      "storage",
+      "service"
+    ]
+  },
+  {
+    "id": "eks",
+    "title": "Amazon EKS",
+    "aliases": [
+      "EKS",
+      "Amazon EKS",
+      "Amazon EKS (Elastic Kubernetes Service)"
+    ],
+    "summary": "Servicio administrado para ejecutar Kubernetes.",
+    "details": [
+      "En examen aparecen mucho cross-account, aws-auth, IAM y despliegues desde CodeBuild."
+    ],
+    "tags": [
+      "containers",
+      "service"
+    ]
+  },
+  {
+    "id": "aws-auth",
+    "title": "EKS aws-auth",
+    "aliases": [
+      "aws-auth",
+      "ConfigMap aws-auth"
+    ],
+    "summary": "Mapeo de identidades IAM hacia permisos dentro del cluster EKS.",
+    "details": [
+      "En EKS cross-account no basta con AssumeRole; el cluster debe mapear ese rol."
+    ],
+    "tags": [
+      "security",
+      "eks",
+      "concept"
+    ]
+  },
+  {
+    "id": "elasticache",
+    "title": "Amazon ElastiCache",
+    "aliases": [
+      "ElastiCache",
+      "Amazon ElastiCache"
+    ],
+    "summary": "Servicio administrado de cache en memoria compatible con Redis y Memcached.",
+    "details": [
+      "No es una base relacional ni un almacén persistente principal."
+    ],
+    "tags": [
+      "data",
+      "service"
+    ]
+  },
+  {
+    "id": "elastic-beanstalk",
+    "title": "AWS Elastic Beanstalk",
+    "aliases": [
+      "Elastic Beanstalk",
+      "Beanstalk"
+    ],
+    "summary": "Plataforma administrada para desplegar y operar aplicaciones web y worker.",
+    "details": [
+      "Su patron blue/green suele ser dos entornos y CNAME swap.",
+      "No usa el mismo modelo mental que CodeDeploy."
+    ],
+    "tags": [
+      "ci-cd",
+      "service"
+    ]
+  },
+  {
+    "id": "emr",
+    "title": "Amazon EMR",
+    "aliases": [
+      "EMR",
+      "Amazon EMR"
+    ],
+    "summary": "Plataforma administrada para big data y procesamiento distribuido.",
+    "details": [
+      "Aparece con Spark, Hadoop y pipelines de datos."
+    ],
+    "tags": [
+      "data",
+      "service"
+    ]
+  },
+  {
+    "id": "end-user-messaging",
+    "title": "AWS End User Messaging",
+    "aliases": [
+      "AWS End User Messaging"
+    ],
+    "summary": "Familia de mensajeria para comunicarte con usuarios finales.",
+    "details": [
+      "No es un servicio central de DOP-C02, pero conviene ubicarlo como mensajeria para usuario final."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "eventbridge",
+    "title": "Amazon EventBridge",
+    "aliases": [
+      "EventBridge",
+      "Amazon EventBridge"
+    ],
+    "summary": "Bus de eventos sin servidor para ingerir, filtrar, transformar y enrutar eventos hacia destinos.",
+    "details": [
+      "Gana cuando la pregunta es 'cuando pase X, dispara Y'.",
+      "Encaja con pull requests, builds terminados, hallazgos de seguridad y eventos operativos puntuales.",
+      "No reemplaza compliance continuo ni alarms por umbral."
+    ],
+    "tags": [
+      "operations",
+      "events",
+      "service"
+    ]
+  },
+  {
+    "id": "eventbridge-bus",
+    "title": "EventBridge event bus",
+    "aliases": [
+      "event bus",
+      "EventBridge bus",
+      "default event bus"
+    ],
+    "summary": "Router que recibe eventos y los entrega a cero o mas destinos segun reglas.",
+    "details": [
+      "Es la pieza central cuando varios productores envian eventos a varios consumidores.",
+      "Las reglas del bus filtran por patron de evento."
+    ],
+    "tags": [
+      "events",
+      "concept"
+    ]
+  },
+  {
+    "id": "eventbridge-rule",
+    "title": "EventBridge rule",
+    "aliases": [
+      "EventBridge rule",
+      "rule",
+      "event pattern"
+    ],
+    "summary": "Regla que hace match con eventos y define a que destinos se envian.",
+    "details": [
+      "Si ya conoces el evento exacto, aqui suele vivir el filtro ganador.",
+      "Puede ser por patron de evento o por horario."
+    ],
+    "tags": [
+      "events",
+      "concept"
+    ]
+  },
+  {
+    "id": "failover-routing",
+    "title": "Failover routing",
+    "aliases": [
+      "Failover routing",
+      "failover"
+    ],
+    "summary": "Politica de Route 53 para activo-pasivo segun salud.",
+    "details": [
+      "Gana si la pista es primario/secundario con health checks."
+    ],
+    "tags": [
+      "networking",
+      "concept"
+    ]
+  },
+  {
+    "id": "fargate",
+    "title": "AWS Fargate",
+    "aliases": [
+      "Fargate",
+      "AWS Fargate"
+    ],
+    "summary": "Motor serverless para ejecutar contenedores en ECS o EKS sin administrar hosts.",
+    "details": [
+      "No es un orquestador por si solo; corre tareas/Pods para ECS o EKS."
+    ],
+    "tags": [
+      "containers",
+      "service"
+    ]
+  },
+  {
+    "id": "filter-layer",
+    "title": "Filter layer",
+    "aliases": [
+      "filter layer",
+      "capa del filtro",
+      "event filtering"
+    ],
+    "summary": "Regla mental de examen: filtra lo antes posible en la capa correcta.",
+    "details": [
+      "EventBridge filtra y SNS distribuye; Config evalua y EventBridge reacciona."
+    ],
+    "tags": [
+      "exam",
+      "concept"
+    ]
+  },
+  {
+    "id": "finspace",
+    "title": "Amazon FinSpace",
+    "aliases": [
+      "FinSpace",
+      "Amazon FinSpace"
+    ],
+    "summary": "Servicio especializado para datos y analitica financiera.",
+    "details": [
+      "Fuera del centro del examen; tratalo como servicio vertical."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "firewall-manager",
+    "title": "AWS Firewall Manager",
+    "aliases": [
+      "Firewall Manager",
+      "AWS Firewall Manager"
+    ],
+    "summary": "Servicio para administrar politicas de seguridad de red a escala en multiples cuentas.",
+    "details": [
+      "Suele aparecer con WAF, Shield Advanced y Security Groups en organizaciones."
+    ],
+    "tags": [
+      "security",
+      "organizations",
+      "service"
+    ]
+  },
+  {
+    "id": "gamelift",
+    "title": "Amazon GameLift",
+    "aliases": [
+      "GameLift",
+      "Amazon GameLift"
+    ],
+    "summary": "Servicio para backend y hosting de juegos multijugador.",
+    "details": [
+      "Fuera del centro del examen; ubicalo como servicio especializado."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "glue",
+    "title": "AWS Glue",
+    "aliases": [
+      "Glue",
+      "AWS Glue"
+    ],
+    "summary": "Servicio administrado de integracion de datos, catalogo y ETL.",
+    "details": [
+      "En examen puede aparecer con workflows, retries y eventos de fallas."
+    ],
+    "tags": [
+      "data",
+      "service"
+    ]
+  },
+  {
+    "id": "guardduty",
+    "title": "Amazon GuardDuty",
+    "aliases": [
+      "GuardDuty",
+      "AWS GuardDuty",
+      "Amazon GuardDuty"
+    ],
+    "summary": "Servicio de deteccion de amenazas que analiza fuentes y logs de AWS para encontrar actividad sospechosa.",
+    "details": [
+      "Gana con credenciales comprometidas, exfiltracion, cripto-minado o actividad maliciosa.",
+      "No es el servicio principal para CVEs o exposure scanning."
+    ],
+    "tags": [
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "health",
+    "title": "AWS Health",
+    "aliases": [
+      "Health",
+      "AWS Health"
+    ],
+    "summary": "Servicio que informa eventos de salud de AWS y su impacto en tus recursos.",
+    "details": [
+      "Puede aparecer en incident response y operacion."
+    ],
+    "tags": [
+      "operations",
+      "service"
+    ]
+  },
+  {
+    "id": "honeycode",
+    "title": "Amazon Honeycode",
+    "aliases": [
+      "Honeycode",
+      "Amazon Honeycode"
+    ],
+    "summary": "Servicio para crear apps sencillas sin mucho codigo.",
+    "details": [
+      "Fuera del centro del examen; ubicalo como no-code/low-code."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "iam",
+    "title": "AWS IAM",
+    "aliases": [
+      "IAM",
+      "AWS IAM",
+      "Identity and Access Management",
+      "AWS IAM (Identity and Access Management)"
+    ],
+    "summary": "Servicio para controlar identidades, autenticacion y permisos sobre recursos AWS.",
+    "details": [
+      "En examen debes separar trust policy, permissions policy, roles de servicio y permisos del recurso."
+    ],
+    "tags": [
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "image-digest",
+    "title": "Image digest",
+    "aliases": [
+      "image digest",
+      "digest de imagen",
+      "tag vs digest",
+      "digest"
+    ],
+    "summary": "Identificador inmutable de una imagen de contenedor.",
+    "details": [
+      "Gana cuando la pregunta pide consistencia exacta del artefacto entre despliegues."
+    ],
+    "tags": [
+      "containers",
+      "concept"
+    ]
+  },
+  {
+    "id": "image-tag",
+    "title": "Image tag",
+    "aliases": [
+      "image tag",
+      "tag de imagen",
+      "tag vs digest",
+      "tag"
+    ],
+    "summary": "Etiqueta mutable asociada a una imagen de contenedor.",
+    "details": [
+      "Un tag puede moverse; no identifica de forma inmutable el artefacto exacto."
+    ],
+    "tags": [
+      "containers",
+      "concept"
+    ]
+  },
+  {
+    "id": "inspector",
+    "title": "Amazon Inspector",
+    "aliases": [
+      "Inspector",
+      "Amazon Inspector"
+    ],
+    "summary": "Servicio de gestion de vulnerabilidades que descubre workloads y los escanea por CVEs y exposicion de red.",
+    "details": [
+      "Gana con vulnerabilidades y exposure; no con threat detection en tiempo real."
+    ],
+    "tags": [
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "iot-core",
+    "title": "AWS IoT Core",
+    "aliases": [
+      "IoT Core",
+      "AWS IoT Core"
+    ],
+    "summary": "Servicio para conectar y administrar dispositivos IoT de forma segura.",
+    "details": [
+      "Aparece en mensajeria de dispositivos y telemetria."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "iot-greengrass",
+    "title": "AWS IoT Greengrass",
+    "aliases": [
+      "IoT Greengrass",
+      "AWS IoT Greengrass"
+    ],
+    "summary": "Extiende servicios AWS a dispositivos edge y gateways locales.",
+    "details": [
+      "No es lo mismo que IoT Core; se enfoca en edge runtime."
+    ],
+    "tags": [
+      "service",
+      "edge"
+    ]
+  },
+  {
+    "id": "kendra",
+    "title": "Amazon Kendra",
+    "aliases": [
+      "Kendra",
+      "Amazon Kendra"
+    ],
+    "summary": "Servicio de busqueda inteligente empresarial.",
+    "details": [
+      "Fuera del centro del examen; ubicalo como search/AI."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "kinesis",
+    "title": "Amazon Kinesis Data Streams",
+    "aliases": [
+      "Kinesis",
+      "Kinesis Data Streams",
+      "Amazon Kinesis"
+    ],
+    "summary": "Servicio para ingestión y procesamiento de datos en streaming.",
+    "details": [
+      "Fijate en retencion, consumidores y metricas como MillisBehindLatest."
+    ],
+    "tags": [
+      "streaming",
+      "service"
+    ]
+  },
+  {
+    "id": "kms",
+    "title": "AWS KMS",
+    "aliases": [
+      "KMS",
+      "AWS KMS",
+      "AWS Key Management Service (KMS)"
+    ],
+    "summary": "Servicio administrado para crear y usar claves criptograficas.",
+    "details": [
+      "En problemas de acceso debes separar key policy, IAM policy y permisos del servicio que usa la clave.",
+      "En CI/CD cross-account es comun que el bloqueo real viva en KMS.",
+      "No confundas cifrado del artefacto con permiso para desencriptarlo; muchas respuestas fallan por esa diferencia fina."
+    ],
+    "tags": [
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "key-policy",
+    "title": "KMS key policy",
+    "aliases": [
+      "key policy",
+      "KMS key policy"
+    ],
+    "summary": "Politica principal que controla acceso a una clave KMS.",
+    "details": [
+      "Aunque IAM este correcto, una key policy mal puesta puede seguir bloqueando el flujo."
+    ],
+    "tags": [
+      "security",
+      "concept"
+    ]
+  },
+  {
+    "id": "lambda",
+    "title": "AWS Lambda",
+    "aliases": [
+      "Lambda",
+      "AWS Lambda"
+    ],
+    "summary": "Servicio serverless para ejecutar codigo sin administrar servidores.",
+    "details": [
+      "En examen debes separar bien cold starts, reserved concurrency y provisioned concurrency."
+    ],
+    "tags": [
+      "serverless",
+      "service"
+    ]
+  },
+  {
+    "id": "latency-routing",
+    "title": "Latency-based routing",
+    "aliases": [
+      "Latency-based routing",
+      "latency routing",
+      "latency-based"
+    ],
+    "summary": "Politica de Route 53 para enviar trafico a la region con mejor latencia para el usuario.",
+    "details": [
+      "Gana si la pista clave es menor latencia observada."
+    ],
+    "tags": [
+      "networking",
+      "concept"
+    ]
+  },
+  {
+    "id": "lex",
+    "title": "Amazon Lex",
+    "aliases": [
+      "Lex",
+      "Amazon Lex"
+    ],
+    "summary": "Servicio para construir interfaces conversacionales por voz o texto.",
+    "details": [
+      "No es servicio de orquestacion ni de colas."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "lightsail",
+    "title": "Amazon Lightsail",
+    "aliases": [
+      "Lightsail",
+      "Amazon Lightsail"
+    ],
+    "summary": "Plataforma simplificada para apps, sitios y VPS sencillos.",
+    "details": [
+      "Fuera del centro del examen, pero conviene distinguirlo de EC2 puro."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "location-service",
+    "title": "Amazon Location Service",
+    "aliases": [
+      "Location Service",
+      "Amazon Location Service"
+    ],
+    "summary": "Servicio para mapas, geocodificacion y rastreo de ubicacion.",
+    "details": [
+      "Fuera del centro del examen; ubicalo como servicio geoespacial."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "macie",
+    "title": "Amazon Macie",
+    "aliases": [
+      "Macie",
+      "Amazon Macie"
+    ],
+    "summary": "Servicio para descubrir y proteger datos sensibles en S3.",
+    "details": [
+      "Gana cuando la pregunta habla de PII o datos sensibles en buckets S3."
+    ],
+    "tags": [
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "managed-blockchain",
+    "title": "Amazon Managed Blockchain",
+    "aliases": [
+      "Managed Blockchain",
+      "Amazon Managed Blockchain"
+    ],
+    "summary": "Servicio administrado para redes blockchain.",
+    "details": [
+      "Fuera del centro del examen; tratalo como servicio especializado."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "managed-vs-custom",
+    "title": "Managed vs custom",
+    "aliases": [
+      "managed vs custom",
+      "managed",
+      "custom"
+    ],
+    "summary": "Regla mental de examen: si AWS ya trae una capacidad administrada que cumple exacto, suele ganar sobre la version custom.",
+    "details": [
+      "No construyas con Lambda lo que AWS ya resuelve de forma nativa si la pregunta pide menor esfuerzo."
+    ],
+    "tags": [
+      "exam",
+      "concept"
+    ]
+  },
+  {
+    "id": "marketplace",
+    "title": "AWS Marketplace",
+    "aliases": [
+      "Marketplace",
+      "AWS Marketplace"
+    ],
+    "summary": "Catalogo para adquirir software, datos y servicios de terceros en AWS.",
+    "details": [
+      "No es servicio de runtime ni de deploy por si solo."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "memorydb",
+    "title": "Amazon MemoryDB",
+    "aliases": [
+      "MemoryDB",
+      "Amazon MemoryDB"
+    ],
+    "summary": "Base de datos en memoria compatible con Redis y durable.",
+    "details": [
+      "No es igual a ElastiCache; tiene objetivo de base de datos principal de baja latencia."
+    ],
+    "tags": [
+      "data",
+      "service"
+    ]
+  },
+  {
+    "id": "low-operational-overhead",
+    "title": "Menor esfuerzo operacional",
+    "aliases": [
+      "menos piezas",
+      "menor esfuerzo",
+      "low operational overhead"
+    ],
+    "summary": "Regla de examen: si una solucion nativa cumple, suele ganar la opcion con menos piezas y menos operacion.",
+    "details": [
+      "No significa siempre la opcion mas corta; significa la menos sobreingenierizada que cumple exacto el requisito."
+    ],
+    "tags": [
+      "exam",
+      "concept"
+    ]
+  },
+  {
+    "id": "mixed-instances-policy",
+    "title": "Mixed instances policy",
+    "aliases": [
+      "mixed instances policy",
+      "mixed instances"
+    ],
+    "summary": "Configuracion del ASG para mezclar tipos de instancia y/o Spot con On-Demand.",
+    "details": [
+      "Puede cambiar la logica de termination y causar desbalance temporal entre AZs."
+    ],
+    "tags": [
+      "resilience",
+      "concept"
+    ]
+  },
+  {
+    "id": "neptune",
+    "title": "Amazon Neptune",
+    "aliases": [
+      "Neptune",
+      "Amazon Neptune"
+    ],
+    "summary": "Base de datos de grafos administrada.",
+    "details": [
+      "Fuera del centro del examen, pero conviene ubicarla como graph DB."
+    ],
+    "tags": [
+      "data",
+      "service"
+    ]
+  },
+  {
+    "id": "on-demand-instances",
+    "title": "On-Demand Instances",
+    "aliases": [
+      "On-Demand",
+      "On-Demand Instances"
+    ],
+    "summary": "Capacidad EC2 de precio estable y sin interrupcion por recuperacion de capacidad de AWS.",
+    "details": [
+      "Suele compararse con Spot en costos y comportamiento de interrupcion."
+    ],
+    "tags": [
+      "resilience",
+      "concept"
+    ]
+  },
+  {
+    "id": "opsworks",
+    "title": "AWS OpsWorks",
+    "aliases": [
+      "OpsWorks",
+      "AWS OpsWorks"
+    ],
+    "summary": "Servicio legacy de gestion de configuracion y despliegue.",
+    "details": [
+      "En DOP-C02 suele aparecer como distractor o por compatibilidad heredada."
+    ],
+    "tags": [
+      "operations",
+      "service"
+    ]
+  },
+  {
+    "id": "ou",
+    "title": "Organizational Unit (OU)",
+    "aliases": [
+      "OU",
+      "Organizational Unit",
+      "Organizational Units"
+    ],
+    "summary": "Grupo logico de cuentas dentro de AWS Organizations.",
+    "details": [
+      "Permite aplicar politicas y despliegues a un subconjunto de cuentas."
+    ],
+    "tags": [
+      "organizations",
+      "concept"
+    ]
+  },
+  {
+    "id": "organizations",
+    "title": "AWS Organizations",
+    "aliases": [
+      "Organizations",
+      "AWS Organizations"
+    ],
+    "summary": "Servicio para administrar cuentas AWS en conjunto, aplicar politicas y gobernanza centralizada.",
+    "details": [
+      "Gana con multi-cuenta, OUs, SCPs, trails organizacionales y despliegue centralizado.",
+      "Estar en la misma organizacion no elimina la necesidad de trust policy o permisos cross-account."
+    ],
+    "tags": [
+      "organizations",
+      "governance",
+      "service"
+    ]
+  },
+  {
+    "id": "patch-manager",
+    "title": "Patch Manager",
+    "aliases": [
+      "Patch Manager",
+      "Systems Manager Patch Manager"
+    ],
+    "summary": "Capacidad de Systems Manager para parcheo administrado de instancias.",
+    "details": [
+      "Gana cuando el requisito es programar y gobernar parcheo de flota."
+    ],
+    "tags": [
+      "operations",
+      "service"
+    ]
+  },
+  {
+    "id": "permissions-policy",
+    "title": "Permissions policy",
+    "aliases": [
+      "permissions policy",
+      "IAM policy",
+      "policy de permisos"
+    ],
+    "summary": "Politica que define que acciones puede ejecutar una identidad o rol.",
+    "details": [
+      "En cross-account, asumir el rol no basta; tambien debe poder hacer la accion requerida."
+    ],
+    "tags": [
+      "security",
+      "concept"
+    ]
+  },
+  {
+    "id": "pilot-light",
+    "title": "Pilot Light",
+    "aliases": [
+      "Pilot Light",
+      "pilot light"
+    ],
+    "summary": "Estrategia de DR con nucleo critico activo y resto de infraestructura a escalar en desastre.",
+    "details": [
+      "Suele ganar cuando importa el costo y el RTO es de horas, no inmediato."
+    ],
+    "tags": [
+      "resilience",
+      "dr",
+      "concept"
+    ]
+  },
+  {
+    "id": "pinpoint",
+    "title": "Amazon Pinpoint",
+    "aliases": [
+      "Pinpoint",
+      "Amazon Pinpoint"
+    ],
+    "summary": "Servicio de engagement y comunicacion multicanal con usuarios.",
+    "details": [
+      "No es SNS/SQS; se orienta a mensajeria hacia clientes finales."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "proton",
+    "title": "AWS Proton",
+    "aliases": [
+      "Proton",
+      "AWS Proton"
+    ],
+    "summary": "Servicio para estandarizar y desplegar plataformas y plantillas para microservicios.",
+    "details": [
+      "Aparece en platform engineering e infraestructura estandarizada."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "provisioned-concurrency",
+    "title": "Provisioned concurrency",
+    "aliases": [
+      "Provisioned concurrency",
+      "provisioned concurrency"
+    ],
+    "summary": "Capacidad preinicializada de Lambda para reducir cold starts.",
+    "details": [
+      "Gana cuando el dolor real es latencia de arranque."
+    ],
+    "tags": [
+      "serverless",
+      "resilience",
+      "concept"
+    ]
+  },
+  {
+    "id": "amazon-q",
+    "title": "Amazon Q",
+    "aliases": [
+      "Amazon Q",
+      "Amazon Q (AI assistant)"
+    ],
+    "summary": "Asistente de IA generativa de AWS para desarrollo y negocio.",
+    "details": [
+      "Fuera del nucleo del examen, pero conviene ubicarlo como asistente/AI."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "rds",
+    "title": "Amazon RDS",
+    "aliases": [
+      "RDS",
+      "Amazon RDS"
+    ],
+    "summary": "Servicio administrado de bases de datos relacionales.",
+    "details": [
+      "En examen suele aparecer con read replicas, backups, Multi-AZ y DR.",
+      "No es lo mismo que Aurora, que usa endpoints de cluster propios."
+    ],
+    "tags": [
+      "data",
+      "service"
+    ]
+  },
+  {
+    "id": "read-replica",
+    "title": "Read replica",
+    "aliases": [
+      "read replica",
+      "Read replica"
+    ],
+    "summary": "Replica asincrona para descarga de lecturas o estrategias de DR.",
+    "details": [
+      "Gana cuando la pregunta pide mejorar RPO/RTO mejor que backup/restore puro."
+    ],
+    "tags": [
+      "data",
+      "concept"
+    ]
+  },
+  {
+    "id": "rebalancing",
+    "title": "Rebalancing",
+    "aliases": [
+      "rebalancing",
+      "rebalance"
+    ],
+    "summary": "Ajuste automatico del ASG para redistribuir capacidad y mantener balance.",
+    "details": [
+      "Puede exceder temporalmente el max capacity mientras corrige el balance."
+    ],
+    "tags": [
+      "resilience",
+      "concept"
+    ]
+  },
+  {
+    "id": "redshift",
+    "title": "Amazon Redshift",
+    "aliases": [
+      "Redshift",
+      "Amazon Redshift"
+    ],
+    "summary": "Data warehouse administrado para analitica a gran escala.",
+    "details": [
+      "No es RDS ni Athena; se usa para almacenamiento analitico persistente."
+    ],
+    "tags": [
+      "data",
+      "service"
+    ]
+  },
+  {
+    "id": "reserved-concurrency",
+    "title": "Reserved concurrency",
+    "aliases": [
+      "Reserved concurrency",
+      "reserved concurrency"
+    ],
+    "summary": "Reserva y limita concurrencia para una funcion Lambda.",
+    "details": [
+      "Sirve para aislar capacidad o limitar ejecuciones, pero no elimina cold starts."
+    ],
+    "tags": [
+      "serverless",
+      "resilience",
+      "concept"
+    ]
+  },
+  {
+    "id": "ram",
+    "title": "AWS Resource Access Manager",
+    "aliases": [
+      "RAM",
+      "AWS Resource Access Manager",
+      "AWS Resource Access Manager (RAM)"
+    ],
+    "summary": "Servicio para compartir recursos AWS entre cuentas.",
+    "details": [
+      "Aparece con Organizations y multi-cuenta."
+    ],
+    "tags": [
+      "organizations",
+      "service"
+    ]
+  },
+  {
+    "id": "robomaker",
+    "title": "AWS RoboMaker",
+    "aliases": [
+      "RoboMaker",
+      "AWS RoboMaker"
+    ],
+    "summary": "Servicio para desarrollo, simulacion y despliegue de aplicaciones roboticas.",
+    "details": [
+      "Fuera del centro del examen; ubicalo como servicio especializado."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "route53",
+    "title": "Amazon Route 53",
+    "aliases": [
+      "Route 53",
+      "Amazon Route 53"
+    ],
+    "summary": "Servicio DNS administrado con varias politicas de routing y health checks.",
+    "details": [
+      "La politica exacta decide la respuesta: failover, weighted, latency, geolocation, etc.",
+      "No uses TTL bajo como sustituto de traffic shifting interno cuando ALB o CodeDeploy ya controlan el cambio real.",
+      "Multi-AZ no implica Route 53; Route 53 aparece cuando el problema es DNS, failover o decision entre endpoints."
+    ],
+    "tags": [
+      "resilience",
+      "networking",
+      "service"
+    ]
+  },
+  {
+    "id": "s3",
+    "title": "Amazon S3",
+    "aliases": [
+      "S3",
+      "Amazon S3"
+    ],
+    "summary": "Servicio de almacenamiento de objetos altamente durable y escalable.",
+    "details": [
+      "Suele aparecer con logging, versionado, eventos, artefactos y sitios estaticos."
+    ],
+    "tags": [
+      "storage",
+      "service"
+    ]
+  },
+  {
+    "id": "s3objectversion",
+    "title": "S3ObjectVersion",
+    "aliases": [
+      "S3ObjectVersion"
+    ],
+    "summary": "Propiedad comunmente usada para forzar actualizaciones de codigo empaquetado en CloudFormation.",
+    "details": [
+      "Muy util para que Lambda o otros artefactos se actualicen cuando el objeto cambia."
+    ],
+    "tags": [
+      "storage",
+      "concept"
+    ]
+  },
+  {
+    "id": "sagemaker",
+    "title": "Amazon SageMaker",
+    "aliases": [
+      "SageMaker",
+      "Amazon SageMaker"
+    ],
+    "summary": "Servicio para construir, entrenar y desplegar modelos de ML.",
+    "details": [
+      "Fuera del nucleo del examen, pero conviene distinguirlo de Glue o Kendra."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "scheduled-scaling",
+    "title": "Scheduled scaling",
+    "aliases": [
+      "scheduled scaling",
+      "Scheduled scaling"
+    ],
+    "summary": "Politica de Auto Scaling para cambios de carga predecibles por horario o calendario.",
+    "details": [
+      "Gana cuando la carga sigue un patron temporal claro, como picos semanales."
+    ],
+    "tags": [
+      "resilience",
+      "concept"
+    ]
+  },
+  {
+    "id": "secrets-manager",
+    "title": "AWS Secrets Manager",
+    "aliases": [
+      "Secrets Manager",
+      "AWS Secrets Manager"
+    ],
+    "summary": "Servicio para administrar, recuperar y rotar secretos como credenciales, tokens y API keys.",
+    "details": [
+      "Gana cuando la pista clave es rotacion automatica de secretos.",
+      "Evita credenciales embebidas en codigo.",
+      "No lo confundas con Parameter Store cuando el requisito fino es rotacion administrada y manejo de secretos."
+    ],
+    "tags": [
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "security-hub",
+    "title": "AWS Security Hub",
+    "aliases": [
+      "Security Hub",
+      "AWS Security Hub"
+    ],
+    "summary": "Servicio para agregar, normalizar y priorizar hallazgos de seguridad y postura entre multiples cuentas y servicios.",
+    "details": [
+      "No reemplaza GuardDuty, Inspector o Config; los centraliza y correlaciona.",
+      "Gana cuando la pista es vista centralizada de hallazgos, estandares de seguridad o postura multi-cuenta.",
+      "No es el servicio que detecta primero la amenaza ni el que evalua NON_COMPLIANT por si solo."
+    ],
+    "tags": [
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "service-catalog",
+    "title": "AWS Service Catalog",
+    "aliases": [
+      "Service Catalog",
+      "AWS Service Catalog"
+    ],
+    "summary": "Servicio para publicar y gobernar productos aprobados de infraestructura y software.",
+    "details": [
+      "Aparece con Control Tower, Account Factory y gobernanza multi-cuenta."
+    ],
+    "tags": [
+      "governance",
+      "service"
+    ]
+  },
+  {
+    "id": "service-managed-permissions",
+    "title": "Service-managed permissions",
+    "aliases": [
+      "service-managed permissions",
+      "Service-managed permissions"
+    ],
+    "summary": "Modelo de permisos de StackSets que integra CloudFormation con Organizations.",
+    "details": [
+      "Reduce el trabajo manual para despliegues automativos en cuentas nuevas."
+    ],
+    "tags": [
+      "iac",
+      "concept"
+    ]
+  },
+  {
+    "id": "ses",
+    "title": "Amazon SES",
+    "aliases": [
+      "SES",
+      "Amazon SES",
+      "Amazon SES (Simple Email Service)"
+    ],
+    "summary": "Servicio de envio y recepcion de correo electronico.",
+    "details": [
+      "No es SNS; se enfoca en correo."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "sns",
+    "title": "Amazon SNS",
+    "aliases": [
+      "SNS",
+      "Amazon SNS",
+      "Amazon SNS (Simple Notification Service)"
+    ],
+    "summary": "Servicio de notificacion y fan-out para distribuir mensajes a suscriptores o sistemas.",
+    "details": [
+      "Suele ir al final del flujo de alerta o notificacion.",
+      "No deberia cargar con el filtro principal si EventBridge o Config ya pueden decidir antes."
+    ],
+    "tags": [
+      "operations",
+      "service"
+    ]
+  },
+  {
+    "id": "spot-instances",
+    "title": "Spot Instances",
+    "aliases": [
+      "Spot",
+      "Spot Instances"
+    ],
+    "summary": "Capacidad EC2 con descuento que puede ser interrumpida por AWS.",
+    "details": [
+      "No es lo mismo que On-Demand y cambia la logica de ASG en mixed instances."
+    ],
+    "tags": [
+      "resilience",
+      "concept"
+    ]
+  },
+  {
+    "id": "sqs",
+    "title": "Amazon SQS",
+    "aliases": [
+      "SQS",
+      "Amazon SQS",
+      "Amazon SQS (Simple Queue Service)"
+    ],
+    "summary": "Servicio de colas para desacoplar componentes.",
+    "details": [
+      "Distingue colas de notificaciones: SQS guarda; SNS distribuye."
+    ],
+    "tags": [
+      "operations",
+      "service"
+    ]
+  },
+  {
+    "id": "state-manager",
+    "title": "State Manager",
+    "aliases": [
+      "State Manager",
+      "Systems Manager State Manager"
+    ],
+    "summary": "Capacidad de Systems Manager para mantener configuracion deseada sobre nodos administrados.",
+    "details": [
+      "Sirve para aplicar configuraciones repetibles y asociaciones programadas."
+    ],
+    "tags": [
+      "operations",
+      "service"
+    ]
+  },
+  {
+    "id": "step-functions",
+    "title": "AWS Step Functions",
+    "aliases": [
+      "Step Functions",
+      "AWS Step Functions"
+    ],
+    "summary": "Servicio para orquestar flujos de trabajo con estado, esperas, errores y pasos multiples.",
+    "details": [
+      "Gana cuando el workflow dura mucho, necesita estado o aprobaciones/esperas estructuradas."
+    ],
+    "tags": [
+      "operations",
+      "serverless",
+      "service"
+    ]
+  },
+  {
+    "id": "assume-role",
+    "title": "STS AssumeRole",
+    "aliases": [
+      "AssumeRole",
+      "sts:AssumeRole",
+      "STS AssumeRole"
+    ],
+    "summary": "Patron base para acceso cross-account o cambio temporal de identidad.",
+    "details": [
+      "La trust policy del rol destino decide quien puede asumirlo.",
+      "Luego vienen las permissions policies y permisos del recurso."
+    ],
+    "tags": [
+      "security",
+      "cross-account",
+      "concept"
+    ]
+  },
+  {
+    "id": "systems-manager",
+    "title": "AWS Systems Manager",
+    "aliases": [
+      "Systems Manager",
+      "AWS Systems Manager"
+    ],
+    "summary": "Familia de capacidades para operar nodos, automatizar tareas, parchear, inventariar y administrar configuracion y parametros.",
+    "details": [
+      "Automation, Patch Manager, State Manager, Run Command y Parameter Store viven aqui.",
+      "Gana cuando piden runbooks, aprobacion manual, trazabilidad operativa o remediacion repetible.",
+      "No confundas operar flota con reaccionar a un evento puntual; muchas veces Systems Manager ejecuta y EventBridge solo dispara."
+    ],
+    "tags": [
+      "operations",
+      "service"
+    ]
+  },
+  {
+    "id": "ssm-automation",
+    "title": "Systems Manager Automation",
+    "aliases": [
+      "SSM Automation",
+      "Systems Manager Automation",
+      "Automation"
+    ],
+    "summary": "Motor de runbooks para automatizar mantenimiento, despliegue y remediacion a escala.",
+    "details": [
+      "Muy comun en autoremediacion de Config y en flujos con aprobacion manual.",
+      "Piensa en runbooks, pasos, concurrencia y errores tolerados."
+    ],
+    "tags": [
+      "operations",
+      "service"
+    ]
+  },
+  {
+    "id": "parameter-store",
+    "title": "Systems Manager Parameter Store",
+    "aliases": [
+      "Parameter Store",
+      "Systems Manager Parameter Store"
+    ],
+    "summary": "Almacen de parametros y configuracion runtime; tambien puede guardar secretos como SecureString.",
+    "details": [
+      "No gana si el requisito fuerte es rotacion nativa; ahi gana Secrets Manager.",
+      "Si la pista es configuracion centralizada o parametros runtime, suele encajar bien."
+    ],
+    "tags": [
+      "operations",
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "target-tracking",
+    "title": "Target tracking scaling",
+    "aliases": [
+      "target tracking",
+      "Target tracking",
+      "target tracking scaling"
+    ],
+    "summary": "Politica de Auto Scaling para mantener una metrica cerca de un valor objetivo.",
+    "details": [
+      "Gana cuando el objetivo es mantener CPU o throughput alrededor de un valor."
+    ],
+    "tags": [
+      "resilience",
+      "concept"
+    ]
+  },
+  {
+    "id": "textract",
+    "title": "AWS Textract",
+    "aliases": [
+      "Textract",
+      "AWS Textract"
+    ],
+    "summary": "Servicio para extraer texto, formularios y tablas de documentos.",
+    "details": [
+      "Fuera del nucleo del examen; ubicalo como OCR/document AI."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "transfer-family",
+    "title": "AWS Transfer Family",
+    "aliases": [
+      "Transfer Family",
+      "AWS Transfer Family"
+    ],
+    "summary": "Servicio administrado para SFTP, FTPS y FTP sobre AWS.",
+    "details": [
+      "Aparece cuando el requisito es integracion de transferencia de archivos tradicional."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "transit-gateway",
+    "title": "AWS Transit Gateway",
+    "aliases": [
+      "Transit Gateway",
+      "AWS Transit Gateway",
+      "TGW"
+    ],
+    "summary": "Hub de red para interconectar VPCs, cuentas y redes on-premises.",
+    "details": [
+      "No confundas logs de trafico/red con logs del appliance de firewall."
+    ],
+    "tags": [
+      "networking",
+      "service"
+    ]
+  },
+  {
+    "id": "trusted-advisor",
+    "title": "AWS Trusted Advisor",
+    "aliases": [
+      "Trusted Advisor",
+      "AWS Trusted Advisor"
+    ],
+    "summary": "Checks administrados de mejores practicas para costo, seguridad, limites, performance y resiliencia.",
+    "details": [
+      "Gana cuando AWS ya trae el check y la pregunta pide menor esfuerzo de desarrollo u operacion.",
+      "No es la herramienta correcta para enforcement continuo fino de configuracion."
+    ],
+    "tags": [
+      "operations",
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "trust-policy",
+    "title": "Trust policy",
+    "aliases": [
+      "trust policy",
+      "Trust policy"
+    ],
+    "summary": "Politica del rol IAM que define quien puede asumirlo.",
+    "details": [
+      "No es lo mismo que la policy de permisos del principal."
+    ],
+    "tags": [
+      "security",
+      "concept"
+    ]
+  },
+  {
+    "id": "vpc",
+    "title": "Amazon VPC",
+    "aliases": [
+      "VPC",
+      "Amazon VPC"
+    ],
+    "summary": "Red virtual aislada para recursos AWS.",
+    "details": [
+      "Base de networking; aparece con subnets, rutas, endpoints y TGW."
+    ],
+    "tags": [
+      "networking",
+      "service"
+    ]
+  },
+  {
+    "id": "waf",
+    "title": "AWS WAF",
+    "aliases": [
+      "WAF",
+      "AWS WAF"
+    ],
+    "summary": "Firewall de aplicaciones web para filtrar trafico HTTP/HTTPS.",
+    "details": [
+      "Aparece con CloudFront, ALB y Firewall Manager."
+    ],
+    "tags": [
+      "security",
+      "service"
+    ]
+  },
+  {
+    "id": "warm-standby",
+    "title": "Warm Standby",
+    "aliases": [
+      "Warm Standby",
+      "warm standby"
+    ],
+    "summary": "Estrategia de DR con entorno reducido pero funcional listo para escalar rapido.",
+    "details": [
+      "Mas rapido que Pilot Light, pero mas caro."
+    ],
+    "tags": [
+      "resilience",
+      "dr",
+      "concept"
+    ]
+  },
+  {
+    "id": "well-architected-tool",
+    "title": "AWS Well-Architected Tool",
+    "aliases": [
+      "Well-Architected Tool",
+      "AWS Well-Architected Tool"
+    ],
+    "summary": "Herramienta para revisar workloads frente al marco Well-Architected.",
+    "details": [
+      "No es enforcement automatico; es revision guiada y mejora continua."
+    ],
+    "tags": [
+      "operations",
+      "service"
+    ]
+  },
+  {
+    "id": "workspaces",
+    "title": "Amazon WorkSpaces",
+    "aliases": [
+      "WorkSpaces",
+      "Amazon WorkSpaces"
+    ],
+    "summary": "Servicio de escritorios virtuales administrados.",
+    "details": [
+      "Fuera del nucleo del examen; ubicalo como EUC/VDI."
+    ],
+    "tags": [
+      "service"
+    ]
+  },
+  {
+    "id": "xray",
+    "title": "AWS X-Ray",
+    "aliases": [
+      "X-Ray",
+      "AWS X-Ray"
+    ],
+    "summary": "Servicio de trazabilidad distribuida para seguir una solicitud entre servicios y encontrar latencia.",
+    "details": [
+      "Gana cuando el problema es tracing, no logs ni auditoria API."
+    ],
+    "tags": [
+      "observability",
+      "service"
+    ]
+  }
+]

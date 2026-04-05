@@ -10,6 +10,7 @@ fs.mkdirSync(outputDir, { recursive: true });
 const files = fs
   .readdirSync(notesDir)
   .filter((file) => file.toLowerCase().endsWith('.md'))
+  .filter((file) => file.toLowerCase() !== 'huecos-temario-oficial.md')
   .sort((a, b) => a.localeCompare(b, 'es'));
 
 const index = files.map((file) => {

@@ -25,14 +25,14 @@
     "title": "Dominio 6: Security and Compliance",
     "category": "Examen",
     "description": "Objetivos oficiales del dominio 6 del examen.",
-    "url": "https://docs.aws.amazon.com/es_es/aws-certification/latest/devops-engineer-professional-02/eses-devops-engineer-professional-02-domain6.html"
+    "url": "https://docs.aws.amazon.com/aws-certification/latest/userguide/devops-engineer-professional-02-domain6.html"
   },
   {
     "id": "dop-c02-domain5",
     "title": "Dominio 5: Incident and Event Response",
     "category": "Examen",
     "description": "Objetivos oficiales del dominio 5 del examen.",
-    "url": "https://docs.aws.amazon.com/aws-certification/latest/devops-engineer-professional-02/devops-engineer-professional-02-domain5.html"
+    "url": "https://docs.aws.amazon.com/aws-certification/latest/userguide/devops-engineer-professional-02-domain5.html"
   },
   {
     "id": "config-what-is",

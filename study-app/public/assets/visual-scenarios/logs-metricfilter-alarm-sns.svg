@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 300" role="img" aria-label="Logs metric filter alarm sns">
+  <rect width="1100" height="300" fill="#0f1218"/>
+  <text x="35" y="42" fill="#f1b356" font-family="Arial, sans-serif" font-size="24" font-weight="700">CloudWatch Logs - metric filter - alarm - SNS</text>
+  <g font-family="Arial, sans-serif" font-size="22" fill="#fff">
+    <rect x="35" y="95" width="220" height="100" rx="18" fill="#17304a" stroke="#8fc3ff"/><text x="145" y="138" text-anchor="middle">Logs</text><text x="145" y="165" text-anchor="middle" font-size="15" fill="#d6e8ff">Firewall / app / system</text>
+    <rect x="305" y="95" width="220" height="100" rx="18" fill="#1a2f23" stroke="#9fe3b1"/><text x="415" y="138" text-anchor="middle">Metric filter</text><text x="415" y="165" text-anchor="middle" font-size="15" fill="#dff5e6">Critical, Error, login</text>
+    <rect x="575" y="95" width="220" height="100" rx="18" fill="#3d2f12" stroke="#f1d37a"/><text x="685" y="138" text-anchor="middle">Alarm</text><text x="685" y="165" text-anchor="middle" font-size="15" fill="#fff0c2">Threshold decide</text>
+    <rect x="845" y="95" width="220" height="100" rx="18" fill="#3a2415" stroke="#f1b356"/><text x="955" y="138" text-anchor="middle">SNS</text><text x="955" y="165" text-anchor="middle" font-size="15" fill="#ffe8c2">Notificacion</text>
+  </g>
+  <path d="M255 145 H305 M525 145 H575 M795 145 H845" stroke="#9fd1ff" stroke-width="6" marker-end="url(#a)"/>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#9fd1ff"/></marker></defs>
+</svg>

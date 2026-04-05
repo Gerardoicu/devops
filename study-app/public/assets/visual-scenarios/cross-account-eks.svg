@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 340" role="img" aria-label="Cross account EKS">
+  <rect width="1100" height="340" fill="#0f1218"/>
+  <text x="35" y="42" fill="#f1b356" font-family="Arial, sans-serif" font-size="24" font-weight="700">Cuenta DevOps - AssumeRole - Cuenta App - EKS</text>
+  <rect x="40" y="80" width="420" height="200" rx="22" fill="#152032" stroke="#8fc3ff"/>
+  <text x="250" y="112" fill="#cfe6ff" font-family="Arial, sans-serif" font-size="22" text-anchor="middle">Cuenta DevOps</text>
+  <rect x="90" y="145" width="150" height="80" rx="14" fill="#1a2f23" stroke="#9fe3b1"/>
+  <text x="165" y="188" fill="#fff" font-family="Arial, sans-serif" font-size="22" text-anchor="middle">CodeBuild</text>
+  <rect x="260" y="145" width="150" height="80" rx="14" fill="#17304a" stroke="#8fc3ff"/>
+  <text x="335" y="188" fill="#fff" font-family="Arial, sans-serif" font-size="20" text-anchor="middle">Rol origen</text>
+  <rect x="640" y="80" width="420" height="200" rx="22" fill="#22171a" stroke="#f1b356"/>
+  <text x="850" y="112" fill="#ffe0c0" font-family="Arial, sans-serif" font-size="22" text-anchor="middle">Cuenta App</text>
+  <rect x="690" y="130" width="150" height="70" rx="14" fill="#3a2415" stroke="#f1b356"/>
+  <text x="765" y="171" fill="#fff" font-family="Arial, sans-serif" font-size="18" text-anchor="middle">Trust policy</text>
+  <rect x="860" y="130" width="150" height="70" rx="14" fill="#1a2f23" stroke="#9fe3b1"/>
+  <text x="935" y="171" fill="#fff" font-family="Arial, sans-serif" font-size="20" text-anchor="middle">Rol destino</text>
+  <rect x="775" y="215" width="150" height="50" rx="14" fill="#17304a" stroke="#8fc3ff"/>
+  <text x="850" y="246" fill="#fff" font-family="Arial, sans-serif" font-size="18" text-anchor="middle">EKS + aws-auth</text>
+  <path d="M410 185 H690" stroke="#9fd1ff" stroke-width="6" marker-end="url(#a)"/>
+  <text x="550" y="170" fill="#d4c8ae" font-family="Arial, sans-serif" font-size="16" text-anchor="middle">sts:AssumeRole</text>
+  <path d="M935 200 V215" stroke="#9fd1ff" stroke-width="5" marker-end="url(#a)"/>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#9fd1ff"/></marker></defs>
+</svg>

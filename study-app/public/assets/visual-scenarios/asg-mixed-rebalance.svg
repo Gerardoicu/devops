@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 360" role="img" aria-label="ASG mixed instances rebalance">
+  <rect width="1280" height="360" fill="#0f1218"/>
+  <text x="34" y="40" fill="#f1b356" font-family="Arial, sans-serif" font-size="26" font-weight="700">Auto Scaling con mixed instances y rebalance</text>
+  <g font-family="Arial, sans-serif">
+    <rect x="70" y="90" width="1140" height="220" rx="24" fill="#152032" stroke="#8fc3ff"/>
+    <text x="640" y="125" fill="#cfe6ff" font-size="24" text-anchor="middle">Auto Scaling Group</text>
+    <rect x="140" y="165" width="220" height="95" rx="18" fill="#17304a" stroke="#8fc3ff"/><text x="250" y="205" fill="#fff" font-size="22" text-anchor="middle">AZ A</text><text x="250" y="232" fill="#d6e8ff" font-size="15" text-anchor="middle">On-Demand + Spot</text>
+    <rect x="450" y="165" width="220" height="95" rx="18" fill="#1a2f23" stroke="#9fe3b1"/><text x="560" y="205" fill="#fff" font-size="22" text-anchor="middle">AZ B</text><text x="560" y="232" fill="#dff5e6" font-size="15" text-anchor="middle">On-Demand + Spot</text>
+    <rect x="760" y="165" width="220" height="95" rx="18" fill="#3a2415" stroke="#f1b356"/><text x="870" y="205" fill="#fff" font-size="22" text-anchor="middle">Rebalance</text><text x="870" y="232" fill="#ffe8c2" font-size="15" text-anchor="middle">Exceso temporal</text>
+    <rect x="1010" y="165" width="140" height="95" rx="18" fill="#22171a" stroke="#ff9f9f"/><text x="1080" y="205" fill="#fff" font-size="20" text-anchor="middle">Scale-in</text><text x="1080" y="232" fill="#ffd8d8" font-size="15" text-anchor="middle">No intuitivo</text>
+  </g>
+</svg>
