@@ -15,7 +15,7 @@ type AppPhase =
   | 'visual-scenarios'
   | 'glossary';
 type SimulatorBankType = 'verified' | 'public';
-type AssessmentMode = 'quick-quiz' | 'exam';
+type AssessmentMode = 'quick-quiz' | 'exam' | 'training';
 
 interface CardOption {
   id: string;
@@ -60,6 +60,8 @@ interface CardProgress {
 interface DeckState {
   progress: Record<string, CardProgress>;
   examHistory: Record<SimulatorBankType, { attempts: number; lastScorePercent: number | null }>;
+  quickQuizHistory: Record<number, { answered: number; correct: number; incorrect: number }>;
+  trainingBookmarks: Record<number, boolean>;
 }
 
 interface SessionSummary {
@@ -123,9 +125,35 @@ interface GlossaryEntry {
   tags: string[];
 }
 
+type ReportTargetType =
+  | 'question'
+  | 'quick-quiz'
+  | 'concept'
+  | 'note'
+  | 'visual-scenario'
+  | 'glossary';
+
+interface ReportContext {
+  type: ReportTargetType;
+  id: string;
+  title: string;
+  meta?: string | null;
+}
+
+interface ContentReport {
+  type: ReportTargetType;
+  id: string;
+  title: string;
+  meta: string | null;
+  comment: string;
+  createdAt: string;
+  appVersion: string;
+}
+
 const STORAGE_KEY = 'dop-c02-study-state-v1';
 const RUNTIME_STORAGE_KEY = 'dop-c02-runtime-state-v1';
-const SIMULATOR_DURATION_SECONDS = 180 * 60;
+const REPORTS_STORAGE_KEY = 'dop-c02-content-reports-v1';
+const SIMULATOR_DURATION_SECONDS = 210 * 60;
 
 interface RuntimeSnapshot {
   phase: AppPhase;
@@ -147,9 +175,11 @@ interface RuntimeSnapshot {
   activeNoteId: string | null;
   activeGlossaryId: string | null;
   glossaryReturnPhase: AppPhase | null;
+  visualReturnPhase: AppPhase | null;
   assessmentMode: AssessmentMode;
   quickQuizRevealed: boolean;
   quickQuizLastCorrect: boolean | null;
+  trainingChecked: Record<number, boolean>;
 }
 
 @Component({
@@ -161,7 +191,7 @@ export class App {
   private readonly http = inject(HttpClient);
   private readonly sanitizer = inject(DomSanitizer);
   private audioContext: AudioContext | null = null;
-  readonly appVersion = 'v1.2.7';
+  readonly appVersion = 'v1.3.4';
 
   readonly cards = signal<StudyCard[]>([]);
   readonly conceptCards = signal<StudyCard[]>([]);
@@ -179,6 +209,7 @@ export class App {
   readonly activeGlossaryEntry = signal<GlossaryEntry | null>(null);
   readonly glossaryQuery = signal('');
   readonly glossaryReturnPhase = signal<AppPhase | null>(null);
+  readonly visualReturnPhase = signal<AppPhase | null>(null);
   readonly simulatorBankType = signal<SimulatorBankType>('verified');
   readonly assessmentMode = signal<AssessmentMode>('exam');
   readonly phase = signal<AppPhase>('home');
@@ -199,6 +230,10 @@ export class App {
   readonly simulatorDeadlineAt = signal<number | null>(null);
   readonly quickQuizRevealed = signal(false);
   readonly quickQuizLastCorrect = signal<boolean | null>(null);
+  readonly trainingChecked = signal<Record<number, boolean>>({});
+  readonly reports = signal<ContentReport[]>(this.loadReports());
+  readonly reportContext = signal<ReportContext | null>(null);
+  readonly reportDraft = signal('');
 
   readonly currentCard = computed(() => this.sessionQueue()[this.currentIndex()] ?? null);
   readonly currentSimulatorQuestion = computed(
@@ -258,6 +293,43 @@ export class App {
   readonly quickQuizIncorrectCount = computed(() =>
     this.simulatorAnsweredCount() - this.quickQuizCorrectCount()
   );
+  readonly hasQuickQuizInProgress = computed(() => {
+    if (this.assessmentMode() !== 'quick-quiz' || this.simulatorSummary() !== null) {
+      return false;
+    }
+    return (
+      this.simulatorQueue().length > 0 &&
+      (this.simulatorIndex() > 0 || Object.keys(this.simulatorAnswers()).length > 0)
+    );
+  });
+  readonly hasExamInProgress = computed(() => {
+    if (this.assessmentMode() !== 'exam' || this.simulatorSummary() !== null) {
+      return false;
+    }
+    return this.simulatorQueue().length > 0;
+  });
+  readonly hasTrainingInProgress = computed(() => {
+    if (this.assessmentMode() !== 'training' || this.simulatorSummary() !== null) {
+      return false;
+    }
+    return this.simulatorQueue().length > 0;
+  });
+  readonly hasAnySimulatorInProgress = computed(
+    () => this.hasExamInProgress() || this.hasTrainingInProgress()
+  );
+  readonly currentTrainingBookmarked = computed(() => {
+    const question = this.currentSimulatorQuestion();
+    if (!question || !this.isTraining()) {
+      return false;
+    }
+    return !!this.state().trainingBookmarks[question.id];
+  });
+  readonly activeSimulatorLabel = computed(() => {
+    if (this.hasTrainingInProgress()) {
+      return 'Continuar entrenamiento';
+    }
+    return 'Continuar simulador';
+  });
   readonly formattedRemainingTime = computed(() => {
     const totalSeconds = this.remainingSeconds();
     const hours = Math.floor(totalSeconds / 3600);
@@ -364,6 +436,8 @@ export class App {
     return card ? this.findGlossaryEntries(`${card.title}\n${card.prompt}\n${card.body ?? ''}\n${card.explanation}`) : [];
   });
   readonly isQuickQuiz = computed(() => this.assessmentMode() === 'quick-quiz');
+  readonly isTraining = computed(() => this.assessmentMode() === 'training');
+  readonly reportCount = computed(() => this.reports().length);
   readonly filteredGlossaryEntries = computed(() => {
     const query = this.glossaryQuery().trim().toLowerCase();
     const entries = this.glossaryEntries();
@@ -495,6 +569,7 @@ export class App {
   }
 
   startSession(mode: SessionMode): void {
+    this.closeReportPanel();
     this.sessionMode.set(mode);
     this.selectedAnswer.set(null);
     this.revealed.set(false);
@@ -521,8 +596,9 @@ export class App {
   }
 
   startQuickQuiz(): void {
+    this.closeReportPanel();
     this.assessmentMode.set('quick-quiz');
-    const queue = this.shuffle(this.quickQuizBank()).slice(0, Math.min(100, this.quickQuizBank().length));
+    const queue = this.buildWeightedQuickQuizQueue();
     this.simulatorBankType.set('verified');
     this.simulatorQueue.set(queue);
     this.simulatorIndex.set(0);
@@ -534,28 +610,90 @@ export class App {
     this.simulatorDeadlineAt.set(null);
     this.quickQuizRevealed.set(false);
     this.quickQuizLastCorrect.set(null);
+    this.trainingChecked.set({});
     this.phase.set('simulator');
     this.playTone('start');
   }
 
+  continueQuickQuiz(): void {
+    if (!this.hasQuickQuizInProgress()) {
+      this.startQuickQuiz();
+      return;
+    }
+
+    this.closeReportPanel();
+    this.assessmentMode.set('quick-quiz');
+    this.phase.set('simulator');
+    this.syncQuickQuizRevealState();
+    this.playTone('start');
+  }
+
+  startTraining(): void {
+    this.closeReportPanel();
+    this.assessmentMode.set('training');
+    this.simulatorBankType.set('verified');
+    this.simulatorQueue.set([...this.simulatorBank()]);
+    this.simulatorIndex.set(0);
+    this.simulatorAnswers.set({});
+    this.simulatorSummary.set(null);
+    this.showSimulatorReview.set(false);
+    this.remainingSeconds.set(0);
+    this.simulatorStartedAt.set(null);
+    this.simulatorDeadlineAt.set(null);
+    this.quickQuizRevealed.set(false);
+    this.quickQuizLastCorrect.set(null);
+    this.trainingChecked.set({});
+    this.phase.set('simulator');
+    this.playTone('start');
+  }
+
+  continueSimulator(): void {
+    if (!this.hasAnySimulatorInProgress()) {
+      this.startSimulator('verified');
+      return;
+    }
+
+    this.closeReportPanel();
+    this.phase.set('simulator');
+    if (this.assessmentMode() === 'exam' && this.simulatorDeadlineAt()) {
+      this.syncRemainingSecondsFromDeadline();
+      if (this.remainingSeconds() > 0) {
+        this.startSimulatorTimer();
+      } else {
+        this.finishSimulator();
+      }
+    }
+    this.playTone('start');
+  }
+
   goHome(): void {
-    this.clearSimulatorTimer();
+    const preserveActiveAssessment =
+      this.simulatorQueue().length > 0 && this.simulatorSummary() === null;
+    if (!preserveActiveAssessment) {
+      this.clearSimulatorTimer();
+    }
     this.phase.set('home');
     this.selectedAnswer.set(null);
     this.revealed.set(false);
     this.activeNote.set(null);
     this.activeNoteContent.set('');
     this.sessionSummary.set(null);
-    this.simulatorSummary.set(null);
-    this.showSimulatorReview.set(false);
+    if (!preserveActiveAssessment) {
+      this.simulatorSummary.set(null);
+      this.showSimulatorReview.set(false);
+      this.quickQuizRevealed.set(false);
+      this.quickQuizLastCorrect.set(null);
+      this.trainingChecked.set({});
+    }
     this.activeGlossaryEntry.set(null);
     this.glossaryReturnPhase.set(null);
-    this.quickQuizRevealed.set(false);
-    this.quickQuizLastCorrect.set(null);
+    this.visualReturnPhase.set(null);
     this.visualScenarioQuestionFilter.set(null);
+    this.closeReportPanel();
   }
 
   openNote(note: StudyNote): void {
+    this.closeReportPanel();
     this.http
       .get(`assets/notes/${encodeURIComponent(note.fileName)}`, { responseType: 'text' })
       .subscribe((content) => {
@@ -567,20 +705,37 @@ export class App {
   }
 
   openOfficialLinks(): void {
+    this.closeReportPanel();
     this.phase.set('official-links');
   }
 
   openVisualScenarios(): void {
+    this.closeReportPanel();
+    if (this.phase() !== 'visual-scenarios') {
+      this.visualReturnPhase.set(this.phase());
+    }
     this.visualScenarioQuestionFilter.set(null);
     this.phase.set('visual-scenarios');
   }
 
   openVisualScenariosForQuestion(questionId: number): void {
+    this.closeReportPanel();
+    if (this.phase() !== 'visual-scenarios') {
+      this.visualReturnPhase.set(this.phase());
+    }
     this.visualScenarioQuestionFilter.set(questionId);
     this.phase.set('visual-scenarios');
   }
 
+  closeVisualScenarios(): void {
+    const returnPhase = this.visualReturnPhase();
+    this.visualReturnPhase.set(null);
+    this.visualScenarioQuestionFilter.set(null);
+    this.phase.set(returnPhase ?? 'home');
+  }
+
   openVerifiedQuestion(questionId: number): void {
+    this.closeReportPanel();
     const question = this.simulatorBank().find((item) => item.id === questionId);
     if (!question) {
       return;
@@ -603,6 +758,7 @@ export class App {
   }
 
   openGlossaryBrowser(): void {
+    this.closeReportPanel();
     this.activeGlossaryEntry.set(null);
     this.glossaryQuery.set('');
     this.glossaryReturnPhase.set(this.phase());
@@ -610,6 +766,7 @@ export class App {
   }
 
   openGlossary(entry: GlossaryEntry): void {
+    this.closeReportPanel();
     if (this.phase() !== 'glossary') {
       this.glossaryReturnPhase.set(this.phase());
     }
@@ -622,10 +779,85 @@ export class App {
     this.activeGlossaryEntry.set(null);
     this.glossaryReturnPhase.set(null);
     this.glossaryQuery.set('');
+    this.closeReportPanel();
     this.phase.set(returnPhase ?? 'home');
   }
 
+  openReportPanel(context: ReportContext): void {
+    this.reportContext.set(context);
+    this.reportDraft.set('');
+  }
+
+  closeReportPanel(): void {
+    this.reportContext.set(null);
+    this.reportDraft.set('');
+  }
+
+  isReporting(type: ReportTargetType, id: string): boolean {
+    const current = this.reportContext();
+    return !!current && current.type === type && current.id === id;
+  }
+
+  saveReport(): void {
+    const context = this.reportContext();
+    const comment = this.reportDraft().trim();
+    if (!context || !comment) {
+      return;
+    }
+
+    const next: ContentReport = {
+      type: context.type,
+      id: context.id,
+      title: context.title,
+      meta: context.meta ?? null,
+      comment,
+      createdAt: new Date().toISOString(),
+      appVersion: this.appVersion
+    };
+
+    this.reports.update((current) => {
+      const updated = [...current, next];
+      localStorage.setItem(REPORTS_STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+
+    this.closeReportPanel();
+    this.playTone('soft');
+  }
+
+  exportReports(): void {
+    const reports = this.reports();
+    if (!reports.length) {
+      return;
+    }
+
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      appVersion: this.appVersion,
+      total: reports.length,
+      reports
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    link.href = url;
+    link.download = `dop-c02-content-reports-${stamp}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+
+    this.clearReports();
+  }
+
+  clearReports(): void {
+    this.reports.set([]);
+    localStorage.removeItem(REPORTS_STORAGE_KEY);
+    this.closeReportPanel();
+  }
+
   startSimulator(bankType: SimulatorBankType = 'verified'): void {
+    this.closeReportPanel();
     this.assessmentMode.set('exam');
     this.simulatorBankType.set(bankType);
     const sourceBank = bankType === 'verified' ? this.simulatorBank() : this.publicSimulatorBank();
@@ -640,6 +872,7 @@ export class App {
     this.simulatorStartedAt.set(startedAt);
     this.simulatorDeadlineAt.set(startedAt + SIMULATOR_DURATION_SECONDS * 1000);
     this.phase.set('simulator');
+    this.trainingChecked.set({});
     this.startSimulatorTimer();
     this.playTone('start');
   }
@@ -672,7 +905,35 @@ export class App {
 
       this.quickQuizRevealed.set(true);
       this.quickQuizLastCorrect.set(isCorrect);
+      this.recordQuickQuizAttempt(question.id, isCorrect);
       this.playTone(isCorrect ? 'correct' : 'incorrect');
+      return;
+    }
+
+    if (this.isTraining()) {
+      this.simulatorAnswers.update((current) => {
+        const existing = current[question.id] ?? [];
+        const next =
+          question.questionType === 'single'
+            ? [optionId]
+            : existing.includes(optionId)
+              ? existing.filter((value) => value !== optionId)
+              : [...existing, optionId].sort();
+
+        return {
+          ...current,
+          [question.id]: next
+        };
+      });
+
+      if (question.questionType === 'single') {
+        this.trainingChecked.update((current) => ({
+          ...current,
+          [question.id]: true
+        }));
+      }
+
+      this.playTone('soft');
       return;
     }
 
@@ -702,6 +963,10 @@ export class App {
 
   nextSimulatorQuestion(): void {
     if (this.isQuickQuiz() && !this.quickQuizRevealed()) {
+      return;
+    }
+
+    if (this.isTraining() && !this.isTrainingQuestionChecked(this.currentSimulatorQuestion()?.id ?? -1)) {
       return;
     }
 
@@ -825,6 +1090,22 @@ export class App {
   }
 
   simulatorOptionClass(question: SimulatorQuestion, optionId: string): string {
+    if (this.isTraining()) {
+      if (!this.isTrainingQuestionChecked(question.id)) {
+        return this.isSimulatorSelected(question.id, optionId) ? 'selected' : '';
+      }
+
+      if (question.correctAnswers.includes(optionId)) {
+        return 'correct';
+      }
+
+      if (this.isSimulatorSelected(question.id, optionId)) {
+        return 'incorrect';
+      }
+
+      return '';
+    }
+
     if (!this.isQuickQuiz() || !this.quickQuizRevealed()) {
       return this.isSimulatorSelected(question.id, optionId) ? 'selected' : '';
     }
@@ -842,6 +1123,71 @@ export class App {
 
   toggleSimulatorReview(): void {
     this.showSimulatorReview.update((value) => !value);
+  }
+
+  isTrainingQuestionChecked(questionId: number): boolean {
+    return !!this.trainingChecked()[questionId];
+  }
+
+  verifyCurrentTrainingAnswer(): void {
+    const question = this.currentSimulatorQuestion();
+    if (!question) {
+      return;
+    }
+
+    const selected = this.simulatorAnswers()[question.id] ?? [];
+    if (!selected.length) {
+      return;
+    }
+
+    this.trainingChecked.update((current) => ({
+      ...current,
+      [question.id]: true
+    }));
+    this.playTone(this.isCurrentTrainingAnswerCorrect() ? 'correct' : 'incorrect');
+  }
+
+  toggleTrainingBookmark(questionId: number): void {
+    this.state.update((current) => {
+      const next = { ...current.trainingBookmarks };
+      if (next[questionId]) {
+        delete next[questionId];
+      } else {
+        next[questionId] = true;
+      }
+
+      return {
+        ...current,
+        trainingBookmarks: next
+      };
+    });
+    this.playTone('soft');
+  }
+
+  isTrainingBookmarked(questionId: number): boolean {
+    return !!this.state().trainingBookmarks[questionId];
+  }
+
+  hasCurrentTrainingSelection(): boolean {
+    const question = this.currentSimulatorQuestion();
+    if (!question) {
+      return false;
+    }
+    return (this.simulatorAnswers()[question.id] ?? []).length > 0;
+  }
+
+  isCurrentTrainingAnswerCorrect(): boolean {
+    const question = this.currentSimulatorQuestion();
+    if (!question) {
+      return false;
+    }
+
+    const selected = [...(this.simulatorAnswers()[question.id] ?? [])].sort();
+    const expected = [...question.correctAnswers].sort();
+    return (
+      selected.length === expected.length &&
+      selected.every((value, index) => value === expected[index])
+    );
   }
 
   selectAnswer(optionId: string): void {
@@ -1053,7 +1399,9 @@ export class App {
         examHistory: {
           verified: { attempts: 0, lastScorePercent: null },
           public: { attempts: 0, lastScorePercent: null }
-        }
+        },
+        quickQuizHistory: {},
+        trainingBookmarks: {}
       };
     }
 
@@ -1064,7 +1412,9 @@ export class App {
         examHistory: {
           verified: parsed.examHistory?.verified ?? { attempts: 0, lastScorePercent: null },
           public: parsed.examHistory?.public ?? { attempts: 0, lastScorePercent: null }
-        }
+        },
+        quickQuizHistory: parsed.quickQuizHistory ?? {},
+        trainingBookmarks: parsed.trainingBookmarks ?? {}
       };
     } catch {
       return {
@@ -1072,8 +1422,24 @@ export class App {
         examHistory: {
           verified: { attempts: 0, lastScorePercent: null },
           public: { attempts: 0, lastScorePercent: null }
-        }
+        },
+        quickQuizHistory: {},
+        trainingBookmarks: {}
       };
+    }
+  }
+
+  private loadReports(): ContentReport[] {
+    const raw = localStorage.getItem(REPORTS_STORAGE_KEY);
+    if (!raw) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? (parsed as ContentReport[]) : [];
+    } catch {
+      return [];
     }
   }
 
@@ -1126,9 +1492,11 @@ export class App {
       activeNoteId: this.activeNote()?.id ?? null,
       activeGlossaryId: this.activeGlossaryEntry()?.id ?? null,
       glossaryReturnPhase: this.glossaryReturnPhase(),
+      visualReturnPhase: this.visualReturnPhase(),
       assessmentMode: this.assessmentMode(),
       quickQuizRevealed: this.quickQuizRevealed(),
       quickQuizLastCorrect: this.quickQuizLastCorrect(),
+      trainingChecked: this.trainingChecked(),
     };
   }
 
@@ -1146,8 +1514,10 @@ export class App {
     this.simulatorDeadlineAt.set(snapshot.simulatorDeadlineAt ?? null);
     this.assessmentMode.set(snapshot.assessmentMode ?? 'exam');
     this.glossaryReturnPhase.set(snapshot.glossaryReturnPhase ?? null);
+    this.visualReturnPhase.set(snapshot.visualReturnPhase ?? null);
     this.quickQuizRevealed.set(!!snapshot.quickQuizRevealed);
     this.quickQuizLastCorrect.set(snapshot.quickQuizLastCorrect ?? null);
+    this.trainingChecked.set(snapshot.trainingChecked ?? {});
 
     const cardsById = new Map(this.conceptCards().map((card) => [card.id, card]));
     const restoredSessionQueue = (snapshot.sessionQueueIds ?? [])
@@ -1187,6 +1557,7 @@ export class App {
     }
 
     this.phase.set(snapshot.phase ?? 'home');
+    this.syncQuickQuizRevealState();
 
     if (snapshot.phase === 'simulator' && restoredSimulatorQueue.length && snapshot.assessmentMode !== 'quick-quiz') {
       this.syncRemainingSecondsFromDeadline();
@@ -1226,6 +1597,72 @@ export class App {
 
     const next = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
     this.remainingSeconds.set(next);
+  }
+
+  private buildWeightedQuickQuizQueue(): SimulatorQuestion[] {
+    const history = this.state().quickQuizHistory;
+    return [...this.quickQuizBank()]
+      .map((question) => {
+        const stats = history[question.id] ?? { answered: 0, correct: 0, incorrect: 0 };
+        return {
+          question,
+          priority: stats.answered + Math.random() * 1.5
+        };
+      })
+      .sort((left, right) => left.priority - right.priority)
+      .slice(0, Math.min(100, this.quickQuizBank().length))
+      .map((item) => item.question);
+  }
+
+  private recordQuickQuizAttempt(questionId: number, isCorrect: boolean): void {
+    this.state.update((current) => {
+      const previous = current.quickQuizHistory[questionId] ?? {
+        answered: 0,
+        correct: 0,
+        incorrect: 0
+      };
+
+      return {
+        ...current,
+        quickQuizHistory: {
+          ...current.quickQuizHistory,
+          [questionId]: {
+            answered: previous.answered + 1,
+            correct: previous.correct + (isCorrect ? 1 : 0),
+            incorrect: previous.incorrect + (isCorrect ? 0 : 1)
+          }
+        }
+      };
+    });
+  }
+
+  private syncQuickQuizRevealState(): void {
+    if (this.assessmentMode() !== 'quick-quiz') {
+      this.quickQuizRevealed.set(false);
+      this.quickQuizLastCorrect.set(null);
+      return;
+    }
+
+    const question = this.currentSimulatorQuestion();
+    if (!question) {
+      this.quickQuizRevealed.set(false);
+      this.quickQuizLastCorrect.set(null);
+      return;
+    }
+
+    const selected = [...(this.simulatorAnswers()[question.id] ?? [])].sort();
+    if (!selected.length) {
+      this.quickQuizRevealed.set(false);
+      this.quickQuizLastCorrect.set(null);
+      return;
+    }
+
+    const expected = [...question.correctAnswers].sort();
+    const isCorrect =
+      selected.length === expected.length &&
+      selected.every((value, index) => value === expected[index]);
+    this.quickQuizRevealed.set(true);
+    this.quickQuizLastCorrect.set(isCorrect);
   }
 
   private shuffle<T>(items: T[]): T[] {

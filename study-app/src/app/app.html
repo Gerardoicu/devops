@@ -1,4 +1,4 @@
-<main class="shell">
+﻿<main class="shell">
   <section class="hero">
     <div>
       <p class="eyebrow">DOP-C02 microaprendizaje</p>
@@ -15,9 +15,9 @@
     <section class="home-grid">
       <article class="mode-card mode-card-simulator">
         <p class="mode-kicker">Simulador AWS</p>
-        <h2>Examen completo</h2>
+        <h2>Simulador y entrenamiento</h2>
         <p>
-          Ejecuta un simulador cronometrado y elige el origen del banco antes de empezar.
+          Ejecuta examen cronometrado o entrenamiento con correccion inmediata usando el banco verificado.
         </p>
         <div class="simulator-home-stats">
           <div class="simulator-home-stat">
@@ -44,12 +44,30 @@
           </div>
         </div>
         <div class="simulator-bank-actions">
-          <button type="button" class="primary" (click)="startSimulator('verified')">
-            Banco verificado
-          </button>
-          <button type="button" class="secondary" (click)="startSimulator('public')">
-            Banco publico
-          </button>
+          @if (hasAnySimulatorInProgress()) {
+            <button type="button" class="primary" (click)="continueSimulator()">
+              {{ activeSimulatorLabel() }}
+            </button>
+            <button type="button" class="secondary" (click)="startSimulator('verified')">
+              Nuevo verificado
+            </button>
+            <button type="button" class="ghost" (click)="startTraining()">
+              Nuevo entrenamiento
+            </button>
+            <button type="button" class="ghost" (click)="startSimulator('public')">
+              Nuevo publico
+            </button>
+          } @else {
+            <button type="button" class="primary" (click)="startSimulator('verified')">
+              Banco verificado
+            </button>
+            <button type="button" class="secondary" (click)="startSimulator('public')">
+              Banco publico
+            </button>
+            <button type="button" class="ghost" (click)="startTraining()">
+              Entrenamiento
+            </button>
+          }
         </div>
       </article>
 
@@ -59,9 +77,20 @@
         <p>
           Preguntas cortas, aleatorias y con feedback inmediato. Pensado para rondas rapidas de 2 a 5 minutos.
         </p>
-        <button type="button" class="primary" (click)="startQuickQuiz()">
-          Empezar quiz de 100
-        </button>
+        <div class="simulator-bank-actions">
+          @if (hasQuickQuizInProgress()) {
+            <button type="button" class="primary" (click)="continueQuickQuiz()">
+              Continuar quiz
+            </button>
+            <button type="button" class="secondary" (click)="startQuickQuiz()">
+              Nueva ronda de 100
+            </button>
+          } @else {
+            <button type="button" class="primary" (click)="startQuickQuiz()">
+              Empezar quiz de 100
+            </button>
+          }
+        </div>
       </article>
 
       @for (mode of sessionModes; track mode) {
@@ -129,6 +158,23 @@
           Abrir glosario
         </button>
       </article>
+
+      <article class="mode-card">
+        <p class="mode-kicker">Revision local</p>
+        <h2>Reportes de contenido</h2>
+        <p>
+          Guarda observaciones sobre preguntas, conceptos, imagenes o notas y exportalas en un JSON para revisarlas despues.
+        </p>
+        <p class="body">Pendientes: {{ reportCount() }}</p>
+        <div class="simulator-bank-actions">
+          <button type="button" class="primary" [disabled]="!reportCount()" (click)="exportReports()">
+            Exportar JSON
+          </button>
+          <button type="button" class="ghost" [disabled]="!reportCount()" (click)="clearReports()">
+            Limpiar
+          </button>
+        </div>
+      </article>
     </section>
   }
 
@@ -142,15 +188,39 @@
 
     <article class="card notes-card">
       <header class="card-header">
-        <h2>{{ activeNote()?.title }}</h2>
+        <div class="header-actions">
+          <h2>{{ activeNote()?.title }}</h2>
+          @if (activeNote(); as note) {
+            <button type="button" class="report-trigger" (click)="openReportPanel({ type: 'note', id: note.id, title: note.title })">
+              Reportar
+            </button>
+          }
+        </div>
       </header>
+      @if (activeNote(); as note) {
+        @if (isReporting('note', note.id)) {
+          <section class="report-panel">
+            <p class="body">Anota que ajustar en este apunte.</p>
+            <textarea
+              class="report-textarea"
+              [value]="reportDraft()"
+              (input)="reportDraft.set($any($event.target).value)"
+              placeholder="Ejemplo: esta regla suena demasiado absoluta o esta nota necesita mas contexto."
+            ></textarea>
+            <div class="report-actions">
+              <button type="button" class="primary" [disabled]="!reportDraft().trim()" (click)="saveReport()">Guardar reporte</button>
+              <button type="button" class="ghost" (click)="closeReportPanel()">Cancelar</button>
+            </div>
+          </section>
+        }
+      }
       <div class="notes-content rendered-note" [innerHTML]="activeNoteRendered()"></div>
     </article>
   }
 
   @if (phase() === 'visual-scenarios') {
     <section class="session-meta">
-      <button type="button" class="back-link" (click)="goHome()">Volver</button>
+      <button type="button" class="back-link" (click)="closeVisualScenarios()">Volver</button>
       <div class="session-status">
         <span class="pill">visual</span>
       </div>
@@ -183,11 +253,31 @@
                 }
               </div>
             </div>
-            <h3>{{ scenario.title }}</h3>
+            <div class="header-actions">
+              <h3>{{ scenario.title }}</h3>
+              <button type="button" class="report-trigger" (click)="openReportPanel({ type: 'visual-scenario', id: scenario.id, title: scenario.title, meta: 'Q' + scenario.questionIds.join(',') })">
+                Reportar
+              </button>
+            </div>
             <p class="body">{{ scenario.summary }}</p>
             <img class="visual-scenario-image" [src]="scenario.imageUrl" [alt]="scenario.title" />
             <p class="body"><strong>Decision:</strong> {{ scenario.decision }}</p>
             <p class="body"><strong>Trampa:</strong> {{ scenario.trap }}</p>
+            @if (isReporting('visual-scenario', scenario.id)) {
+              <section class="report-panel">
+                <p class="body">Anota que parte visual o explicativa necesita ajuste.</p>
+                <textarea
+                  class="report-textarea"
+                  [value]="reportDraft()"
+                  (input)="reportDraft.set($any($event.target).value)"
+                  placeholder="Ejemplo: falta una capa, la flecha confunde o la trampa no coincide con la pregunta."
+                ></textarea>
+                <div class="report-actions">
+                  <button type="button" class="primary" [disabled]="!reportDraft().trim()" (click)="saveReport()">Guardar reporte</button>
+                  <button type="button" class="ghost" (click)="closeReportPanel()">Cancelar</button>
+                </div>
+              </section>
+            }
           </section>
         }
       </div>
@@ -246,13 +336,33 @@
       </div>
       @if (activeGlossaryEntry(); as entry) {
         <header class="card-header">
-          <h2>{{ entry.title }}</h2>
+          <div class="header-actions">
+            <h2>{{ entry.title }}</h2>
+            <button type="button" class="report-trigger" (click)="openReportPanel({ type: 'glossary', id: entry.id, title: entry.title })">
+              Reportar
+            </button>
+          </div>
           <div class="tag-row">
             @for (tag of entry.tags; track tag) {
               <span class="tag tag-system">{{ tag }}</span>
             }
           </div>
         </header>
+        @if (isReporting('glossary', entry.id)) {
+          <section class="report-panel">
+            <p class="body">Anota si la definicion esta floja, incompleta o confunde con otro servicio.</p>
+            <textarea
+              class="report-textarea"
+              [value]="reportDraft()"
+              (input)="reportDraft.set($any($event.target).value)"
+              placeholder="Ejemplo: esta definicion necesita mejor contraste con Config o con EventBridge."
+            ></textarea>
+            <div class="report-actions">
+              <button type="button" class="primary" [disabled]="!reportDraft().trim()" (click)="saveReport()">Guardar reporte</button>
+              <button type="button" class="ghost" (click)="closeReportPanel()">Cancelar</button>
+            </div>
+          </section>
+        }
         <div class="notes-content">
           <p class="prompt">{{ entry.summary }}</p>
           @for (detail of entry.details; track detail) {
@@ -302,10 +412,41 @@
     <article class="card simulator-card">
         <header class="card-header simulator-header">
           <div>
-            <h2>{{ isQuickQuiz() ? 'Quiz rapido' : 'Pregunta ' + simulatorPosition() }}</h2>
+            <div class="header-actions">
+              <h2>{{ isQuickQuiz() ? 'Quiz rapido' : isTraining() ? 'Entrenamiento ' + simulatorPosition() : 'Pregunta ' + simulatorPosition() }}</h2>
+              <div class="header-actions-right">
+                @if (isQuickQuiz()) {
+                  <button type="button" class="ghost compact-ghost" (click)="finishSimulator()">Terminar</button>
+                }
+                @if (isTraining()) {
+                  <button
+                    type="button"
+                    class="ghost compact-ghost bookmark-button"
+                    [class.bookmark-active]="currentTrainingBookmarked()"
+                    (click)="toggleTrainingBookmark(question.id)"
+                  >
+                    <span
+                      class="bookmark-icon"
+                      [class.bookmark-icon-filled]="currentTrainingBookmarked()"
+                      aria-hidden="true"
+                    ></span>
+                    <span>{{ currentTrainingBookmarked() ? 'Marcada' : 'Marcar' }}</span>
+                  </button>
+                }
+                <button
+                  type="button"
+                  class="report-trigger"
+                  (click)="openReportPanel({ type: isQuickQuiz() ? 'quick-quiz' : 'question', id: '' + question.id, title: question.topic || ('Pregunta ' + question.id), meta: simulatorBankType() })"
+                >
+                  Reportar
+                </button>
+              </div>
+            </div>
             <p class="mode-kicker">
               @if (isQuickQuiz()) {
                 Banco rapido derivado
+              } @else if (isTraining()) {
+                Banco verificado en orden
               } @else {
                 {{ simulatorBankType() === 'verified' ? 'Banco verificado' : 'Banco publico suplementario' }}
               }
@@ -315,13 +456,28 @@
               <p class="body">{{ question.topic }}</p>
             }
         </div>
-        @if (!isQuickQuiz()) {
+        @if (!isQuickQuiz() && !isTraining()) {
           <div class="timer-box">
             <span class="label">Tiempo restante</span>
             <strong>{{ formattedRemainingTime() }}</strong>
           </div>
         }
       </header>
+      @if (isReporting(isQuickQuiz() ? 'quick-quiz' : 'question', '' + question.id)) {
+        <section class="report-panel">
+          <p class="body">Anota si la pregunta, respuesta o explicacion necesitan correccion.</p>
+          <textarea
+            class="report-textarea"
+            [value]="reportDraft()"
+            (input)="reportDraft.set($any($event.target).value)"
+            placeholder="Ejemplo: la respuesta correcta no me convence, el distractor es flojo o la explicacion es ambigua."
+          ></textarea>
+          <div class="report-actions">
+            <button type="button" class="primary" [disabled]="!reportDraft().trim()" (click)="saveReport()">Guardar reporte</button>
+            <button type="button" class="ghost" (click)="closeReportPanel()">Cancelar</button>
+          </div>
+        </section>
+      }
 
       <div class="card-body">
         <p class="prompt question-text">{{ question.question }}</p>
@@ -383,6 +539,17 @@
         </section>
       }
 
+      @if (isTraining() && isTrainingQuestionChecked(question.id)) {
+        <section class="answer-feedback" [class.feedback-correct]="isCurrentTrainingAnswerCorrect()" [class.feedback-incorrect]="!isCurrentTrainingAnswerCorrect()">
+          <p class="eyebrow">{{ isCurrentTrainingAnswerCorrect() ? 'Bien' : 'Revisa esta' }}</p>
+          <p class="body">
+            Correcta:
+            <strong>{{ question.correctAnswers.join(', ') }}</strong>.
+          </p>
+          <p class="body">{{ question.explanation }}</p>
+        </section>
+      }
+
       @if (!isQuickQuiz()) {
         <div class="simulator-nav-grid">
           @for (simQuestion of simulatorQueue(); track simQuestion.id; let idx = $index) {
@@ -391,8 +558,12 @@
               class="sim-nav-pill"
               [class.current]="simulatorQuestionState(idx) === 'current'"
               [class.answered]="simulatorQuestionState(idx) === 'answered'"
+              [class.bookmarked]="isTraining() && isTrainingBookmarked(simQuestion.id)"
               (click)="goToSimulatorQuestion(idx)"
             >
+              @if (isTraining() && isTrainingBookmarked(simQuestion.id)) {
+                <span class="sim-nav-bookmark" aria-hidden="true"></span>
+              }
               {{ idx + 1 }}
             </button>
           }
@@ -406,8 +577,19 @@
             {{ simulatorAnsweredCount() }}/{{ simulatorTotal() }}
           </span>
           <div class="simulator-actions">
-            <button type="button" class="ghost" (click)="finishSimulator()">Terminar ronda</button>
             <button type="button" class="next" [disabled]="!quickQuizRevealed()" (click)="nextSimulatorQuestion()">
+              {{ simulatorPosition() === simulatorTotal() ? 'Ver resultado' : 'Siguiente' }}
+            </button>
+          </div>
+        } @else if (isTraining()) {
+          <span class="feed-hint">Pregunta {{ simulatorPosition() }} de {{ simulatorTotal() }} en orden.</span>
+          <div class="simulator-actions">
+            @if (question.questionType === 'multi') {
+              <button type="button" class="secondary" [disabled]="isTrainingQuestionChecked(question.id) || !hasCurrentTrainingSelection()" (click)="verifyCurrentTrainingAnswer()">
+                Verificar respuesta
+              </button>
+            }
+            <button type="button" class="next" [disabled]="!isTrainingQuestionChecked(question.id)" (click)="nextSimulatorQuestion()">
               {{ simulatorPosition() === simulatorTotal() ? 'Ver resultado' : 'Siguiente' }}
             </button>
           </div>
@@ -429,11 +611,13 @@
 
   @if (phase() === 'simulator-complete' && simulatorSummary(); as simSummary) {
     <section class="summary-card">
-      <p class="eyebrow">{{ isQuickQuiz() ? 'Quiz terminado' : 'Simulador terminado' }}</p>
-      <h2>{{ isQuickQuiz() ? 'Resultado del quiz' : 'Resultado bruto' }}</h2>
+      <p class="eyebrow">{{ isQuickQuiz() ? 'Quiz terminado' : isTraining() ? 'Entrenamiento terminado' : 'Simulador terminado' }}</p>
+      <h2>{{ isQuickQuiz() ? 'Resultado del quiz' : isTraining() ? 'Resultado del entrenamiento' : 'Resultado bruto' }}</h2>
       <p class="summary-copy">
         @if (isQuickQuiz()) {
           Quiz de 100 micro-preguntas derivadas para aprendizaje rapido. No reemplaza el simulador verificado.
+        } @else if (isTraining()) {
+          Entrenamiento con el banco verificado completo, en orden y con correccion inmediata por pregunta.
         } @else {
           Banco usado:
           {{ simSummary.bankType === 'verified' ? 'verificado' : 'publico suplementario' }}.
@@ -474,7 +658,7 @@
                   <div class="progress-fill" [style.width.%]="item.scorePercent"></div>
                 </div>
                 <p class="body">
-                  {{ item.correct }}/{{ item.total }} correctas · {{ item.incorrect }} incorrectas ·
+                  {{ item.correct }}/{{ item.total }} correctas Â· {{ item.incorrect }} incorrectas Â·
                   {{ item.unanswered }} sin responder
                 </p>
               </article>
@@ -484,8 +668,8 @@
       }
 
       <div class="summary-actions">
-        <button type="button" class="primary" (click)="isQuickQuiz() ? startQuickQuiz() : startSimulator(simSummary.bankType)">
-          {{ isQuickQuiz() ? 'Repetir quiz' : 'Repetir simulador' }}
+        <button type="button" class="primary" (click)="isQuickQuiz() ? startQuickQuiz() : isTraining() ? startTraining() : startSimulator(simSummary.bankType)">
+          {{ isQuickQuiz() ? 'Repetir quiz' : isTraining() ? 'Repetir entrenamiento' : 'Repetir simulador' }}
         </button>
         <button type="button" class="ghost" (click)="toggleSimulatorReview()">
           {{ showSimulatorReview() ? 'Ocultar correccion' : 'Ver correccion' }}
@@ -537,7 +721,12 @@
 
     <article class="card">
       <header class="card-header">
-        <h2>{{ card.title }}</h2>
+        <div class="header-actions">
+          <h2>{{ card.title }}</h2>
+          <button type="button" class="report-trigger" (click)="openReportPanel({ type: 'concept', id: card.id, title: card.title })">
+            Reportar
+          </button>
+        </div>
         <div class="tag-row">
           @for (tag of currentCardSystemTags(); track tag) {
             <span class="tag tag-system">{{ tag }}</span>
@@ -547,6 +736,21 @@
           }
         </div>
       </header>
+      @if (isReporting('concept', card.id)) {
+        <section class="report-panel">
+          <p class="body">Anota si este patron o mapa mental necesita ajuste editorial.</p>
+          <textarea
+            class="report-textarea"
+            [value]="reportDraft()"
+            (input)="reportDraft.set($any($event.target).value)"
+            placeholder="Ejemplo: esta heuristica es muy absoluta, falta una trampa o este patron necesita mejor ejemplo."
+          ></textarea>
+          <div class="report-actions">
+            <button type="button" class="primary" [disabled]="!reportDraft().trim()" (click)="saveReport()">Guardar reporte</button>
+            <button type="button" class="ghost" (click)="closeReportPanel()">Cancelar</button>
+          </div>
+        </section>
+      }
 
       <div class="card-body">
         <p class="prompt">{{ card.prompt }}</p>
@@ -647,3 +851,5 @@
     </section>
   }
 </main>
+
+
