@@ -81,6 +81,43 @@ Guia corta:
 
 - [LOCAL-NETWORK.md](study-app/LOCAL-NETWORK.md)
 
+## Publicarla en GitHub Pages
+
+El repo ya queda preparado para publicar la app Angular en:
+
+```text
+https://gerardoicu.github.io/devops/
+```
+
+### Lo que ya quedó listo
+
+- workflow en [deploy-pages.yml](.github/workflows/deploy-pages.yml)
+- script de build para Pages en [study-app/package.json](study-app/package.json)
+
+### Lo único que tienes que ajustar en GitHub
+
+1. Entra al repo en GitHub.
+2. Ve a `Settings > Pages`.
+3. En `Build and deployment`, elige `Source: GitHub Actions`.
+4. Haz push a `main`.
+5. Espera a que termine el workflow `Deploy Study App to GitHub Pages`.
+
+### Build local equivalente
+
+Desde `study-app/`:
+
+```powershell
+npm run build:pages
+```
+
+Eso construye la app con:
+
+```text
+/devops/
+```
+
+como `base-href`, que es lo correcto para este repo.
+
 ## Modos de estudio de la app
 
 - `Solo aprender`
