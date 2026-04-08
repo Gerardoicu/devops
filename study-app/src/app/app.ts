@@ -858,9 +858,10 @@ export class App {
 
   startSimulator(bankType: SimulatorBankType = 'verified'): void {
     this.closeReportPanel();
+    const resolvedBankType: SimulatorBankType = 'verified';
     this.assessmentMode.set('exam');
-    this.simulatorBankType.set(bankType);
-    const sourceBank = bankType === 'verified' ? this.simulatorBank() : this.publicSimulatorBank();
+    this.simulatorBankType.set(resolvedBankType);
+    const sourceBank = this.simulatorBank();
     const queue = this.shuffle(sourceBank).slice(0, Math.min(75, sourceBank.length));
     this.simulatorQueue.set(queue);
     this.simulatorIndex.set(0);
@@ -891,22 +892,23 @@ export class App {
         return;
       }
 
-      const next = question.questionType === 'single' ? [optionId] : [optionId];
+      const existing = this.simulatorAnswers()[question.id] ?? [];
+      const next =
+        question.questionType === 'single'
+          ? [optionId]
+          : existing.includes(optionId)
+            ? existing.filter((value) => value !== optionId)
+            : [...existing, optionId].sort();
       this.simulatorAnswers.update((current) => ({
         ...current,
         [question.id]: next
       }));
 
-      const expected = [...question.correctAnswers].sort();
-      const selected = [...next].sort();
-      const isCorrect =
-        selected.length === expected.length &&
-        selected.every((value, index) => value === expected[index]);
-
-      this.quickQuizRevealed.set(true);
-      this.quickQuizLastCorrect.set(isCorrect);
-      this.recordQuickQuizAttempt(question.id, isCorrect);
-      this.playTone(isCorrect ? 'correct' : 'incorrect');
+      if (question.questionType === 'single') {
+        this.submitQuickQuizAnswer(question, next);
+      } else {
+        this.playTone('soft');
+      }
       return;
     }
 
@@ -1174,6 +1176,33 @@ export class App {
       return false;
     }
     return (this.simulatorAnswers()[question.id] ?? []).length > 0;
+  }
+
+  hasCurrentQuickQuizSelection(): boolean {
+    const question = this.currentSimulatorQuestion();
+    if (!question || !this.isQuickQuiz()) {
+      return false;
+    }
+
+    return (this.simulatorAnswers()[question.id] ?? []).length > 0;
+  }
+
+  verifyCurrentQuickQuizAnswer(): void {
+    if (!this.isQuickQuiz() || this.quickQuizRevealed()) {
+      return;
+    }
+
+    const question = this.currentSimulatorQuestion();
+    if (!question) {
+      return;
+    }
+
+    const selected = this.simulatorAnswers()[question.id] ?? [];
+    if (!selected.length) {
+      return;
+    }
+
+    this.submitQuickQuizAnswer(question, selected);
   }
 
   isCurrentTrainingAnswerCorrect(): boolean {
@@ -1501,18 +1530,22 @@ export class App {
   }
 
   private restoreRuntimeSnapshot(snapshot: RuntimeSnapshot): void {
+    const restoredAssessmentMode = snapshot.assessmentMode ?? 'exam';
+    const restoredBankType: SimulatorBankType =
+      restoredAssessmentMode === 'exam' ? 'verified' : (snapshot.simulatorBankType ?? 'verified');
+
     this.sessionMode.set(snapshot.sessionMode ?? 'learn');
     this.selectedAnswer.set(snapshot.selectedAnswer ?? null);
     this.revealed.set(!!snapshot.revealed);
     this.sessionSummary.set(snapshot.sessionSummary ?? null);
-    this.simulatorBankType.set(snapshot.simulatorBankType ?? 'verified');
+    this.simulatorBankType.set(restoredBankType);
     this.simulatorAnswers.set(snapshot.simulatorAnswers ?? {});
     this.simulatorSummary.set(snapshot.simulatorSummary ?? null);
     this.showSimulatorReview.set(!!snapshot.showSimulatorReview);
     this.remainingSeconds.set(snapshot.remainingSeconds ?? SIMULATOR_DURATION_SECONDS);
     this.simulatorStartedAt.set(snapshot.simulatorStartedAt ?? null);
     this.simulatorDeadlineAt.set(snapshot.simulatorDeadlineAt ?? null);
-    this.assessmentMode.set(snapshot.assessmentMode ?? 'exam');
+    this.assessmentMode.set(restoredAssessmentMode);
     this.glossaryReturnPhase.set(snapshot.glossaryReturnPhase ?? null);
     this.visualReturnPhase.set(snapshot.visualReturnPhase ?? null);
     this.quickQuizRevealed.set(!!snapshot.quickQuizRevealed);
@@ -1531,9 +1564,7 @@ export class App {
     );
 
     const simulatorSource =
-      (snapshot.simulatorBankType ?? 'verified') === 'verified'
-        ? this.simulatorBank()
-        : this.publicSimulatorBank();
+      restoredBankType === 'verified' ? this.simulatorBank() : this.publicSimulatorBank();
     const simulatorById = new Map(simulatorSource.map((question) => [question.id, question]));
     const restoredSimulatorQueue = (snapshot.simulatorQueueIds ?? [])
       .map((id) => simulatorById.get(id))
@@ -1672,6 +1703,19 @@ export class App {
       [copy[i], copy[j]] = [copy[j], copy[i]];
     }
     return copy;
+  }
+
+  private submitQuickQuizAnswer(question: SimulatorQuestion, selectedAnswers: string[]): void {
+    const expected = [...question.correctAnswers].sort();
+    const selected = [...selectedAnswers].sort();
+    const isCorrect =
+      selected.length === expected.length &&
+      selected.every((value, index) => value === expected[index]);
+
+    this.quickQuizRevealed.set(true);
+    this.quickQuizLastCorrect.set(isCorrect);
+    this.recordQuickQuizAttempt(question.id, isCorrect);
+    this.playTone(isCorrect ? 'correct' : 'incorrect');
   }
 
   private glossarySearchTerms(entry: GlossaryEntry): string[] {

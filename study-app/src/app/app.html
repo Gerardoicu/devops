@@ -31,17 +31,6 @@
             </strong>
             <span class="meta">Intentos: {{ verifiedExamHistory().attempts }}</span>
           </div>
-          <div class="simulator-home-stat">
-            <span class="label">Publico</span>
-            <strong>
-              @if (publicExamHistory().lastScorePercent !== null) {
-                {{ publicExamHistory().lastScorePercent }}%
-              } @else {
-                Sin intento
-              }
-            </strong>
-            <span class="meta">Intentos: {{ publicExamHistory().attempts }}</span>
-          </div>
         </div>
         <div class="simulator-bank-actions">
           @if (hasAnySimulatorInProgress()) {
@@ -54,15 +43,9 @@
             <button type="button" class="ghost" (click)="startTraining()">
               Nuevo entrenamiento
             </button>
-            <button type="button" class="ghost" (click)="startSimulator('public')">
-              Nuevo publico
-            </button>
           } @else {
             <button type="button" class="primary" (click)="startSimulator('verified')">
               Banco verificado
-            </button>
-            <button type="button" class="secondary" (click)="startSimulator('public')">
-              Banco publico
             </button>
             <button type="button" class="ghost" (click)="startTraining()">
               Entrenamiento
@@ -513,7 +496,7 @@
           <button
             type="button"
             class="option"
-            [class.selected]="!isQuickQuiz() && isSimulatorSelected(question.id, optionKey)"
+            [class.selected]="isSimulatorSelected(question.id, optionKey)"
             [class.correct]="simulatorOptionClass(question, optionKey) === 'correct'"
             [class.incorrect]="simulatorOptionClass(question, optionKey) === 'incorrect'"
             (click)="selectSimulatorOption(question, optionKey)"
@@ -577,6 +560,11 @@
             {{ simulatorAnsweredCount() }}/{{ simulatorTotal() }}
           </span>
           <div class="simulator-actions">
+            @if (question.questionType === 'multi') {
+              <button type="button" class="secondary" [disabled]="quickQuizRevealed() || !hasCurrentQuickQuizSelection()" (click)="verifyCurrentQuickQuizAnswer()">
+                Verificar respuesta
+              </button>
+            }
             <button type="button" class="next" [disabled]="!quickQuizRevealed()" (click)="nextSimulatorQuestion()">
               {{ simulatorPosition() === simulatorTotal() ? 'Ver resultado' : 'Siguiente' }}
             </button>
@@ -668,7 +656,7 @@
       }
 
       <div class="summary-actions">
-        <button type="button" class="primary" (click)="isQuickQuiz() ? startQuickQuiz() : isTraining() ? startTraining() : startSimulator(simSummary.bankType)">
+        <button type="button" class="primary" (click)="isQuickQuiz() ? startQuickQuiz() : isTraining() ? startTraining() : startSimulator('verified')">
           {{ isQuickQuiz() ? 'Repetir quiz' : isTraining() ? 'Repetir entrenamiento' : 'Repetir simulador' }}
         </button>
         <button type="button" class="ghost" (click)="toggleSimulatorReview()">
