@@ -17,7 +17,7 @@
         <p class="mode-kicker">Simulador AWS</p>
         <h2>Simulador y entrenamiento</h2>
         <p>
-          Ejecuta examen cronometrado o entrenamiento con correccion inmediata usando el banco verificado.
+          Ejecuta examen cronometrado o entrenamiento con correccion inmediata. El banco verificado queda como opcion principal.
         </p>
         <div class="simulator-home-stats">
           <div class="simulator-home-stat">
@@ -31,6 +31,17 @@
             </strong>
             <span class="meta">Intentos: {{ verifiedExamHistory().attempts }}</span>
           </div>
+          <div class="simulator-home-stat">
+            <span class="label">Publico</span>
+            <strong>
+              @if (publicExamHistory().lastScorePercent !== null) {
+                {{ publicExamHistory().lastScorePercent }}%
+              } @else {
+                Sin intento
+              }
+            </strong>
+            <span class="meta">Intentos: {{ publicExamHistory().attempts }}</span>
+          </div>
         </div>
         <div class="simulator-bank-actions">
           @if (hasAnySimulatorInProgress()) {
@@ -38,17 +49,29 @@
               {{ activeSimulatorLabel() }}
             </button>
             <button type="button" class="secondary" (click)="startSimulator('verified')">
-              Nuevo verificado
+              Examen verificado
             </button>
-            <button type="button" class="ghost" (click)="startTraining()">
-              Nuevo entrenamiento
+            <button type="button" class="ghost" (click)="startSimulator('public')">
+              Examen publico
+            </button>
+            <button type="button" class="secondary" (click)="startTraining('verified')">
+              Entrenamiento verificado
+            </button>
+            <button type="button" class="ghost" (click)="startTraining('public')">
+              Entrenamiento publico
             </button>
           } @else {
             <button type="button" class="primary" (click)="startSimulator('verified')">
-              Banco verificado
+              Examen verificado
             </button>
-            <button type="button" class="ghost" (click)="startTraining()">
-              Entrenamiento
+            <button type="button" class="secondary" (click)="startSimulator('public')">
+              Examen publico
+            </button>
+            <button type="button" class="ghost" (click)="startTraining('verified')">
+              Entrenamiento verificado
+            </button>
+            <button type="button" class="ghost" (click)="startTraining('public')">
+              Entrenamiento publico
             </button>
           }
         </div>
@@ -656,7 +679,7 @@
       }
 
       <div class="summary-actions">
-        <button type="button" class="primary" (click)="isQuickQuiz() ? startQuickQuiz() : isTraining() ? startTraining() : startSimulator('verified')">
+        <button type="button" class="primary" (click)="isQuickQuiz() ? startQuickQuiz() : isTraining() ? startTraining(simSummary.bankType) : startSimulator(simSummary.bankType)">
           {{ isQuickQuiz() ? 'Repetir quiz' : isTraining() ? 'Repetir entrenamiento' : 'Repetir simulador' }}
         </button>
         <button type="button" class="ghost" (click)="toggleSimulatorReview()">

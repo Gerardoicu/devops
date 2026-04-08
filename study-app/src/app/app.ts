@@ -191,7 +191,7 @@ export class App {
   private readonly http = inject(HttpClient);
   private readonly sanitizer = inject(DomSanitizer);
   private audioContext: AudioContext | null = null;
-  readonly appVersion = 'v1.3.4';
+  readonly appVersion = 'v1.3.5';
 
   readonly cards = signal<StudyCard[]>([]);
   readonly conceptCards = signal<StudyCard[]>([]);
@@ -628,11 +628,11 @@ export class App {
     this.playTone('start');
   }
 
-  startTraining(): void {
+  startTraining(bankType: SimulatorBankType = 'verified'): void {
     this.closeReportPanel();
     this.assessmentMode.set('training');
-    this.simulatorBankType.set('verified');
-    this.simulatorQueue.set([...this.simulatorBank()]);
+    this.simulatorBankType.set(bankType);
+    this.simulatorQueue.set([...this.getSimulatorBank(bankType)]);
     this.simulatorIndex.set(0);
     this.simulatorAnswers.set({});
     this.simulatorSummary.set(null);
@@ -858,10 +858,9 @@ export class App {
 
   startSimulator(bankType: SimulatorBankType = 'verified'): void {
     this.closeReportPanel();
-    const resolvedBankType: SimulatorBankType = 'verified';
     this.assessmentMode.set('exam');
-    this.simulatorBankType.set(resolvedBankType);
-    const sourceBank = this.simulatorBank();
+    this.simulatorBankType.set(bankType);
+    const sourceBank = this.getSimulatorBank(bankType);
     const queue = this.shuffle(sourceBank).slice(0, Math.min(75, sourceBank.length));
     this.simulatorQueue.set(queue);
     this.simulatorIndex.set(0);
@@ -1531,8 +1530,7 @@ export class App {
 
   private restoreRuntimeSnapshot(snapshot: RuntimeSnapshot): void {
     const restoredAssessmentMode = snapshot.assessmentMode ?? 'exam';
-    const restoredBankType: SimulatorBankType =
-      restoredAssessmentMode === 'exam' ? 'verified' : (snapshot.simulatorBankType ?? 'verified');
+    const restoredBankType: SimulatorBankType = snapshot.simulatorBankType ?? 'verified';
 
     this.sessionMode.set(snapshot.sessionMode ?? 'learn');
     this.selectedAnswer.set(snapshot.selectedAnswer ?? null);
@@ -1716,6 +1714,10 @@ export class App {
     this.quickQuizLastCorrect.set(isCorrect);
     this.recordQuickQuizAttempt(question.id, isCorrect);
     this.playTone(isCorrect ? 'correct' : 'incorrect');
+  }
+
+  private getSimulatorBank(bankType: SimulatorBankType): SimulatorQuestion[] {
+    return bankType === 'verified' ? this.simulatorBank() : this.publicSimulatorBank();
   }
 
   private glossarySearchTerms(entry: GlossaryEntry): string[] {

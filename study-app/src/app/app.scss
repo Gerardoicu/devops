@@ -2,6 +2,7 @@
   display: block;
   min-height: 100dvh;
   color: #f4efe1;
+  touch-action: manipulation;
 }
 
 .shell {
@@ -138,6 +139,8 @@ h1 {
 .ghost {
   border: 0;
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
   transition:
     transform 0.18s ease,
     background 0.18s ease,
@@ -375,13 +378,15 @@ h1 {
   overflow-wrap: anywhere;
 }
 
-.option:hover:not(:disabled),
-.back-link:hover,
-.primary:hover,
-.secondary:hover,
-.next:hover,
-.ghost:hover {
-  transform: translateY(-1px);
+@media (hover: hover) and (pointer: fine) {
+  .option:hover:not(:disabled),
+  .back-link:hover,
+  .primary:hover,
+  .secondary:hover,
+  .next:hover,
+  .ghost:hover {
+    transform: translateY(-1px);
+  }
 }
 
 .option.correct {
