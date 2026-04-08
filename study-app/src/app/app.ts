@@ -179,6 +179,7 @@ interface RuntimeSnapshot {
   assessmentMode: AssessmentMode;
   quickQuizRevealed: boolean;
   quickQuizLastCorrect: boolean | null;
+  examChecked: Record<number, boolean>;
   trainingChecked: Record<number, boolean>;
 }
 
@@ -191,7 +192,7 @@ export class App {
   private readonly http = inject(HttpClient);
   private readonly sanitizer = inject(DomSanitizer);
   private audioContext: AudioContext | null = null;
-  readonly appVersion = 'v1.3.5';
+  readonly appVersion = 'v1.3.6';
 
   readonly cards = signal<StudyCard[]>([]);
   readonly conceptCards = signal<StudyCard[]>([]);
@@ -230,6 +231,7 @@ export class App {
   readonly simulatorDeadlineAt = signal<number | null>(null);
   readonly quickQuizRevealed = signal(false);
   readonly quickQuizLastCorrect = signal<boolean | null>(null);
+  readonly examChecked = signal<Record<number, boolean>>({});
   readonly trainingChecked = signal<Record<number, boolean>>({});
   readonly reports = signal<ContentReport[]>(this.loadReports());
   readonly reportContext = signal<ReportContext | null>(null);
@@ -610,6 +612,7 @@ export class App {
     this.simulatorDeadlineAt.set(null);
     this.quickQuizRevealed.set(false);
     this.quickQuizLastCorrect.set(null);
+    this.examChecked.set({});
     this.trainingChecked.set({});
     this.phase.set('simulator');
     this.playTone('start');
@@ -642,6 +645,7 @@ export class App {
     this.simulatorDeadlineAt.set(null);
     this.quickQuizRevealed.set(false);
     this.quickQuizLastCorrect.set(null);
+    this.examChecked.set({});
     this.trainingChecked.set({});
     this.phase.set('simulator');
     this.playTone('start');
@@ -683,6 +687,7 @@ export class App {
       this.showSimulatorReview.set(false);
       this.quickQuizRevealed.set(false);
       this.quickQuizLastCorrect.set(null);
+      this.examChecked.set({});
       this.trainingChecked.set({});
     }
     this.activeGlossaryEntry.set(null);
@@ -753,6 +758,7 @@ export class App {
     this.simulatorDeadlineAt.set(null);
     this.quickQuizRevealed.set(false);
     this.quickQuizLastCorrect.set(null);
+    this.examChecked.set({});
     this.phase.set('simulator');
     this.playTone('start');
   }
@@ -846,8 +852,6 @@ export class App {
     link.download = `dop-c02-content-reports-${stamp}.json`;
     link.click();
     URL.revokeObjectURL(url);
-
-    this.clearReports();
   }
 
   clearReports(): void {
@@ -872,6 +876,7 @@ export class App {
     this.simulatorStartedAt.set(startedAt);
     this.simulatorDeadlineAt.set(startedAt + SIMULATOR_DURATION_SECONDS * 1000);
     this.phase.set('simulator');
+    this.examChecked.set({});
     this.trainingChecked.set({});
     this.startSimulatorTimer();
     this.playTone('start');
@@ -912,6 +917,10 @@ export class App {
     }
 
     if (this.isTraining()) {
+      if (this.isTrainingQuestionChecked(question.id)) {
+        return;
+      }
+
       this.simulatorAnswers.update((current) => {
         const existing = current[question.id] ?? [];
         const next =
@@ -935,6 +944,10 @@ export class App {
       }
 
       this.playTone('soft');
+      return;
+    }
+
+    if (this.assessmentMode() === 'exam' && this.isExamQuestionChecked(question.id)) {
       return;
     }
 
@@ -1107,6 +1120,22 @@ export class App {
       return '';
     }
 
+    if (this.assessmentMode() === 'exam') {
+      if (!this.isExamQuestionChecked(question.id)) {
+        return this.isSimulatorSelected(question.id, optionId) ? 'selected' : '';
+      }
+
+      if (question.correctAnswers.includes(optionId)) {
+        return 'correct';
+      }
+
+      if (this.isSimulatorSelected(question.id, optionId)) {
+        return 'incorrect';
+      }
+
+      return '';
+    }
+
     if (!this.isQuickQuiz() || !this.quickQuizRevealed()) {
       return this.isSimulatorSelected(question.id, optionId) ? 'selected' : '';
     }
@@ -1128,6 +1157,32 @@ export class App {
 
   isTrainingQuestionChecked(questionId: number): boolean {
     return !!this.trainingChecked()[questionId];
+  }
+
+  isExamQuestionChecked(questionId: number): boolean {
+    return !!this.examChecked()[questionId];
+  }
+
+  verifyCurrentExamAnswer(): void {
+    if (this.assessmentMode() !== 'exam') {
+      return;
+    }
+
+    const question = this.currentSimulatorQuestion();
+    if (!question) {
+      return;
+    }
+
+    const selected = this.simulatorAnswers()[question.id] ?? [];
+    if (!selected.length) {
+      return;
+    }
+
+    this.examChecked.update((current) => ({
+      ...current,
+      [question.id]: true
+    }));
+    this.playTone(this.isCurrentExamAnswerCorrect() ? 'correct' : 'incorrect');
   }
 
   verifyCurrentTrainingAnswer(): void {
@@ -1177,6 +1232,15 @@ export class App {
     return (this.simulatorAnswers()[question.id] ?? []).length > 0;
   }
 
+  hasCurrentExamSelection(): boolean {
+    const question = this.currentSimulatorQuestion();
+    if (!question || this.assessmentMode() !== 'exam') {
+      return false;
+    }
+
+    return (this.simulatorAnswers()[question.id] ?? []).length > 0;
+  }
+
   hasCurrentQuickQuizSelection(): boolean {
     const question = this.currentSimulatorQuestion();
     if (!question || !this.isQuickQuiz()) {
@@ -1205,6 +1269,20 @@ export class App {
   }
 
   isCurrentTrainingAnswerCorrect(): boolean {
+    const question = this.currentSimulatorQuestion();
+    if (!question) {
+      return false;
+    }
+
+    const selected = [...(this.simulatorAnswers()[question.id] ?? [])].sort();
+    const expected = [...question.correctAnswers].sort();
+    return (
+      selected.length === expected.length &&
+      selected.every((value, index) => value === expected[index])
+    );
+  }
+
+  isCurrentExamAnswerCorrect(): boolean {
     const question = this.currentSimulatorQuestion();
     if (!question) {
       return false;
@@ -1524,6 +1602,7 @@ export class App {
       assessmentMode: this.assessmentMode(),
       quickQuizRevealed: this.quickQuizRevealed(),
       quickQuizLastCorrect: this.quickQuizLastCorrect(),
+      examChecked: this.examChecked(),
       trainingChecked: this.trainingChecked(),
     };
   }
@@ -1548,6 +1627,7 @@ export class App {
     this.visualReturnPhase.set(snapshot.visualReturnPhase ?? null);
     this.quickQuizRevealed.set(!!snapshot.quickQuizRevealed);
     this.quickQuizLastCorrect.set(snapshot.quickQuizLastCorrect ?? null);
+    this.examChecked.set(snapshot.examChecked ?? {});
     this.trainingChecked.set(snapshot.trainingChecked ?? {});
 
     const cardsById = new Map(this.conceptCards().map((card) => [card.id, card]));

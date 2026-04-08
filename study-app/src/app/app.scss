@@ -853,6 +853,7 @@ h1 {
 .answer-feedback {
   margin-top: 18px;
   padding: 16px;
+  min-height: 180px;
   border-radius: 18px;
   border: 1px solid rgba(255, 248, 231, 0.12);
   background: rgba(255, 248, 231, 0.05);
@@ -965,6 +966,10 @@ h1 {
   .card-footer {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .answer-feedback {
+    min-height: 220px;
   }
 
   .feed-hint {

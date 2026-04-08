@@ -556,24 +556,15 @@
         </section>
       }
 
-      @if (!isQuickQuiz()) {
-        <div class="simulator-nav-grid">
-          @for (simQuestion of simulatorQueue(); track simQuestion.id; let idx = $index) {
-            <button
-              type="button"
-              class="sim-nav-pill"
-              [class.current]="simulatorQuestionState(idx) === 'current'"
-              [class.answered]="simulatorQuestionState(idx) === 'answered'"
-              [class.bookmarked]="isTraining() && isTrainingBookmarked(simQuestion.id)"
-              (click)="goToSimulatorQuestion(idx)"
-            >
-              @if (isTraining() && isTrainingBookmarked(simQuestion.id)) {
-                <span class="sim-nav-bookmark" aria-hidden="true"></span>
-              }
-              {{ idx + 1 }}
-            </button>
-          }
-        </div>
+      @if (assessmentMode() === 'exam' && isExamQuestionChecked(question.id)) {
+        <section class="answer-feedback" [class.feedback-correct]="isCurrentExamAnswerCorrect()" [class.feedback-incorrect]="!isCurrentExamAnswerCorrect()">
+          <p class="eyebrow">{{ isCurrentExamAnswerCorrect() ? 'Bien' : 'Revisa esta' }}</p>
+          <p class="body">
+            Correcta:
+            <strong>{{ question.correctAnswers.join(', ') }}</strong>.
+          </p>
+          <p class="body">{{ question.explanation }}</p>
+        </section>
       }
 
       <footer class="card-footer simulator-footer">
@@ -607,6 +598,11 @@
         } @else {
           <span class="feed-hint">Respondidas: {{ simulatorAnsweredCount() }}/{{ simulatorTotal() }}</span>
           <div class="simulator-actions">
+            @if (question.questionType === 'multi') {
+              <button type="button" class="secondary" [disabled]="isExamQuestionChecked(question.id) || !hasCurrentExamSelection()" (click)="verifyCurrentExamAnswer()">
+                Verificar respuesta
+              </button>
+            }
             <button type="button" class="secondary" [disabled]="simulatorPosition() === 1" (click)="prevSimulatorQuestion()">
               Anterior
             </button>
@@ -617,6 +613,26 @@
           </div>
         }
       </footer>
+
+      @if (!isQuickQuiz()) {
+        <div class="simulator-nav-grid">
+          @for (simQuestion of simulatorQueue(); track simQuestion.id; let idx = $index) {
+            <button
+              type="button"
+              class="sim-nav-pill"
+              [class.current]="simulatorQuestionState(idx) === 'current'"
+              [class.answered]="simulatorQuestionState(idx) === 'answered'"
+              [class.bookmarked]="isTraining() && isTrainingBookmarked(simQuestion.id)"
+              (click)="goToSimulatorQuestion(idx)"
+            >
+              @if (isTraining() && isTrainingBookmarked(simQuestion.id)) {
+                <span class="sim-nav-bookmark" aria-hidden="true"></span>
+              }
+              {{ idx + 1 }}
+            </button>
+          }
+        </div>
+      }
     </article>
   }
 
