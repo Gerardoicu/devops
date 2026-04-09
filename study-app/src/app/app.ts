@@ -192,7 +192,7 @@ export class App {
   private readonly http = inject(HttpClient);
   private readonly sanitizer = inject(DomSanitizer);
   private audioContext: AudioContext | null = null;
-  readonly appVersion = 'v1.3.6';
+  readonly appVersion = 'v1.3.7';
 
   readonly cards = signal<StudyCard[]>([]);
   readonly conceptCards = signal<StudyCard[]>([]);
@@ -969,37 +969,19 @@ export class App {
   }
 
   prevSimulatorQuestion(): void {
-    if (this.simulatorIndex() > 0) {
-      this.simulatorIndex.update((value) => value - 1);
-      this.playTone('next');
-    }
+    this.setSimulatorIndex(this.simulatorIndex() - 1);
   }
 
   nextSimulatorQuestion(): void {
-    if (this.isQuickQuiz() && !this.quickQuizRevealed()) {
-      return;
-    }
-
-    if (this.isTraining() && !this.isTrainingQuestionChecked(this.currentSimulatorQuestion()?.id ?? -1)) {
-      return;
-    }
-
     if (this.simulatorIndex() < this.simulatorQueue().length - 1) {
-      this.simulatorIndex.update((value) => value + 1);
-      if (this.isQuickQuiz()) {
-        this.quickQuizRevealed.set(false);
-        this.quickQuizLastCorrect.set(null);
-      }
-      this.playTone('next');
+      this.setSimulatorIndex(this.simulatorIndex() + 1);
       return;
     }
     this.finishSimulator();
   }
 
   goToSimulatorQuestion(index: number): void {
-    if (index >= 0 && index < this.simulatorQueue().length) {
-      this.simulatorIndex.set(index);
-    }
+    this.setSimulatorIndex(index);
   }
 
   simulatorQuestionState(index: number): 'current' | 'answered' | 'unanswered' {
@@ -1266,6 +1248,16 @@ export class App {
     }
 
     this.submitQuickQuizAnswer(question, selected);
+  }
+
+  private setSimulatorIndex(index: number): void {
+    if (index < 0 || index >= this.simulatorQueue().length || index === this.simulatorIndex()) {
+      return;
+    }
+
+    this.simulatorIndex.set(index);
+    this.syncQuickQuizRevealState();
+    this.playTone('next');
   }
 
   isCurrentTrainingAnswerCorrect(): boolean {

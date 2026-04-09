@@ -579,7 +579,10 @@
                 Verificar respuesta
               </button>
             }
-            <button type="button" class="next" [disabled]="!quickQuizRevealed()" (click)="nextSimulatorQuestion()">
+            <button type="button" class="secondary" [disabled]="simulatorPosition() === 1" (click)="prevSimulatorQuestion()">
+              Anterior
+            </button>
+            <button type="button" class="next" (click)="nextSimulatorQuestion()">
               {{ simulatorPosition() === simulatorTotal() ? 'Ver resultado' : 'Siguiente' }}
             </button>
           </div>
@@ -591,7 +594,10 @@
                 Verificar respuesta
               </button>
             }
-            <button type="button" class="next" [disabled]="!isTrainingQuestionChecked(question.id)" (click)="nextSimulatorQuestion()">
+            <button type="button" class="secondary" [disabled]="simulatorPosition() === 1" (click)="prevSimulatorQuestion()">
+              Anterior
+            </button>
+            <button type="button" class="next" (click)="nextSimulatorQuestion()">
               {{ simulatorPosition() === simulatorTotal() ? 'Ver resultado' : 'Siguiente' }}
             </button>
           </div>
