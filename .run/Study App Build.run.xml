@@ -1,9 +1,9 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Study App Build" type="js.build_tools.npm" factoryName="npm">
+  <configuration default="false" name="Study App Run" type="js.build_tools.npm" factoryName="npm">
     <package-json value="$PROJECT_DIR$/study-app/package.json" />
     <command value="run" />
     <scripts>
-      <script value="build" />
+      <script value="start" />
     </scripts>
     <node-interpreter value="project" />
     <method v="2" />

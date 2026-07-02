@@ -530,6 +530,35 @@
         }
       </div>
 
+      <section class="response-metadata">
+        <div class="confidence-block">
+          <p class="metadata-label">Confianza</p>
+          <div class="confidence-scale" role="radiogroup" [attr.aria-label]="'Confianza para pregunta ' + question.id">
+            @for (value of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track value) {
+              <label class="confidence-choice" [class.selected]="simulatorConfidenceValue(question.id) === value">
+                <input
+                  type="radio"
+                  name="confidence-{{ question.id }}"
+                  [checked]="simulatorConfidenceValue(question.id) === value"
+                  (change)="setSimulatorConfidence(question.id, value)"
+                />
+                <span>{{ value }}</span>
+              </label>
+            }
+          </div>
+        </div>
+
+        <label class="notes-block">
+          <span class="metadata-label">Notas opcionales</span>
+          <textarea
+            class="report-textarea simulator-notes"
+            [value]="simulatorNotesValue(question.id)"
+            (input)="setSimulatorNotes(question.id, $any($event.target).value)"
+            placeholder="Duda, descarte entre opciones o razonamiento breve."
+          ></textarea>
+        </label>
+      </section>
+
       @if (isQuickQuiz() && quickQuizRevealed()) {
         <section class="answer-feedback" [class.feedback-correct]="quickQuizLastCorrect()" [class.feedback-incorrect]="quickQuizLastCorrect() === false">
           <p class="eyebrow">{{ quickQuizLastCorrect() ? 'Bien' : 'No era esa' }}</p>
@@ -706,6 +735,9 @@
         </button>
         <button type="button" class="ghost" (click)="toggleSimulatorReview()">
           {{ showSimulatorReview() ? 'Ocultar correccion' : 'Ver correccion' }}
+        </button>
+        <button type="button" class="secondary" [disabled]="!simulatorExportRecords().length" (click)="exportSimulatorResults()">
+          Descargar JSON
         </button>
         <button type="button" class="secondary" (click)="goHome()">Volver al inicio</button>
       </div>

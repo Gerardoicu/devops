@@ -91,6 +91,15 @@ interface SimulatorSummary {
   }>;
 }
 
+interface SimulatorAnswerExportRecord {
+  question: number;
+  answer: string[];
+  is_correct: boolean;
+  confidence: number;
+  time_seconds: number;
+  notes: string;
+}
+
 interface StudyNote {
   id: string;
   title: string;
@@ -172,6 +181,10 @@ interface RuntimeSnapshot {
   remainingSeconds: number;
   simulatorStartedAt: number | null;
   simulatorDeadlineAt: number | null;
+  simulatorConfidence: Record<number, number>;
+  simulatorNotes: Record<number, string>;
+  simulatorQuestionTimeSeconds: Record<number, number>;
+  simulatorQuestionStartedAt: number | null;
   activeNoteId: string | null;
   activeGlossaryId: string | null;
   glossaryReturnPhase: AppPhase | null;
@@ -229,6 +242,10 @@ export class App {
   readonly remainingSeconds = signal(SIMULATOR_DURATION_SECONDS);
   readonly simulatorStartedAt = signal<number | null>(null);
   readonly simulatorDeadlineAt = signal<number | null>(null);
+  readonly simulatorConfidence = signal<Record<number, number>>({});
+  readonly simulatorNotes = signal<Record<number, string>>({});
+  readonly simulatorQuestionTimeSeconds = signal<Record<number, number>>({});
+  readonly simulatorQuestionStartedAt = signal<number | null>(null);
   readonly quickQuizRevealed = signal(false);
   readonly quickQuizLastCorrect = signal<boolean | null>(null);
   readonly examChecked = signal<Record<number, boolean>>({});
@@ -355,6 +372,7 @@ export class App {
       };
     })
   );
+  readonly simulatorExportRecords = computed(() => this.buildSimulatorExportRecords());
   readonly progressByCard = computed(() => this.state().progress);
   readonly verifiedExamHistory = computed(
     () => this.state().examHistory.verified ?? { attempts: 0, lastScorePercent: null }
@@ -610,11 +628,13 @@ export class App {
     this.remainingSeconds.set(0);
     this.simulatorStartedAt.set(null);
     this.simulatorDeadlineAt.set(null);
+    this.resetSimulatorResponseTracking();
     this.quickQuizRevealed.set(false);
     this.quickQuizLastCorrect.set(null);
     this.examChecked.set({});
     this.trainingChecked.set({});
     this.phase.set('simulator');
+    this.beginCurrentSimulatorQuestionTimer();
     this.playTone('start');
   }
 
@@ -627,6 +647,7 @@ export class App {
     this.closeReportPanel();
     this.assessmentMode.set('quick-quiz');
     this.phase.set('simulator');
+    this.beginCurrentSimulatorQuestionTimer();
     this.syncQuickQuizRevealState();
     this.playTone('start');
   }
@@ -643,11 +664,13 @@ export class App {
     this.remainingSeconds.set(0);
     this.simulatorStartedAt.set(null);
     this.simulatorDeadlineAt.set(null);
+    this.resetSimulatorResponseTracking();
     this.quickQuizRevealed.set(false);
     this.quickQuizLastCorrect.set(null);
     this.examChecked.set({});
     this.trainingChecked.set({});
     this.phase.set('simulator');
+    this.beginCurrentSimulatorQuestionTimer();
     this.playTone('start');
   }
 
@@ -659,6 +682,7 @@ export class App {
 
     this.closeReportPanel();
     this.phase.set('simulator');
+    this.beginCurrentSimulatorQuestionTimer();
     if (this.assessmentMode() === 'exam' && this.simulatorDeadlineAt()) {
       this.syncRemainingSecondsFromDeadline();
       if (this.remainingSeconds() > 0) {
@@ -689,6 +713,7 @@ export class App {
       this.quickQuizLastCorrect.set(null);
       this.examChecked.set({});
       this.trainingChecked.set({});
+      this.resetSimulatorResponseTracking();
     }
     this.activeGlossaryEntry.set(null);
     this.glossaryReturnPhase.set(null);
@@ -756,10 +781,12 @@ export class App {
     this.remainingSeconds.set(0);
     this.simulatorStartedAt.set(null);
     this.simulatorDeadlineAt.set(null);
+    this.resetSimulatorResponseTracking();
     this.quickQuizRevealed.set(false);
     this.quickQuizLastCorrect.set(null);
     this.examChecked.set({});
     this.phase.set('simulator');
+    this.beginCurrentSimulatorQuestionTimer();
     this.playTone('start');
   }
 
@@ -854,6 +881,21 @@ export class App {
     URL.revokeObjectURL(url);
   }
 
+  exportSimulatorResults(): void {
+    const records = this.simulatorExportRecords();
+    if (!records.length) {
+      return;
+    }
+
+    const blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `dop-c02-simulator-results-${this.formatDateStamp(new Date())}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   clearReports(): void {
     this.reports.set([]);
     localStorage.removeItem(REPORTS_STORAGE_KEY);
@@ -875,9 +917,11 @@ export class App {
     const startedAt = Date.now();
     this.simulatorStartedAt.set(startedAt);
     this.simulatorDeadlineAt.set(startedAt + SIMULATOR_DURATION_SECONDS * 1000);
+    this.resetSimulatorResponseTracking();
     this.phase.set('simulator');
     this.examChecked.set({});
     this.trainingChecked.set({});
+    this.beginCurrentSimulatorQuestionTimer();
     this.startSimulatorTimer();
     this.playTone('start');
   }
@@ -888,6 +932,29 @@ export class App {
 
   isSimulatorSelected(questionId: number, optionId: string): boolean {
     return (this.simulatorAnswers()[questionId] ?? []).includes(optionId);
+  }
+
+  simulatorConfidenceValue(questionId: number): number {
+    return this.simulatorConfidence()[questionId] ?? 5;
+  }
+
+  setSimulatorConfidence(questionId: number, confidence: number): void {
+    const normalized = Math.min(10, Math.max(1, Math.round(confidence)));
+    this.simulatorConfidence.update((current) => ({
+      ...current,
+      [questionId]: normalized
+    }));
+  }
+
+  simulatorNotesValue(questionId: number): string {
+    return this.simulatorNotes()[questionId] ?? '';
+  }
+
+  setSimulatorNotes(questionId: number, notes: string): void {
+    this.simulatorNotes.update((current) => ({
+      ...current,
+      [questionId]: notes
+    }));
   }
 
   selectSimulatorOption(question: SimulatorQuestion, optionId: string): void {
@@ -941,6 +1008,7 @@ export class App {
           ...current,
           [question.id]: true
         }));
+        this.captureCurrentSimulatorQuestionTime();
       }
 
       this.playTone('soft');
@@ -994,6 +1062,7 @@ export class App {
 
   finishSimulator(): void {
     this.clearSimulatorTimer();
+    this.captureCurrentSimulatorQuestionTime();
     const queue = this.simulatorQueue();
     const answers = this.simulatorAnswers();
     let answered = 0;
@@ -1164,6 +1233,7 @@ export class App {
       ...current,
       [question.id]: true
     }));
+    this.captureCurrentSimulatorQuestionTime();
     this.playTone(this.isCurrentExamAnswerCorrect() ? 'correct' : 'incorrect');
   }
 
@@ -1182,6 +1252,7 @@ export class App {
       ...current,
       [question.id]: true
     }));
+    this.captureCurrentSimulatorQuestionTime();
     this.playTone(this.isCurrentTrainingAnswerCorrect() ? 'correct' : 'incorrect');
   }
 
@@ -1255,7 +1326,9 @@ export class App {
       return;
     }
 
+    this.captureCurrentSimulatorQuestionTime();
     this.simulatorIndex.set(index);
+    this.beginCurrentSimulatorQuestionTimer();
     this.syncQuickQuizRevealState();
     this.playTone('next');
   }
@@ -1587,6 +1660,10 @@ export class App {
       remainingSeconds: this.remainingSeconds(),
       simulatorStartedAt: this.simulatorStartedAt(),
       simulatorDeadlineAt: this.simulatorDeadlineAt(),
+      simulatorConfidence: this.simulatorConfidence(),
+      simulatorNotes: this.simulatorNotes(),
+      simulatorQuestionTimeSeconds: this.simulatorQuestionTimeSeconds(),
+      simulatorQuestionStartedAt: this.simulatorQuestionStartedAt(),
       activeNoteId: this.activeNote()?.id ?? null,
       activeGlossaryId: this.activeGlossaryEntry()?.id ?? null,
       glossaryReturnPhase: this.glossaryReturnPhase(),
@@ -1614,6 +1691,10 @@ export class App {
     this.remainingSeconds.set(snapshot.remainingSeconds ?? SIMULATOR_DURATION_SECONDS);
     this.simulatorStartedAt.set(snapshot.simulatorStartedAt ?? null);
     this.simulatorDeadlineAt.set(snapshot.simulatorDeadlineAt ?? null);
+    this.simulatorConfidence.set(snapshot.simulatorConfidence ?? {});
+    this.simulatorNotes.set(snapshot.simulatorNotes ?? {});
+    this.simulatorQuestionTimeSeconds.set(snapshot.simulatorQuestionTimeSeconds ?? {});
+    this.simulatorQuestionStartedAt.set(snapshot.simulatorQuestionStartedAt ?? null);
     this.assessmentMode.set(restoredAssessmentMode);
     this.glossaryReturnPhase.set(snapshot.glossaryReturnPhase ?? null);
     this.visualReturnPhase.set(snapshot.visualReturnPhase ?? null);
@@ -1661,12 +1742,15 @@ export class App {
     this.syncQuickQuizRevealState();
 
     if (snapshot.phase === 'simulator' && restoredSimulatorQueue.length && snapshot.assessmentMode !== 'quick-quiz') {
+      this.beginCurrentSimulatorQuestionTimer();
       this.syncRemainingSecondsFromDeadline();
       if (this.remainingSeconds() > 0) {
         this.startSimulatorTimer();
       } else {
         this.finishSimulator();
       }
+    } else if (snapshot.phase === 'simulator' && restoredSimulatorQueue.length) {
+      this.beginCurrentSimulatorQuestionTimer();
     }
   }
 
@@ -1737,6 +1821,70 @@ export class App {
     });
   }
 
+  private resetSimulatorResponseTracking(): void {
+    this.simulatorConfidence.set({});
+    this.simulatorNotes.set({});
+    this.simulatorQuestionTimeSeconds.set({});
+    this.simulatorQuestionStartedAt.set(null);
+  }
+
+  private beginCurrentSimulatorQuestionTimer(): void {
+    if (!this.currentSimulatorQuestion()) {
+      this.simulatorQuestionStartedAt.set(null);
+      return;
+    }
+
+    this.simulatorQuestionStartedAt.set(Date.now());
+  }
+
+  private captureCurrentSimulatorQuestionTime(): void {
+    const question = this.currentSimulatorQuestion();
+    const startedAt = this.simulatorQuestionStartedAt();
+    if (!question || !startedAt) {
+      return;
+    }
+
+    const elapsedSeconds = Math.max(0, Math.round((Date.now() - startedAt) / 1000));
+    this.simulatorQuestionTimeSeconds.update((current) => ({
+      ...current,
+      [question.id]: (current[question.id] ?? 0) + elapsedSeconds
+    }));
+    this.simulatorQuestionStartedAt.set(null);
+  }
+
+  private buildSimulatorExportRecords(): SimulatorAnswerExportRecord[] {
+    const answers = this.simulatorAnswers();
+    const confidence = this.simulatorConfidence();
+    const notes = this.simulatorNotes();
+    const timeSeconds = this.simulatorQuestionTimeSeconds();
+
+    return this.simulatorQueue()
+      .filter((question) => (answers[question.id] ?? []).length > 0)
+      .map((question) => {
+        const selected = [...(answers[question.id] ?? [])].sort();
+        const expected = [...question.correctAnswers].sort();
+        const isCorrect =
+          selected.length === expected.length &&
+          selected.every((value, index) => value === expected[index]);
+
+        return {
+          question: question.id,
+          answer: selected,
+          is_correct: isCorrect,
+          confidence: confidence[question.id] ?? 5,
+          time_seconds: timeSeconds[question.id] ?? 0,
+          notes: notes[question.id]?.trim() ?? ''
+        };
+      });
+  }
+
+  private formatDateStamp(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   private syncQuickQuizRevealState(): void {
     if (this.assessmentMode() !== 'quick-quiz') {
       this.quickQuizRevealed.set(false);
@@ -1784,6 +1932,7 @@ export class App {
 
     this.quickQuizRevealed.set(true);
     this.quickQuizLastCorrect.set(isCorrect);
+    this.captureCurrentSimulatorQuestionTime();
     this.recordQuickQuizAttempt(question.id, isCorrect);
     this.playTone(isCorrect ? 'correct' : 'incorrect');
   }
