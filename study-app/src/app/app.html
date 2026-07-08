@@ -181,6 +181,46 @@
           </button>
         </div>
       </article>
+
+      <article class="mode-card mode-card-history">
+        <p class="mode-kicker">Historial local</p>
+        <h2>Sesiones del estudiante</h2>
+        <p>
+          Guarda cada examen, entrenamiento o quiz terminado en este navegador. Puedes descargar todo el historial en JSON.
+        </p>
+        <div class="simulator-home-stats">
+          <div class="simulator-home-stat">
+            <span class="label">Sesiones</span>
+            <strong>{{ simulatorHistoryCount() }}</strong>
+            <span class="meta">Guardadas localmente</span>
+          </div>
+          <div class="simulator-home-stat">
+            <span class="label">Ultima</span>
+            <strong>
+              @if (latestSimulatorSession(); as session) {
+                {{ session.summary.scorePercent }}%
+              } @else {
+                Sin historial
+              }
+            </strong>
+            <span class="meta">
+              @if (latestSimulatorSession(); as session) {
+                {{ session.summary.correct }}/{{ session.summary.total }} correctas
+              } @else {
+                Termina una sesion
+              }
+            </span>
+          </div>
+        </div>
+        <div class="simulator-bank-actions">
+          <button type="button" class="primary" [disabled]="!simulatorHistoryCount()" (click)="exportSimulatorHistory()">
+            Descargar historial
+          </button>
+          <button type="button" class="ghost" [disabled]="!simulatorHistoryCount()" (click)="clearSimulatorHistory()">
+            Limpiar historial
+          </button>
+        </div>
+      </article>
     </section>
   }
 
@@ -736,8 +776,8 @@
         <button type="button" class="ghost" (click)="toggleSimulatorReview()">
           {{ showSimulatorReview() ? 'Ocultar correccion' : 'Ver correccion' }}
         </button>
-        <button type="button" class="secondary" [disabled]="!simulatorExportRecords().length" (click)="exportSimulatorResults()">
-          Descargar JSON
+        <button type="button" class="secondary" (click)="exportSimulatorResults()">
+          Exportar intento JSON
         </button>
         <button type="button" class="secondary" (click)="goHome()">Volver al inicio</button>
       </div>

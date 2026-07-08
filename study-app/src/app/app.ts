@@ -93,11 +93,28 @@ interface SimulatorSummary {
 
 interface SimulatorAnswerExportRecord {
   question: number;
+  question_text: string;
+  topic: string | null;
+  domain_name: string | null;
+  question_type: 'single' | 'multi';
   answer: string[];
+  correct_answer: string[];
+  answered: boolean;
   is_correct: boolean;
   confidence: number;
   time_seconds: number;
   notes: string;
+}
+
+interface SimulatorSessionExport {
+  id: string;
+  appVersion: string;
+  assessmentMode: AssessmentMode;
+  bankType: SimulatorBankType;
+  startedAt: string | null;
+  completedAt: string;
+  summary: SimulatorSummary;
+  answers: SimulatorAnswerExportRecord[];
 }
 
 interface StudyNote {
@@ -162,6 +179,7 @@ interface ContentReport {
 const STORAGE_KEY = 'dop-c02-study-state-v1';
 const RUNTIME_STORAGE_KEY = 'dop-c02-runtime-state-v1';
 const REPORTS_STORAGE_KEY = 'dop-c02-content-reports-v1';
+const SIMULATOR_HISTORY_STORAGE_KEY = 'dop-c02-simulator-session-history-v1';
 const SIMULATOR_DURATION_SECONDS = 210 * 60;
 
 interface RuntimeSnapshot {
@@ -251,6 +269,7 @@ export class App {
   readonly examChecked = signal<Record<number, boolean>>({});
   readonly trainingChecked = signal<Record<number, boolean>>({});
   readonly reports = signal<ContentReport[]>(this.loadReports());
+  readonly simulatorHistory = signal<SimulatorSessionExport[]>(this.loadSimulatorHistory());
   readonly reportContext = signal<ReportContext | null>(null);
   readonly reportDraft = signal('');
 
@@ -373,6 +392,8 @@ export class App {
     })
   );
   readonly simulatorExportRecords = computed(() => this.buildSimulatorExportRecords());
+  readonly simulatorHistoryCount = computed(() => this.simulatorHistory().length);
+  readonly latestSimulatorSession = computed(() => this.simulatorHistory().at(-1) ?? null);
   readonly progressByCard = computed(() => this.state().progress);
   readonly verifiedExamHistory = computed(
     () => this.state().examHistory.verified ?? { attempts: 0, lastScorePercent: null }
@@ -882,16 +903,39 @@ export class App {
   }
 
   exportSimulatorResults(): void {
-    const records = this.simulatorExportRecords();
-    if (!records.length) {
+    const payload = this.buildCurrentSimulatorSessionExport();
+    if (!payload) {
       return;
     }
 
-    const blob = new Blob([JSON.stringify(records, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `dop-c02-simulator-results-${this.formatDateStamp(new Date())}.json`;
+    link.download = `dop-c02-simulator-session-${this.formatDateStamp(new Date())}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  exportSimulatorHistory(): void {
+    const sessions = this.simulatorHistory();
+    if (!sessions.length) {
+      return;
+    }
+
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      appVersion: this.appVersion,
+      totalSessions: sessions.length,
+      sessions
+    };
+
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    link.href = url;
+    link.download = `dop-c02-simulator-history-${stamp}.json`;
     link.click();
     URL.revokeObjectURL(url);
   }
@@ -900,6 +944,11 @@ export class App {
     this.reports.set([]);
     localStorage.removeItem(REPORTS_STORAGE_KEY);
     this.closeReportPanel();
+  }
+
+  clearSimulatorHistory(): void {
+    this.simulatorHistory.set([]);
+    localStorage.removeItem(SIMULATOR_HISTORY_STORAGE_KEY);
   }
 
   startSimulator(bankType: SimulatorBankType = 'verified'): void {
@@ -1119,7 +1168,7 @@ export class App {
         return b.total - a.total;
       });
 
-    this.simulatorSummary.set({
+    const summary: SimulatorSummary = {
       bankType: this.simulatorBankType(),
       total,
       answered,
@@ -1129,7 +1178,10 @@ export class App {
       scorePercent: total ? Math.round((correct / total) * 100) : 0,
       elapsedSeconds,
       bySystem
-    });
+    };
+
+    this.simulatorSummary.set(summary);
+    this.saveSimulatorSessionHistory(summary);
     if (this.assessmentMode() === 'exam') {
       this.state.update((current) => {
         const bankType = this.simulatorBankType();
@@ -1614,6 +1666,20 @@ export class App {
     }
   }
 
+  private loadSimulatorHistory(): SimulatorSessionExport[] {
+    const raw = localStorage.getItem(SIMULATOR_HISTORY_STORAGE_KEY);
+    if (!raw) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? (parsed as SimulatorSessionExport[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
   private tryRestoreRuntime(): void {
     if (this.runtimeRestored) {
       return;
@@ -1852,6 +1918,43 @@ export class App {
     this.simulatorQuestionStartedAt.set(null);
   }
 
+  private buildCurrentSimulatorSessionExport(
+    summary: SimulatorSummary | null = this.simulatorSummary()
+  ): SimulatorSessionExport | null {
+    if (!summary) {
+      return null;
+    }
+
+    const completedAt = new Date().toISOString();
+    const startedAt = this.simulatorStartedAt()
+      ? new Date(this.simulatorStartedAt() as number).toISOString()
+      : null;
+
+    return {
+      id: `${completedAt}-${this.assessmentMode()}-${this.simulatorBankType()}`,
+      appVersion: this.appVersion,
+      assessmentMode: this.assessmentMode(),
+      bankType: this.simulatorBankType(),
+      startedAt,
+      completedAt,
+      summary,
+      answers: this.buildSimulatorExportRecords()
+    };
+  }
+
+  private saveSimulatorSessionHistory(summary: SimulatorSummary): void {
+    const session = this.buildCurrentSimulatorSessionExport(summary);
+    if (!session) {
+      return;
+    }
+
+    this.simulatorHistory.update((current) => {
+      const updated = [...current, session];
+      localStorage.setItem(SIMULATOR_HISTORY_STORAGE_KEY, JSON.stringify(updated));
+      return updated;
+    });
+  }
+
   private buildSimulatorExportRecords(): SimulatorAnswerExportRecord[] {
     const answers = this.simulatorAnswers();
     const confidence = this.simulatorConfidence();
@@ -1859,7 +1962,6 @@ export class App {
     const timeSeconds = this.simulatorQuestionTimeSeconds();
 
     return this.simulatorQueue()
-      .filter((question) => (answers[question.id] ?? []).length > 0)
       .map((question) => {
         const selected = [...(answers[question.id] ?? [])].sort();
         const expected = [...question.correctAnswers].sort();
@@ -1869,7 +1971,13 @@ export class App {
 
         return {
           question: question.id,
+          question_text: question.question,
+          topic: question.topic,
+          domain_name: question.domainName,
+          question_type: question.questionType,
           answer: selected,
+          correct_answer: expected,
+          answered: selected.length > 0,
           is_correct: isCorrect,
           confidence: confidence[question.id] ?? 5,
           time_seconds: timeSeconds[question.id] ?? 0,

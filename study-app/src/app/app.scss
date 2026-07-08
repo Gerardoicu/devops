@@ -238,6 +238,11 @@ h1 {
   background: rgba(17, 24, 35, 0.86);
 }
 
+.mode-card-history {
+  border-color: rgba(149, 231, 176, 0.22);
+  background: rgba(16, 28, 22, 0.82);
+}
+
 .simulator-home-stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
