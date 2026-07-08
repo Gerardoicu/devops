@@ -1,0 +1,1682 @@
+[
+  {
+    "id": 2001,
+    "questionType": "single",
+    "question": "Quieres asegurar cumplimiento continuo de configuracion y detectar NON_COMPLIANT. Que servicio evalua primero el estado?",
+    "options": {
+      "A": "AWS Config",
+      "B": "Amazon EventBridge",
+      "C": "Amazon CloudWatch",
+      "D": "AWS Trusted Advisor"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Config evalua cumplimiento continuo. EventBridge reacciona a eventos puntuales.",
+    "domainName": null,
+    "topic": "Config vs EventBridge"
+  },
+  {
+    "id": 2002,
+    "questionType": "single",
+    "question": "Si los logs ya estan en CloudWatch Logs y quieres alertar por un patron textual, por donde empiezas?",
+    "options": {
+      "A": "Metric filter -> custom metric -> alarm -> SNS",
+      "B": "Subscription filter -> Lambda -> SNS para un patron simple",
+      "C": "EventBridge rule sobre cada linea del log y SNS",
+      "D": "CloudWatch dashboard + SNS manual"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Ese es el patron nativo y corto. Las otras rutas sobreingenierizan el problema.",
+    "domainName": null,
+    "topic": "Logs ya en CloudWatch"
+  },
+  {
+    "id": 2003,
+    "questionType": "single",
+    "question": "En preguntas de Config, que palabra suele cambiar toda la respuesta?",
+    "options": {
+      "A": "NON_COMPLIANT vs ERROR",
+      "B": "managed rule vs custom rule",
+      "C": "tag vs name",
+      "D": "SNS vs SQS"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Muchas preguntas de compliance se caen por elegir el estado equivocado, no por el servicio equivocado.",
+    "domainName": null,
+    "topic": "Palabra que decide"
+  },
+  {
+    "id": 2004,
+    "questionType": "single",
+    "question": "Una Lambda sensible a latencia empeora en horas pico por cold starts. Que eliges?",
+    "options": {
+      "A": "Reserved concurrency",
+      "B": "Provisioned concurrency",
+      "C": "Layers",
+      "D": "Mas almacenamiento efimero"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Provisioned concurrency mantiene entornos listos. Reserved concurrency no elimina cold starts.",
+    "domainName": null,
+    "topic": "Cold starts"
+  },
+  {
+    "id": 2005,
+    "questionType": "single",
+    "question": "CodeBuild en cuenta central quiere desplegar en EKS de otra cuenta y recibe Unauthorized. Cual es el patron correcto?",
+    "options": {
+      "A": "AssumeRole en cuenta destino + permisos del rol + aws-auth",
+      "B": "AssumeRole al rol correcto pero sin mapearlo en aws-auth",
+      "C": "Dar permisos al rol de CodeBuild en la cuenta origen y usar kubeconfig local",
+      "D": "Agregar el usuario humano al cluster y reutilizar sus credenciales"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Cross-account EKS suele pedir trust policy en destino, AssumeRole, permisos del rol y mapeo en aws-auth.",
+    "domainName": null,
+    "topic": "EKS cross-account"
+  },
+  {
+    "id": 2006,
+    "questionType": "single",
+    "question": "Que elemento de CloudWatch permite tomar una decision operativa como rollback o notificacion automatica?",
+    "options": {
+      "A": "Una metrica sin umbral",
+      "B": "Una CloudWatch alarm",
+      "C": "Un dashboard",
+      "D": "Un log group"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "La metrica es el dato; la alarm es la evaluacion accionable que puede disparar rollback o notificacion.",
+    "domainName": null,
+    "topic": "Metric vs alarm"
+  },
+  {
+    "id": 2007,
+    "questionType": "single",
+    "question": "Si ya conoces el evento exacto que quieres procesar, donde suele vivir la logica de filtrado ganadora?",
+    "options": {
+      "A": "Lo mas tarde posible, idealmente en SNS",
+      "B": "Lo antes posible, en la capa que ya entiende el evento",
+      "C": "Solo en dashboards para no complicar la arquitectura",
+      "D": "En una tabla temporal con polling"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "En DOP-C02 suele ganar la opcion que filtra antes y en la capa correcta.",
+    "domainName": null,
+    "topic": "Capa del filtro"
+  },
+  {
+    "id": 2008,
+    "questionType": "single",
+    "question": "Produccion debe desplegar estrictamente desde production branch. Que define el artefacto real que llega a produccion?",
+    "options": {
+      "A": "La aprobacion manual del stage de produccion",
+      "B": "La branch configurada en el source stage",
+      "C": "El nombre del environment",
+      "D": "La politica de deployment de CodeDeploy"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "La aprobacion manual no cambia el artefacto origen. La branch del source stage manda.",
+    "domainName": null,
+    "topic": "Source real del pipeline"
+  },
+  {
+    "id": 2009,
+    "questionType": "single",
+    "question": "RTO de 3 horas, RPO de 15 minutos y costo moderado. Que estrategia suele ser mejor?",
+    "options": {
+      "A": "Active/Active",
+      "B": "Pilot Light bien implementado",
+      "C": "Backup and Restore puro",
+      "D": "Warm Standby siempre"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Con esos requisitos, Pilot Light suele equilibrar costo y recuperacion mejor que estrategias mas caras.",
+    "domainName": null,
+    "topic": "DR costo-efectivo"
+  },
+  {
+    "id": 2010,
+    "questionType": "single",
+    "question": "Si el escenario es Beanstalk blue/green, cual es el patron nativo?",
+    "options": {
+      "A": "Dos entornos + CNAME swap",
+      "B": "CodeDeploy blue/green con hooks BeforeAllowTraffic",
+      "C": "Rolling update dentro del mismo entorno sin CNAME swap",
+      "D": "Bajar TTL de Route 53 y cambiar el alias manualmente"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Beanstalk blue/green no se razona igual que CodeDeploy blue/green.",
+    "domainName": null,
+    "topic": "Elastic Beanstalk"
+  },
+  {
+    "id": 2011,
+    "questionType": "single",
+    "question": "Si AWS ya trae una capacidad administrada que cumple exacto y la pregunta pide menor esfuerzo, que suele ganar?",
+    "options": {
+      "A": "La opcion administrada",
+      "B": "La opcion custom con Lambda",
+      "C": "La opcion con mas componentes para escalar despues",
+      "D": "La que implique polling periodico"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Si existe una opcion administrada que cumple exacto, suele ganar sobre la version artesanal.",
+    "domainName": null,
+    "topic": "Managed vs custom"
+  },
+  {
+    "id": 2012,
+    "questionType": "single",
+    "question": "Scale-in raro con Spot + On-Demand y exceso temporal del maximo. Que te estan evaluando realmente?",
+    "options": {
+      "A": "Reglas reales de Auto Scaling, mixed instances y rebalancing",
+      "B": "Termination policy por launch template mas antiguo y facturacion por hora",
+      "C": "Health checks del ALB provocando reemplazos",
+      "D": "Drift de CloudFormation en el launch template"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "El examen quiere que reconozcas comportamiento interno valido de ASG, no que inventes un fallo.",
+    "domainName": null,
+    "topic": "ASG haciendo algo raro"
+  },
+  {
+    "id": 2013,
+    "questionType": "single",
+    "question": "La regla de cumplimiento exige que un volumen EBS tenga un tag obligatorio. Que recurso debe evaluar Config?",
+    "options": {
+      "A": "AWS::EC2::Instance",
+      "B": "AWS::EC2::Volume",
+      "C": "AWS::EC2::SecurityGroup",
+      "D": "AWS::SSM::Parameter"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "El recurso exacto es el volumen. Elegir la instancia es una trampa clasica de scope.",
+    "domainName": null,
+    "topic": "Recurso exacto"
+  },
+  {
+    "id": 2014,
+    "questionType": "single",
+    "question": "La nueva Lambda no debe recibir trafico real hasta que un cambio en base de datos se haya propagado. Que hook gana?",
+    "options": {
+      "A": "BeforeInstall",
+      "B": "AfterAllowTestTraffic",
+      "C": "BeforeAllowTraffic",
+      "D": "ValidateService"
+    },
+    "correctAnswers": [
+      "C"
+    ],
+    "explanation": "El momento importa mas que el nombre bonito. Aqui el riesgo es antes de trafico real.",
+    "domainName": null,
+    "topic": "Hook correcto"
+  },
+  {
+    "id": 2015,
+    "questionType": "single",
+    "question": "La empresa quiere detectar EC2 subutilizadas por 24 horas y pedir aprobacion manual antes de terminarlas. Que sesgo correcto aplicar?",
+    "options": {
+      "A": "Primero buscar un check administrado existente",
+      "B": "CloudWatch alarm por CPU y Lambda para terminar la instancia",
+      "C": "AWS Config con remediacion automatica para terminar instancias",
+      "D": "EventBridge schedule que termine instancias con CPU baja cada noche"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Cuando la pregunta pide menor esfuerzo, Trusted Advisor o una capacidad administrada suele ganar sobre un flujo artesanal.",
+    "domainName": null,
+    "topic": "Menor esfuerzo real"
+  },
+  {
+    "id": 2016,
+    "questionType": "single",
+    "question": "En KMS, que pieza decide principalmente quien puede usar una clave, ademas de IAM?",
+    "options": {
+      "A": "Target group",
+      "B": "Key policy",
+      "C": "CloudWatch Logs Insights",
+      "D": "Security group"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "En problemas de acceso con KMS debes revisar la key policy y no solo IAM.",
+    "domainName": null,
+    "topic": "KMS"
+  },
+  {
+    "id": 2017,
+    "questionType": "single",
+    "question": "Si quieres renombrar un stack sin perder recursos, que patron debes recordar?",
+    "options": {
+      "A": "Retain + import",
+      "B": "Snapshot + recreate para todos los recursos",
+      "C": "Cambiar solo el nombre del stack y relanzar update",
+      "D": "Actualizar el stack con un nuevo stack name y conservar los logical IDs"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Ese es el patron util cuando necesitas mover recursos sin destruirlos.",
+    "domainName": null,
+    "topic": "Renombrar stack"
+  },
+  {
+    "id": 2018,
+    "questionType": "single",
+    "question": "Que eliges para despliegue multi-cuenta y multi-region?",
+    "options": {
+      "A": "CloudFormation StackSets",
+      "B": "Un stack individual por consola",
+      "C": "Un solo stack en una cuenta y replicacion manual",
+      "D": "CodeDeploy blue/green con target groups por cuenta"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "StackSets existe justo para ese problema operativo.",
+    "domainName": null,
+    "topic": "StackSets"
+  },
+  {
+    "id": 2019,
+    "questionType": "single",
+    "question": "Necesitas una operacion repetible sobre flota con aprobacion manual y trazabilidad. Que familia gana?",
+    "options": {
+      "A": "Systems Manager Automation",
+      "B": "Script bash en una EC2",
+      "C": "Lambda con cron",
+      "D": "CloudWatch dashboard con runbook manual en wiki"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "El examen favorece SSM cuando pide control operativo y auditoria.",
+    "domainName": null,
+    "topic": "Operacion auditable"
+  },
+  {
+    "id": 2020,
+    "questionType": "single",
+    "question": "Que responde mejor a 'quien hizo que y cuando'?",
+    "options": {
+      "A": "CloudTrail",
+      "B": "AWS Config",
+      "C": "Security Hub",
+      "D": "CloudWatch Logs"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "CloudTrail es auditoria de API. Config es cumplimiento y estado de recursos.",
+    "domainName": null,
+    "topic": "CloudTrail vs Config"
+  },
+  {
+    "id": 2021,
+    "questionType": "single",
+    "question": "Cual se enfoca en deteccion de amenazas y comportamiento sospechoso?",
+    "options": {
+      "A": "GuardDuty",
+      "B": "Inspector",
+      "C": "Security Hub",
+      "D": "AWS Config"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Inspector vive en vulnerabilidades y exposicion. GuardDuty vive en threat detection.",
+    "domainName": null,
+    "topic": "GuardDuty vs Inspector"
+  },
+  {
+    "id": 2022,
+    "questionType": "single",
+    "question": "Quieres construir automaticamente cada pull request y publicar pass/fail. Que sesgo deberias aplicar?",
+    "options": {
+      "A": "Evento nativo de PR + build + resultado al PR",
+      "B": "Cron que revise PRs abiertos y dispare CodeBuild",
+      "C": "Construir solo la rama de destino despues de merge"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "La automatizacion correcta de PR debe ser event-driven, no por polling.",
+    "domainName": null,
+    "topic": "PR automation"
+  },
+  {
+    "id": 2023,
+    "questionType": "single",
+    "question": "Que feature de Lambda reduce cold starts en una funcion sensible a latencia?",
+    "options": {
+      "A": "Reserved concurrency",
+      "B": "Provisioned concurrency",
+      "C": "Lambda Layers",
+      "D": "Mas almacenamiento efimero"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Provisioned concurrency mantiene entornos inicializados. Reserved concurrency no elimina cold starts.",
+    "domainName": null,
+    "topic": "Reserved vs Provisioned"
+  },
+  {
+    "id": 2024,
+    "questionType": "single",
+    "question": "Entre Pilot Light y Warm Standby, cual suele ser mas rapido pero mas caro?",
+    "options": {
+      "A": "Backup and Restore",
+      "B": "Pilot Light",
+      "C": "Warm Standby",
+      "D": "Active/Active siempre"
+    },
+    "correctAnswers": [
+      "C"
+    ],
+    "explanation": "Warm Standby mantiene un entorno mas listo para escalar rapido, a costa de mas dinero.",
+    "domainName": null,
+    "topic": "Pilot Light vs Warm Standby"
+  },
+  {
+    "id": 2025,
+    "questionType": "single",
+    "question": "Que tipo de capacidad EC2 suele ser mas barata pero puede ser interrumpida por AWS?",
+    "options": {
+      "A": "On-Demand",
+      "B": "Spot",
+      "C": "Dedicated Hosts",
+      "D": "Savings Plans"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Spot usa capacidad sobrante con descuento, pero AWS puede recuperarla.",
+    "domainName": null,
+    "topic": "Spot vs On-Demand"
+  },
+  {
+    "id": 2026,
+    "questionType": "single",
+    "question": "Si dos respuestas pueden funcionar y una cumple exacto con menos overhead, cual suele ganar?",
+    "options": {
+      "A": "La mas simple que cumple exacto",
+      "B": "La que combina mas servicios porque cubre mas casos",
+      "C": "La que deja mas puertas abiertas para personalizacion futura",
+      "D": "La que usa mas componentes administrados aunque no sean necesarios"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "En DOP-C02 suele ganar la opcion mas simple cuando cumple exacto el requisito. No significa que siempre gane la mas corta, sino la menos sobreingenierizada.",
+    "domainName": null,
+    "topic": "Menos piezas"
+  },
+  {
+    "id": 2027,
+    "questionType": "single",
+    "question": "Si el problema real es mover trafico entre versiones ya detras del balanceador, por donde suele ir la solucion?",
+    "options": {
+      "A": "Target groups y routing del ALB",
+      "B": "Bajar TTL de Route 53",
+      "C": "Crear otra zona hospedada y cambiar NS records",
+      "D": "Cambiar security groups en cada version"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "DNS ayuda, pero no sustituye el traffic shifting interno cuando el ALB ya controla el flujo.",
+    "domainName": null,
+    "topic": "ALB vs DNS"
+  },
+  {
+    "id": 2028,
+    "questionType": "single",
+    "question": "Tienes logs del firewall ya en CloudWatch y quieres alertar por severidad Critical. Que no deberias mezclar?",
+    "options": {
+      "A": "Transit Gateway Flow Logs como si fueran logs del firewall",
+      "B": "Metric filter + alarm + SNS",
+      "C": "CloudWatch Logs Insights para revisar despues del alerta",
+      "D": "Dashboard para visibilidad adicional"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "La fuente correcta ya existe. Flow Logs y logs del appliance no significan lo mismo.",
+    "domainName": null,
+    "topic": "Firewall critical"
+  },
+  {
+    "id": 2029,
+    "questionType": "single",
+    "question": "En despliegue cross-account entre servicios AWS, cual suele aplicar?",
+    "options": {
+      "A": "AssumeRole",
+      "B": "AssumeRoleWithSAML",
+      "C": "GetSessionToken",
+      "D": "PassRole"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "AssumeRoleWithSAML es otra clase de federacion. En estos escenarios de despliegue, suele ganar AssumeRole.",
+    "domainName": null,
+    "topic": "AssumeRole vs AssumeRoleWithSAML"
+  },
+  {
+    "id": 2030,
+    "questionType": "single",
+    "question": "Si el recurso guarda datos persistentes y quieres conservarlos al borrar el stack, que opciones debes distinguir?",
+    "options": {
+      "A": "Retain y Snapshot segun el tipo de recurso",
+      "B": "Delete siempre",
+      "C": "UpdateReplacePolicy solamente",
+      "D": "Change Set sin DeletionPolicy"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "DeletionPolicy importa cuando el stack se borra; Retain y Snapshot no significan lo mismo ni aplican igual a todos los recursos.",
+    "domainName": null,
+    "topic": "DeletionPolicy"
+  },
+  {
+    "id": 2031,
+    "questionType": "single",
+    "question": "Quieres notificacion cuando un Glue Job falle despues de un reintento. Cual es el sesgo correcto?",
+    "options": {
+      "A": "EventBridge + Lambda para filtrar el evento correcto + SNS",
+      "B": "EventBridge directo a SNS sin distinguir el fallo final despues del retry",
+      "C": "CloudWatch alarm generica sobre errores del job"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Cuando el evento exacto requiere logica adicional, EventBridge con Lambda de filtro gana sobre un enrutado bruto.",
+    "domainName": null,
+    "topic": "Glue job despues de retry"
+  },
+  {
+    "id": 2032,
+    "questionType": "single",
+    "question": "Que eliges si el trafico es semanal y predecible?",
+    "options": {
+      "A": "Scheduled scaling",
+      "B": "Target tracking",
+      "C": "Step scaling por CPU",
+      "D": "Warm pool"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Si el patron temporal ya es conocido, scheduled scaling gana. Target tracking gana cuando persigues una metrica objetivo cambiante.",
+    "domainName": null,
+    "topic": "Scheduled scaling vs target tracking"
+  },
+  {
+    "id": 2033,
+    "questionType": "single",
+    "question": "Quieres mantener CPU alrededor del 50% en Spot Fleet cuando cambia la carga. Que familia gana?",
+    "options": {
+      "A": "Target tracking",
+      "B": "Scheduled scaling",
+      "C": "Step scaling sobre Lambda"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Si lo importante es sostener una metrica objetivo, target tracking es la respuesta natural.",
+    "domainName": null,
+    "topic": "Spot Fleet al 50%"
+  },
+  {
+    "id": 2034,
+    "questionType": "single",
+    "question": "Quieres asegurar WAF para ALBs publicos y APIs en muchas cuentas AWS sin omisiones. Que servicio gana?",
+    "options": {
+      "A": "Firewall Manager",
+      "B": "AWS Config con remediacion en cada cuenta",
+      "C": "GuardDuty centralizado para detectar recursos sin WAF"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Firewall Manager existe justo para aplicar politicas de seguridad consistentes a escala organizacional.",
+    "domainName": null,
+    "topic": "WAF en toda la organizacion"
+  },
+  {
+    "id": 2035,
+    "questionType": "single",
+    "question": "Tienes API Gateway + Lambda + DynamoDB y usuarios globales. Quieres alta disponibilidad y baja latencia. Que patron destaca?",
+    "options": {
+      "A": "Route 53 latency-based routing + Lambda regional + DynamoDB global tables",
+      "B": "Solo failover routing",
+      "C": "Una sola region con mas concurrencia"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Para baja latencia global, latency-based routing y datos multi-region resuelven mejor que failover puro.",
+    "domainName": null,
+    "topic": "Serverless global y baja latencia"
+  },
+  {
+    "id": 2036,
+    "questionType": "single",
+    "question": "Aurora tiene una sola instancia y quieres minimizar interrupcion en mantenimiento. Que paso mejora mas?",
+    "options": {
+      "A": "Agregar reader y usar cluster endpoint para writes + reader endpoint para reads",
+      "B": "Usar el endpoint de instancia para todo",
+      "C": "Cambiar a Multi-AZ como si fuera RDS clasico"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Aurora se aprovecha mejor con sus endpoints propios y una topologia con reader adicional.",
+    "domainName": null,
+    "topic": "Aurora durante mantenimiento"
+  },
+  {
+    "id": 2037,
+    "questionType": "single",
+    "question": "Necesitas guardar logs antes de terminar instancias y analizar access logs de ALB al menor costo. Que patron destaca?",
+    "options": {
+      "A": "ALB access logs + lifecycle hook + SSM/Lambda hacia S3 + Athena",
+      "B": "EMR bajo demanda para consultas ocasionales de logs",
+      "C": "CloudWatch Logs Insights como historico principal de bajo costo"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Athena sobre S3 gana para analisis ocasional y barato; el lifecycle hook evita perder logs al terminar la instancia.",
+    "domainName": null,
+    "topic": "Logs baratos para analisis ocasional"
+  },
+  {
+    "id": 2038,
+    "questionType": "single",
+    "question": "Una app KCL en EC2 se queda atras y los registros expiran. Quieres cambios minimos. Que dos ideas mandan?",
+    "options": {
+      "A": "Escalar consumidores con MillisBehindLatest y aumentar retencion",
+      "B": "Aumentar shards sin mirar la capacidad del consumidor",
+      "C": "Migrar a Lambda sin resolver backlog ni retencion"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "La metrica adecuada te dice backlog real, y la retencion extra te da margen mientras escalas.",
+    "domainName": null,
+    "topic": "Kinesis consumer atrasado"
+  },
+  {
+    "id": 2039,
+    "questionType": "single",
+    "question": "Tienes un flujo de reservas con verificacion manual externa que puede tardar mas de 3 horas y debe exponerse como API segura. Que patron es el mas simple?",
+    "options": {
+      "A": "Step Functions + API Gateway service integration + Cognito",
+      "B": "Lambda esperando horas hasta responder",
+      "C": "Lambda publica con IAM"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Step Functions maneja duracion larga y estado. Lambda no debe quedarse esperando horas.",
+    "domainName": null,
+    "topic": "Workflow de mas de 3 horas"
+  },
+  {
+    "id": 2040,
+    "questionType": "single",
+    "question": "Que referencia de imagen de contenedor es inmutable y evita ambiguedad entre despliegues?",
+    "options": {
+      "A": "Tag latest",
+      "B": "Tag semantic version mutable",
+      "C": "Digest de imagen",
+      "D": "Nombre del repositorio"
+    },
+    "correctAnswers": [
+      "C"
+    ],
+    "explanation": "El digest identifica de forma inmutable el artefacto exacto. Los tags pueden moverse.",
+    "domainName": null,
+    "topic": "Tag vs digest"
+  },
+  {
+    "id": 2041,
+    "questionType": "single",
+    "question": "Si la pregunta busca deteccion de amenaza, cual de estos gana?",
+    "options": {
+      "A": "GuardDuty",
+      "B": "CloudTrail",
+      "C": "AWS Config",
+      "D": "Security Hub"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "CloudTrail audita y Config evalua cumplimiento. GuardDuty detecta actividad sospechosa.",
+    "domainName": null,
+    "topic": "GuardDuty vs CloudTrail vs Config"
+  },
+  {
+    "id": 2042,
+    "questionType": "single",
+    "question": "La app necesita parametros en runtime con gobierno simple; no necesariamente rotacion de secretos. Que familia suele ganar?",
+    "options": {
+      "A": "Parameter Store",
+      "B": "Secrets Manager aunque no haya rotacion ni secreto sensible",
+      "C": "Variables de entorno duplicadas en cada servicio sin gobierno central"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Cuando el foco es configuracion y no rotacion administrada de secretos, Parameter Store suele ser suficiente y mas simple.",
+    "domainName": null,
+    "topic": "Configuracion en runtime"
+  },
+  {
+    "id": 2043,
+    "questionType": "single",
+    "question": "Quieres desplegar y retirar configuracion comun automaticamente cuando cuentas entran o salen de la organizacion. Que patron gana?",
+    "options": {
+      "A": "CloudFormation StackSets con service-managed permissions",
+      "B": "EventBridge por CreateAccount + Lambda que cree recursos en cada cuenta",
+      "C": "Systems Manager Automation multi-cuenta para bootstrap y cleanup"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "StackSets con permisos administrados por el servicio resuelven justo ese ciclo de vida multi-cuenta.",
+    "domainName": null,
+    "topic": "StackSets en Organizations"
+  },
+  {
+    "id": 2044,
+    "questionType": "single",
+    "question": "CloudFormation queda en UPDATE_ROLLBACK_FAILED despues de un update fallido. Cual es el sesgo correcto?",
+    "options": {
+      "A": "Completar el rollback corrigiendo recursos bloqueados o saltando recursos especificos cuando aplique",
+      "B": "Seguir intentando updates hasta que CloudFormation salga del estado por si solo",
+      "C": "Forzar delete del stack para limpiar el estado"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Ese estado exige destrabar el rollback, no insistir a ciegas con otro update.",
+    "domainName": null,
+    "topic": "UPDATE_ROLLBACK_FAILED"
+  },
+  {
+    "id": 2045,
+    "questionType": "single",
+    "question": "Tu API despliega una nueva version y quieres que los clientes obtengan el SDK actualizado detras de CloudFront. Que pieza suele faltar?",
+    "options": {
+      "A": "Automatizar export del SDK y la invalidacion de CloudFront",
+      "B": "Confiar solo en TTL y expiracion natural del cache",
+      "C": "Publicar el SDK manualmente despues de cada despliegue de API"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Si el SDK vive detras de CloudFront, la invalidez de cache o versionado de assets es parte del despliegue.",
+    "domainName": null,
+    "topic": "SDK via CloudFront"
+  },
+  {
+    "id": 2046,
+    "questionType": "single",
+    "question": "Quieres empaquetar en Docker, publicar en ECR y desplegar a ECS con blue/green. Que familia gana?",
+    "options": {
+      "A": "CodePipeline + CodeBuild + ECR + CodeDeploy para ECS blue/green",
+      "B": "CodePipeline + CodeBuild + ECR + ECS rolling update",
+      "C": "CodePipeline + ECR + Lambda deployment hooks"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Cuando el requisito explicito es ECS blue/green, CodeDeploy para ECS encaja mejor que rolling update simple.",
+    "domainName": null,
+    "topic": "ECS blue/green en pipeline"
+  },
+  {
+    "id": 2047,
+    "questionType": "single",
+    "question": "Si una app Beanstalk procesa CSV enormes y el trabajo CPU-intensivo frena la app web, que patron es natural?",
+    "options": {
+      "A": "Separar web tier y worker tier",
+      "B": "Escalar solo el web tier y seguir procesando ahi los CSV",
+      "C": "Programar mas cron jobs en la misma app para repartir carga"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Beanstalk worker tier existe para sacar procesamiento pesado del front web y escalarlo aparte.",
+    "domainName": null,
+    "topic": "Beanstalk y CPU pesada"
+  },
+  {
+    "id": 2048,
+    "questionType": "single",
+    "question": "Tienes mas de 100 apps en Beanstalk y CloudFormation, y cada semana cambia la AMI. Que sesgo correcto aplicas?",
+    "options": {
+      "A": "Centralizar la resolucion dinamica de la AMI en vez de tocar 100 plantillas una por una",
+      "B": "Actualizar manualmente cada template siguiendo una checklist semanal",
+      "C": "Usar una AMI nueva por entorno y redeploy completo de cada app"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "La pregunta esta empujando a una solucion reusable y central, no a mantenimiento manual masivo.",
+    "domainName": null,
+    "topic": "AMI semanal en muchas apps"
+  },
+  {
+    "id": 2049,
+    "questionType": "single",
+    "question": "Alternas despliegues entre dos ALB+ASG y algunos clientes siguen pegando al entorno inactivo. Quieres menor costo y complejidad. Que sesgo aplicas?",
+    "options": {
+      "A": "Mover el switching al ALB o reducir dependencia en DNS del cliente",
+      "B": "Seguir con Route 53 y bajar TTL esperando mejor comportamiento del cliente",
+      "C": "Mantener dos pilas completas y sumar Global Accelerator"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Si el cliente cachea mal DNS, necesitas una estrategia menos dependiente de ese comportamiento.",
+    "domainName": null,
+    "topic": "Dos ALB y clientes que cachean DNS"
+  },
+  {
+    "id": 2050,
+    "questionType": "single",
+    "question": "Muchas cuentas producen logs en CloudWatch Logs y quieres agregarlos en una cuenta central con poco o nada de storage que aprovisionar. Que patron destaca?",
+    "options": {
+      "A": "Subscription filters hacia destino central administrado",
+      "B": "Exportar periodicamente logs a S3 desde cada cuenta con scripts",
+      "C": "Crear una cuenta central con instancias que reciban los logs por agente"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "El examen suele favorecer streaming centralizado de logs frente a almacenamiento manual o aprovisionado.",
+    "domainName": null,
+    "topic": "CloudWatch Logs a cuenta central"
+  },
+  {
+    "id": 2051,
+    "questionType": "single",
+    "question": "Quieres recolectar logs antes de terminar instancias y luego encontrarlos por instance id y rango de fechas. Que tipo de solucion encaja?",
+    "options": {
+      "A": "Lifecycle hook + S3 para logs + indice en DynamoDB",
+      "B": "Guardar logs en S3 y buscarlos por nombre de archivo sin metadata estructurada",
+      "C": "Enviar logs a CloudWatch y confiar en filtros de texto para todo"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "La pregunta no pide solo guardar logs; pide encontrarlos eficientemente con metadata consultable.",
+    "domainName": null,
+    "topic": "Indice de logs"
+  },
+  {
+    "id": 2052,
+    "questionType": "single",
+    "question": "Quieres snapshot de EBS, copia a otra region, fallback a una tercera, notificacion y auditoria de ejecuciones. Que familia gana por tolerancia a fallos?",
+    "options": {
+      "A": "Step Functions coordinando el workflow con notificaciones",
+      "B": "Lambda unica con toda la logica de snapshots, copias y fallback entre regiones",
+      "C": "Varias reglas de EventBridge sin un orquestador de estado"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Es un flujo multi-paso, largo y con ramas de error; Step Functions encaja bien para coordinarlo y auditarlo.",
+    "domainName": null,
+    "topic": "Backup EBS multi-region con auditoria"
+  },
+  {
+    "id": 2053,
+    "questionType": "single",
+    "question": "En cross-account, cual define quien puede asumir el rol?",
+    "options": {
+      "A": "Trust policy",
+      "B": "Permissions policy",
+      "C": "Session policy",
+      "D": "SCP"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "La trust policy abre la relacion de asuncion. La permissions policy define que puede hacer el principal una vez asumido.",
+    "domainName": null,
+    "topic": "Trust policy vs permissions policy"
+  },
+  {
+    "id": 2054,
+    "questionType": "single",
+    "question": "Quieres asegurar cumplimiento continuo y corregir automaticamente recursos no conformes. Que patron gana?",
+    "options": {
+      "A": "AWS Config + recurso exacto + remediacion con SSM Automation",
+      "B": "EventBridge por CreateResource + Lambda que etiquete solo al crear",
+      "C": "Trusted Advisor + SNS para avisar y esperar correccion manual",
+      "D": "CloudWatch alarm sobre logs de CloudTrail"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Si el requisito es estado continuo mas correccion, Config con remediacion gana frente a eventos puntuales o simple notificacion.",
+    "domainName": null,
+    "topic": "Compliance con remediacion"
+  },
+  {
+    "id": 2055,
+    "questionType": "single",
+    "question": "Quieres asegurar que todos los buckets S3 tengan logging habilitado sin escribir codigo personalizado si ya existe opcion administrada. Que eliges?",
+    "options": {
+      "A": "AWS Config con regla administrada y accion administrada de remediacion",
+      "B": "EventBridge por CreateBucket y Lambda personalizada para habilitar logging",
+      "C": "Trusted Advisor con SNS y correccion manual",
+      "D": "CloudTrail Lake para detectar buckets sin logging"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "La pista es cumplimiento continuo y preferencia por managed sobre custom.",
+    "domainName": null,
+    "topic": "S3 logging obligatorio"
+  },
+  {
+    "id": 2056,
+    "questionType": "single",
+    "question": "Si la pregunta exige rotacion nativa de secretos, cual gana?",
+    "options": {
+      "A": "Secrets Manager",
+      "B": "Parameter Store",
+      "C": "AWS Config",
+      "D": "S3 cifrado con KMS"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Parameter Store puede guardar parametros seguros, pero la rotacion administrada empuja primero a Secrets Manager.",
+    "domainName": null,
+    "topic": "Rotacion de secretos"
+  },
+  {
+    "id": 2057,
+    "questionType": "single",
+    "question": "Quieres rollback automatico de un despliegue si una senal operativa empeora. Que pieza debe tomar la decision?",
+    "options": {
+      "A": "Una CloudWatch alarm asociada al deployment",
+      "B": "La metrica suelta sin alarma",
+      "C": "Un dashboard con la metrica visible al operador",
+      "D": "Un log stream sin evaluacion"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "CodeDeploy reacciona a alarmas, no a metricas sueltas ni a dashboards.",
+    "domainName": null,
+    "topic": "Rollback de CodeDeploy"
+  },
+  {
+    "id": 2058,
+    "questionType": "single",
+    "question": "Quieres enviar a usuarios a la region con menor latencia, no solo hacer failover. Que routing policy encaja mejor?",
+    "options": {
+      "A": "Latency-based routing",
+      "B": "Failover routing",
+      "C": "Weighted routing",
+      "D": "Geolocation routing"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Failover es primario/secundario, weighted reparte porcentajes y geolocation sigue ubicacion, no latencia observada.",
+    "domainName": null,
+    "topic": "Routing policy correcta"
+  },
+  {
+    "id": 2059,
+    "questionType": "single",
+    "question": "Cuando una pregunta menciona clientes que cachean mal DNS, que sesgo evita caer?",
+    "options": {
+      "A": "Bajar el TTL no resuelve por completo un problema estructural de switching",
+      "B": "Siempre que bajes TTL, el trafico alabara la nueva ruta casi al instante",
+      "C": "Un dashboard de Route 53 corrige el problema sin tocar trafico",
+      "D": "CloudTrail detecta automaticamente clientes con cache DNS vieja"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "El examen usa TTL bajo como distractor operativo cuando la estrategia correcta esta en ALB, target groups o traffic shifting.",
+    "domainName": null,
+    "topic": "TTL bajo no salva todo"
+  },
+  {
+    "id": 2060,
+    "questionType": "single",
+    "question": "Si el problema es un workflow largo, con estado y varias ramas, cual gana mejor?",
+    "options": {
+      "A": "Step Functions",
+      "B": "EventBridge solamente",
+      "C": "CloudWatch alarm con SNS",
+      "D": "AWS Config con remediacion"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "EventBridge conecta eventos; Step Functions coordina pasos, espera y fallos con estado.",
+    "domainName": null,
+    "topic": "Step Functions vs EventBridge"
+  },
+  {
+    "id": 2061,
+    "questionType": "single",
+    "question": "Un pipeline central cifra artefactos y una cuenta destino no puede consumirlos. Cual ajuste es el mas probable?",
+    "options": {
+      "A": "Revisar key policy y permisos del rol destino sobre la llave KMS",
+      "B": "Desactivar el cifrado del bucket para simplificar el acceso",
+      "C": "Agregar versionado al bucket de artefactos",
+      "D": "Mover el artefacto a Parameter Store"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "El cuello de botella suele estar en KMS cross-account, no en S3 versioning ni en quitar cifrado.",
+    "domainName": null,
+    "topic": "Artefactos cross-account"
+  },
+  {
+    "id": 2062,
+    "questionType": "single",
+    "question": "En un despliegue cross-account, que error conceptual es comun con CodeBuild?",
+    "options": {
+      "A": "Pensar que el rol de servicio de CodeBuild reemplaza al rol que debe asumirse en la cuenta destino",
+      "B": "Creer que CodeBuild necesita una VPC para ejecutar cualquier build",
+      "C": "Asumir que solo CodePipeline puede desplegar cross-account",
+      "D": "Pensar que ECR obliga a usar Docker-in-Docker en todas las builds"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "El rol de servicio permite ejecutar el build; el acceso real al recurso destino suele requerir otro rol y trust policy.",
+    "domainName": null,
+    "topic": "Rol de CodeBuild vs rol destino"
+  },
+  {
+    "id": 2063,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "AWS Config",
+    "question": "Cumplimiento continuo y NON_COMPLIANT. Que servicio eliges primero?",
+    "options": {
+      "A": "Amazon EventBridge",
+      "B": "AWS Config",
+      "C": "Amazon CloudWatch",
+      "D": "AWS Trusted Advisor"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "AWS Config evalua cumplimiento continuo. EventBridge reacciona a eventos puntuales."
+  },
+  {
+    "id": 2064,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "EventBridge",
+    "question": "PR creado o build terminado. Que servicio suele enrutar el evento?",
+    "options": {
+      "A": "AWS Config",
+      "B": "Amazon EventBridge",
+      "C": "AWS Trusted Advisor",
+      "D": "Amazon Athena"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Cuando la señal es un evento puntual, EventBridge suele ser la capa correcta."
+  },
+  {
+    "id": 2065,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "CloudWatch",
+    "question": "Patron textual en logs ya cargados en CloudWatch Logs. Que pieza convierte el patron en metrica?",
+    "options": {
+      "A": "CloudWatch Alarm",
+      "B": "Subscription filter",
+      "C": "Metric filter",
+      "D": "CloudTrail trail"
+    },
+    "correctAnswers": [
+      "C"
+    ],
+    "explanation": "Metric filter convierte patrones de logs en metricas."
+  },
+  {
+    "id": 2066,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "SNS",
+    "question": "Que servicio distribuye la notificacion una vez que ya detectaste el evento correcto?",
+    "options": {
+      "A": "SNS",
+      "B": "Config",
+      "C": "Athena",
+      "D": "GuardDuty"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "SNS distribuye. No suele ser la capa principal de filtrado."
+  },
+  {
+    "id": 2067,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Trusted Advisor",
+    "question": "La pregunta pide menor esfuerzo y AWS ya trae el check. Que servicio sospechas primero?",
+    "options": {
+      "A": "Trusted Advisor",
+      "B": "Lambda custom",
+      "C": "AWS Config",
+      "D": "Athena"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Si AWS ya tiene el check administrado, Trusted Advisor suele ganar por menor esfuerzo."
+  },
+  {
+    "id": 2068,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Systems Manager Automation",
+    "question": "Runbook, remediacion y aprobacion manual. Que servicio encaja?",
+    "options": {
+      "A": "EventBridge",
+      "B": "Systems Manager Automation",
+      "C": "CloudFront",
+      "D": "CodeArtifact"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Automation ejecuta el flujo operativo y de remediacion."
+  },
+  {
+    "id": 2069,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "CodeDeploy",
+    "question": "Traffic shifting, hooks y rollback con alarmas. Que servicio domina aqui?",
+    "options": {
+      "A": "Elastic Beanstalk",
+      "B": "CodeDeploy",
+      "C": "Config",
+      "D": "GuardDuty"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Ese patron es propio de CodeDeploy."
+  },
+  {
+    "id": 2070,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Elastic Beanstalk",
+    "question": "Dos entornos y CNAME swap. Que servicio viene a la mente?",
+    "options": {
+      "A": "CodeDeploy",
+      "B": "Elastic Beanstalk",
+      "C": "CloudFormation Hook",
+      "D": "Config"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Ese es el patron nativo de blue/green en Beanstalk."
+  },
+  {
+    "id": 2071,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "CodePipeline",
+    "question": "Que servicio orquesta stages de CI/CD?",
+    "options": {
+      "A": "CodeBuild",
+      "B": "CodePipeline",
+      "C": "CodeCommit",
+      "D": "SNS"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "CodePipeline orquesta; CodeBuild compila; CodeCommit aloja codigo."
+  },
+  {
+    "id": 2072,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "CodeBuild",
+    "question": "Que servicio compila y prueba dentro de un pipeline?",
+    "options": {
+      "A": "CodePipeline",
+      "B": "CodeCommit",
+      "C": "CodeBuild",
+      "D": "CloudTrail"
+    },
+    "correctAnswers": [
+      "C"
+    ],
+    "explanation": "CodeBuild es el servicio de build y test."
+  },
+  {
+    "id": 2073,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "CodeCommit",
+    "question": "Repositorio administrado de codigo fuente. Cual es?",
+    "options": {
+      "A": "CodeCommit",
+      "B": "CodeBuild",
+      "C": "CodeDeploy",
+      "D": "EventBridge"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "CodeCommit es el repositorio; no lo confundas con CodeBuild o CodePipeline."
+  },
+  {
+    "id": 2074,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Lambda concurrency",
+    "question": "Cold starts en Lambda. Que feature ataca ese dolor?",
+    "options": {
+      "A": "Reserved concurrency",
+      "B": "Provisioned concurrency",
+      "C": "Lambda Layers",
+      "D": "Mas /tmp"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Provisioned concurrency mantiene entornos inicializados."
+  },
+  {
+    "id": 2075,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "EKS cross-account",
+    "question": "Ademas de AssumeRole, que configuracion suele faltar en EKS cross-account?",
+    "options": {
+      "A": "Config rule",
+      "B": "aws-auth",
+      "C": "CloudWatch dashboard",
+      "D": "Lifecycle hook"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "El cluster debe mapear el rol via aws-auth."
+  },
+  {
+    "id": 2076,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "CloudFormation",
+    "question": "Retain, import y drift detection. Que servicio domina aqui?",
+    "options": {
+      "A": "CloudFormation",
+      "B": "Elastic Beanstalk",
+      "C": "CodeDeploy",
+      "D": "EventBridge"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Ese conjunto de mecanismos es propio de CloudFormation."
+  },
+  {
+    "id": 2077,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "StackSets",
+    "question": "IaC multi-cuenta y multi-region ligado a Organizations. Que usas?",
+    "options": {
+      "A": "State Manager",
+      "B": "StackSets",
+      "C": "OpsWorks",
+      "D": "Service Catalog"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "StackSets con service-managed permissions es el patron nativo."
+  },
+  {
+    "id": 2078,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "IAM y STS",
+    "question": "Que policy decide quien puede asumir un rol destino cross-account?",
+    "options": {
+      "A": "Bucket policy",
+      "B": "Trust policy",
+      "C": "Permissions boundary",
+      "D": "Security group"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "La trust policy del rol destino decide quien puede asumirlo."
+  },
+  {
+    "id": 2079,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "KMS",
+    "question": "Si KMS bloquea el flujo, que pieza revisas ademas de IAM?",
+    "options": {
+      "A": "Key policy",
+      "B": "Target group",
+      "C": "CloudWatch Logs Insights",
+      "D": "Security Hub control"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "En KMS suelen mezclarse IAM y key policy; debes revisar ambas."
+  },
+  {
+    "id": 2080,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Route 53",
+    "question": "La pista dice menor latencia. Que politica de Route 53 eliges?",
+    "options": {
+      "A": "Failover",
+      "B": "Weighted",
+      "C": "Latency-based",
+      "D": "Multivalue answer"
+    },
+    "correctAnswers": [
+      "C"
+    ],
+    "explanation": "Si el requisito es latencia, latency-based routing es la respuesta natural."
+  },
+  {
+    "id": 2081,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Auto Scaling",
+    "question": "Mantener una metrica cerca de un objetivo cambiante. Que politica de scaling usas?",
+    "options": {
+      "A": "Scheduled scaling",
+      "B": "Target tracking",
+      "C": "Manual",
+      "D": "Lifecycle hook"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Target tracking mantiene una metrica alrededor de un valor objetivo."
+  },
+  {
+    "id": 2082,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "DR",
+    "question": "RTO de horas, RPO moderado y costo contenido. Que estrategia suele ganar?",
+    "options": {
+      "A": "Active/Active",
+      "B": "Warm Standby",
+      "C": "Pilot Light",
+      "D": "Sin DR"
+    },
+    "correctAnswers": [
+      "C"
+    ],
+    "explanation": "Pilot Light suele ganar cuando importa costo y el RTO no es inmediato."
+  },
+  {
+    "id": 2083,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "GuardDuty",
+    "question": "Uso anomalo de credenciales. Que servicio gana?",
+    "options": {
+      "A": "Inspector",
+      "B": "GuardDuty",
+      "C": "Config",
+      "D": "Athena"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "GuardDuty detecta amenazas; Inspector se enfoca en vulnerabilidades."
+  },
+  {
+    "id": 2084,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Inspector",
+    "question": "CVEs y exposicion de workloads. Que servicio es mas adecuado?",
+    "options": {
+      "A": "GuardDuty",
+      "B": "Inspector",
+      "C": "SNS",
+      "D": "CodeBuild"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Inspector gana en vulnerabilidades y exposicion."
+  },
+  {
+    "id": 2085,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Secrets Manager",
+    "question": "Rotacion nativa de secretos. Que servicio eliges?",
+    "options": {
+      "A": "Parameter Store",
+      "B": "Secrets Manager",
+      "C": "S3",
+      "D": "Config"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Si la pista clave es rotacion nativa, Secrets Manager gana."
+  },
+  {
+    "id": 2086,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Parameter Store",
+    "question": "Configuracion runtime centralizada, sin que la rotacion nativa sea la prioridad. Que servicio sospechas?",
+    "options": {
+      "A": "Secrets Manager",
+      "B": "GuardDuty",
+      "C": "Parameter Store",
+      "D": "CloudTrail"
+    },
+    "correctAnswers": [
+      "C"
+    ],
+    "explanation": "Parameter Store suele ganar como configuracion runtime centralizada."
+  },
+  {
+    "id": 2087,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Matriz",
+    "question": "NON_COMPLIANT y enforcement continuo. Familia de solucion?",
+    "options": {
+      "A": "Config",
+      "B": "EventBridge",
+      "C": "CloudWatch",
+      "D": "Athena"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "La familia de decision correcta es Config."
+  },
+  {
+    "id": 2088,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Matriz",
+    "question": "Logs ya en CloudWatch Logs y patron textual. Familia de solucion?",
+    "options": {
+      "A": "Athena + S3",
+      "B": "Metric filter + alarm + SNS",
+      "C": "Custom polling",
+      "D": "CloudTrail Lake"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Ese es el patron corto y nativo."
+  },
+  {
+    "id": 2089,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Matriz",
+    "question": "Evento puntual y reaccion en tiempo real. Familia de solucion?",
+    "options": {
+      "A": "Config",
+      "B": "EventBridge",
+      "C": "Patch Manager",
+      "D": "Route 53"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Si la pregunta es evento puntual, piensa en EventBridge."
+  },
+  {
+    "id": 2090,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Matriz",
+    "question": "Branch exacta del artefacto en pipeline. Que manda?",
+    "options": {
+      "A": "Aprobacion manual",
+      "B": "Source branch",
+      "C": "Nombre del stage",
+      "D": "Dashboard"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "La source branch define el artefacto real."
+  },
+  {
+    "id": 2091,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Trampas",
+    "question": "Si una opcion amplia el alcance mas de lo pedido, que suele pasar?",
+    "options": {
+      "A": "Suele ganar",
+      "B": "Suele perder",
+      "C": "Depende del ALB",
+      "D": "Solo aplica en Lambda"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Scope exacto manda en DOP-C02."
+  },
+  {
+    "id": 2092,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Trampas",
+    "question": "Si AWS ya trae una accion administrada exacta, que suele ganar?",
+    "options": {
+      "A": "La opcion custom con Lambda",
+      "B": "La managed",
+      "C": "La mas larga",
+      "D": "La que tenga S3"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "Managed suele ganar a custom cuando cumple exacto."
+  },
+  {
+    "id": 2093,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Trampas",
+    "question": "Si ya sabes el evento exacto, donde filtras primero?",
+    "options": {
+      "A": "Lo antes posible",
+      "B": "Hasta SNS",
+      "C": "Solo en dashboards",
+      "D": "En Excel"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Filtrar antes suele producir la opcion correcta."
+  },
+  {
+    "id": 2094,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Trampas",
+    "question": "Servicio correcto pero feature equivocada. Eso suele ser...",
+    "options": {
+      "A": "Correcto",
+      "B": "Distractor comun",
+      "C": "Mejor respuesta",
+      "D": "Arquitectura final"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "DOP-C02 castiga mucho el casi-correcto."
+  },
+  {
+    "id": 2095,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "CloudWatch",
+    "question": "Rollback de CodeDeploy por deterioro operativo. Que necesita de CloudWatch?",
+    "options": {
+      "A": "Metrica sola",
+      "B": "Alarm asociada",
+      "C": "Solo dashboard",
+      "D": "Solo log group"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "CodeDeploy reacciona a alarms, no a metricas sueltas."
+  },
+  {
+    "id": 2096,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Auto Scaling",
+    "question": "Patron semanal predecible de trafico. Que politica de scaling sospechas?",
+    "options": {
+      "A": "Scheduled scaling",
+      "B": "Target tracking",
+      "C": "Manual",
+      "D": "Warm pool"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Si el patron es por calendario, empieza por scheduled scaling."
+  },
+  {
+    "id": 2097,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "CloudFormation",
+    "question": "Renombrar stack manteniendo recursos. Que atributo es clave?",
+    "options": {
+      "A": "DependsOn",
+      "B": "Retain",
+      "C": "Metadata",
+      "D": "Condition"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "DeletionPolicy: Retain conserva recursos para importarlos luego."
+  },
+  {
+    "id": 2098,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "CodeDeploy",
+    "question": "Antes de exponer trafico real a la nueva version. Que hook suena correcto?",
+    "options": {
+      "A": "AfterAllowTestTraffic",
+      "B": "BeforeAllowTraffic",
+      "C": "ApplicationStop",
+      "D": "AfterInstall"
+    },
+    "correctAnswers": [
+      "B"
+    ],
+    "explanation": "El momento importa: antes de trafico real -> BeforeAllowTraffic."
+  },
+  {
+    "id": 2099,
+    "questionType": "single",
+    "domainName": null,
+    "topic": "Route 53",
+    "question": "Primario/secundario segun salud. Que politica de Route 53 suena correcta?",
+    "options": {
+      "A": "Latency-based",
+      "B": "Geolocation",
+      "C": "Failover",
+      "D": "Weighted"
+    },
+    "correctAnswers": [
+      "C"
+    ],
+    "explanation": "Primario/secundario y health checks apuntan a failover."
+  },
+  {
+    "id": 2100,
+    "questionType": "single",
+    "question": "Conjunto de herramientas y hosting para aplicaciones web y moviles full-stack.",
+    "options": {
+      "A": "AWS Amplify",
+      "B": "Amazon API Gateway",
+      "C": "Amazon AppConfig",
+      "D": "Amazon AppFlow"
+    },
+    "correctAnswers": [
+      "A"
+    ],
+    "explanation": "Aparece con frontends, hosting, autenticacion y despliegue rapido.",
+    "domainName": null,
+    "topic": "AWS Amplify"
+  }
+]

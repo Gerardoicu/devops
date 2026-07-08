@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1380 360" role="img" aria-label="Flujo DevOps end-to-end">
+  <rect width="1380" height="360" fill="#0f1218"/>
+  <text x="34" y="40" fill="#f1b356" font-family="Arial, sans-serif" font-size="26" font-weight="700">Flujo DevOps end-to-end</text>
+  <g font-family="Arial, sans-serif">
+    <rect x="34" y="110" width="170" height="96" rx="18" fill="#17304a" stroke="#8fc3ff"/>
+    <text x="119" y="148" fill="#fff" font-size="24" text-anchor="middle">CodeCommit</text>
+    <text x="119" y="174" fill="#d6e8ff" font-size="15" text-anchor="middle">Source / branch</text>
+
+    <rect x="254" y="110" width="170" height="96" rx="18" fill="#152032" stroke="#9fd1ff"/>
+    <text x="339" y="148" fill="#fff" font-size="24" text-anchor="middle">CodePipeline</text>
+    <text x="339" y="174" fill="#d6e8ff" font-size="15" text-anchor="middle">Orquesta</text>
+
+    <rect x="474" y="110" width="170" height="96" rx="18" fill="#1a2f23" stroke="#9fe3b1"/>
+    <text x="559" y="148" fill="#fff" font-size="24" text-anchor="middle">CodeBuild</text>
+    <text x="559" y="174" fill="#dff5e6" font-size="15" text-anchor="middle">Build / test</text>
+
+    <rect x="694" y="110" width="170" height="96" rx="18" fill="#2d2611" stroke="#f1d37a"/>
+    <text x="779" y="148" fill="#fff" font-size="24" text-anchor="middle">S3 Artifacts</text>
+    <text x="779" y="174" fill="#fff0c2" font-size="15" text-anchor="middle">Versionado</text>
+
+    <rect x="914" y="110" width="170" height="96" rx="18" fill="#3a2415" stroke="#f1b356"/>
+    <text x="999" y="148" fill="#fff" font-size="24" text-anchor="middle">CodeDeploy</text>
+    <text x="999" y="174" fill="#ffe8c2" font-size="15" text-anchor="middle">Traffic shifting</text>
+
+    <rect x="1134" y="110" width="170" height="96" rx="18" fill="#17304a" stroke="#8fc3ff"/>
+    <text x="1219" y="148" fill="#fff" font-size="24" text-anchor="middle">ALB / App</text>
+    <text x="1219" y="174" fill="#d6e8ff" font-size="15" text-anchor="middle">Destino</text>
+
+    <rect x="914" y="246" width="390" height="72" rx="18" fill="#22171a" stroke="#ff9f9f"/>
+    <text x="1109" y="278" fill="#fff" font-size="22" text-anchor="middle">CloudWatch Alarm</text>
+    <text x="1109" y="301" fill="#ffd8d8" font-size="15" text-anchor="middle">Rollback automatico si falla</text>
+  </g>
+  <path d="M204 158 H254 M424 158 H474 M644 158 H694 M864 158 H914 M1084 158 H1134" stroke="#9fd1ff" stroke-width="6" marker-end="url(#a)"/>
+  <path d="M1109 246 V206" stroke="#ff9f9f" stroke-width="5" marker-end="url(#b)"/>
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#9fd1ff"/>
+    </marker>
+    <marker id="b" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#ff9f9f"/>
+    </marker>
+  </defs>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1250 340" role="img" aria-label="CloudFormation Retain Import">
+  <rect width="1250" height="340" fill="#0f1218"/>
+  <text x="34" y="40" fill="#f1b356" font-family="Arial, sans-serif" font-size="26" font-weight="700">CloudFormation con Retain + import</text>
+  <g font-family="Arial, sans-serif">
+    <rect x="70" y="120" width="280" height="120" rx="22" fill="#152032" stroke="#8fc3ff"/>
+    <text x="210" y="160" fill="#cfe6ff" font-size="22" text-anchor="middle">Stack original</text>
+    <rect x="120" y="185" width="180" height="35" rx="10" fill="#17304a" stroke="#8fc3ff"/><text x="210" y="208" fill="#fff" font-size="15" text-anchor="middle">DeletionPolicy: Retain</text>
+    <rect x="470" y="135" width="300" height="90" rx="20" fill="#1a2f23" stroke="#9fe3b1"/>
+    <text x="620" y="175" fill="#fff" font-size="24" text-anchor="middle">Recurso preservado</text>
+    <text x="620" y="202" fill="#dff5e6" font-size="15" text-anchor="middle">Sigue existiendo</text>
+    <rect x="890" y="120" width="280" height="120" rx="22" fill="#22171a" stroke="#f1b356"/>
+    <text x="1030" y="160" fill="#ffe0c0" font-size="22" text-anchor="middle">Nuevo stack</text>
+    <rect x="940" y="185" width="180" height="35" rx="10" fill="#3a2415" stroke="#f1b356"/><text x="1030" y="208" fill="#fff" font-size="15" text-anchor="middle">Resource import</text>
+  </g>
+  <path d="M350 180 H470 M770 180 H890" stroke="#9fd1ff" stroke-width="6" marker-end="url(#a)"/>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#9fd1ff"/></marker></defs>
+</svg>

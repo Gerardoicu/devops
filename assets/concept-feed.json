@@ -1,0 +1,1276 @@
+[
+  {
+    "id": "theme-cicd-patterns",
+    "type": "learn",
+    "title": "1. CI/CD - patrones ganadores",
+    "prompt": "En automatizacion del ciclo de vida, piensa primero en pipeline, artefacto y rollback.",
+    "body": "Patrones: CodePipeline como orquestador central, separacion CodeCommit -> CodeBuild -> CodeDeploy, Blue/Green para minimizar downtime, rollback automatico con CloudWatch Alarms, artefactos versionados en S3, variables por entorno y roles IAM por servicio con minimo privilegio.",
+    "explanation": "Si el escenario habla de CI/CD serio, casi nunca gana una mezcla manual con SSH o scripts sueltos. Gana el flujo declarativo, versionado y automatizado.",
+    "tags": [
+      "ci-cd",
+      "codepipeline",
+      "codebuild",
+      "codedeploy",
+      "rollback",
+      "artifacts"
+    ],
+    "source": "notes",
+    "questionIds": [
+      5,
+      30,
+      39,
+      54,
+      62,
+      68,
+      72,
+      120
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "theme-cicd-traps",
+    "type": "learn",
+    "title": "1. CI/CD - trampas",
+    "prompt": "Las trampas clasicas de CI/CD son manualidad, falta de versionado y source equivocado.",
+    "body": "Trampas: scripts manuales en EC2 en vez de CodeDeploy, acceso directo SSH, no versionar artefactos, deploy a produccion sin stage intermedio, no considerar rollback automatico, confundir CodeBuild con CodeDeploy y usar polling en vez de triggers.",
+    "explanation": "En DOP-C02, una solucion que funciona pero depende de SSH, pasos manuales o polling suele perder frente a una automatizada y menos operativa.",
+    "tags": [
+      "ci-cd",
+      "traps",
+      "ssh",
+      "branching",
+      "rollback"
+    ],
+    "source": "notes",
+    "questionIds": [
+      19,
+      39,
+      54,
+      68,
+      72,
+      120
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "theme-iac-patterns",
+    "type": "learn",
+    "title": "2. IaC - patrones ganadores",
+    "prompt": "Infraestructura como codigo gana con declarativo, modularidad y despliegue automatizado.",
+    "body": "Patrones: CloudFormation o Terraform declarativo, StackSets para multi-cuenta/multi-region, Drift Detection, parametros y outputs, versionado de templates, pipelines para aplicar cambios y separacion por stacks como network/app/data.",
+    "explanation": "Si la infraestructura cambia seguido o vive en muchas cuentas, la respuesta buena se parece a stacks versionados, no a scripts imperativos lanzados a mano.",
+    "tags": [
+      "iac",
+      "cloudformation",
+      "stacksets",
+      "drift",
+      "change-set"
+    ],
+    "source": "notes",
+    "questionIds": [
+      1,
+      2,
+      9,
+      22,
+      34,
+      35,
+      94
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "theme-iac-traps",
+    "type": "learn",
+    "title": "2. IaC - trampas",
+    "prompt": "Las trampas de IaC suelen ser drift, valores hardcodeados y cambios aplicados fuera del flujo.",
+    "body": "Trampas: cambios manuales fuera de CloudFormation, no usar StackSets en organizaciones grandes, hardcodear valores, scripts imperativos en vez de declarativos, no manejar rollback de stack failures, ignorar dependencias y no usar Change Sets antes de cambios criticos.",
+    "explanation": "La infraestructura declarativa se rompe cuando la operas como si fuera scripting manual. El examen castiga mucho eso.",
+    "tags": [
+      "iac",
+      "traps",
+      "drift",
+      "stacksets",
+      "change-set"
+    ],
+    "source": "notes",
+    "questionIds": [
+      1,
+      2,
+      9,
+      34,
+      35,
+      94
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "theme-observability-patterns",
+    "type": "learn",
+    "title": "3. Observabilidad - patrones ganadores",
+    "prompt": "Observabilidad buena mezcla logs, metricas, alarmas, dashboards y acciones.",
+    "body": "Patrones: CloudWatch Logs + Metrics + Alarms, centralizacion de logs, dashboards operativos, alarmas de negocio ademas de CPU, X-Ray para tracing, Auto Scaling con metricas reales y runbooks automatizados con Systems Manager.",
+    "explanation": "Monitorear bien no es solo ver CPU; es tener señales utiles, alarmas accionables y capacidad de respuesta automatizada.",
+    "tags": [
+      "observability",
+      "cloudwatch",
+      "xray",
+      "dashboards",
+      "ssm-automation"
+    ],
+    "source": "notes",
+    "questionIds": [
+      3,
+      4,
+      11,
+      16,
+      44,
+      66,
+      79,
+      100
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "theme-observability-traps",
+    "type": "learn",
+    "title": "3. Observabilidad - trampas",
+    "prompt": "Las trampas de observabilidad suelen ser monitorear poco y actuar tarde.",
+    "body": "Trampas: monitorear solo infraestructura, no configurar alarmas, thresholds pobres, ignorar tracing distribuido, no centralizar logs, usar logs sin estructura y no conectar alertas con acciones como rollback.",
+    "explanation": "Si solo tienes logs pasivos o dashboards bonitos sin alarmas y runbooks, no tienes observabilidad operativa suficiente.",
+    "tags": [
+      "observability",
+      "traps",
+      "alarms",
+      "xray",
+      "logs"
+    ],
+    "source": "notes",
+    "questionIds": [
+      3,
+      4,
+      16,
+      44,
+      66,
+      100
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "theme-security-patterns",
+    "type": "learn",
+    "title": "4. Seguridad y cumplimiento - patrones ganadores",
+    "prompt": "Seguridad en DOP-C02 suele premiar minimo privilegio, auditoria y cumplimiento continuo.",
+    "body": "Patrones: minimo privilegio con IAM, roles en vez de credenciales estaticas, SCPs a nivel organizacion, CloudTrail en todas las cuentas, Config + Security Hub para cumplimiento, cifrado por defecto con KMS y secretos en Secrets Manager o Parameter Store.",
+    "explanation": "La respuesta buena suele separar identidad, auditoria, cumplimiento y cifrado. No metas un solo servicio para todo.",
+    "tags": [
+      "security",
+      "iam",
+      "cloudtrail",
+      "config",
+      "kms",
+      "secrets"
+    ],
+    "source": "notes",
+    "questionIds": [
+      1,
+      7,
+      15,
+      18,
+      20,
+      24,
+      26,
+      43,
+      98
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "theme-security-traps",
+    "type": "learn",
+    "title": "4. Seguridad y cumplimiento - trampas",
+    "prompt": "Las trampas de seguridad suelen ser credenciales estaticas, permisos amplios y confundir capas.",
+    "body": "Trampas: access keys hardcodeadas, confundir IAM con SCP, no habilitar CloudTrail en todas las regiones, permisos *:*, no rotar credenciales, guardar secretos en codigo y pensar que Security Groups reemplazan IAM.",
+    "explanation": "El examen suele poner una opcion parcialmente segura pero con una decision de identidad o gobernanza claramente mala.",
+    "tags": [
+      "security",
+      "traps",
+      "iam",
+      "scp",
+      "cloudtrail",
+      "secrets"
+    ],
+    "source": "notes",
+    "questionIds": [
+      1,
+      15,
+      18,
+      20,
+      24,
+      26,
+      43,
+      98
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "theme-resilience-patterns",
+    "type": "learn",
+    "title": "5. Resiliencia y DR - patrones ganadores",
+    "prompt": "Resiliencia buena empieza en multi-AZ y DR serio empieza en RTO/RPO.",
+    "body": "Patrones: multi-AZ por defecto, Auto Scaling + Load Balancer, estrategias DR claras (Backup & Restore, Pilot Light, Warm Standby, Active/Active), backups automatizados, pruebas periodicas de DR y RTO/RPO alineados al negocio.",
+    "explanation": "No confundas alta disponibilidad con DR. El examen distingue muy bien entre soportar fallo local y recuperarte de un desastre mayor.",
+    "tags": [
+      "resilience",
+      "dr",
+      "multi-az",
+      "backup",
+      "route53",
+      "auto-scaling"
+    ],
+    "source": "notes",
+    "questionIds": [
+      14,
+      17,
+      31,
+      41,
+      59,
+      74,
+      82,
+      86
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "theme-resilience-traps",
+    "type": "learn",
+    "title": "5. Resiliencia y DR - trampas",
+    "prompt": "Las trampas de resiliencia suelen ser confundir disponibilidad local con recuperacion real.",
+    "body": "Trampas: Single AZ, backups sin restauracion probada, confundir HA con DR, no definir RTO/RPO, pensar que Multi-AZ es Multi-region, no automatizar failover y subestimar latencia multi-region.",
+    "explanation": "Una arquitectura puede ser muy disponible en una region y aun asi tener mal plan de desastre.",
+    "tags": [
+      "resilience",
+      "traps",
+      "dr",
+      "rto",
+      "rpo",
+      "failover"
+    ],
+    "source": "notes",
+    "questionIds": [
+      17,
+      31,
+      41,
+      59,
+      74,
+      82,
+      86
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "theme-cross-patterns",
+    "type": "learn",
+    "title": "Patrones transversales del examen",
+    "prompt": "Hay palabras clave que reducen el espacio de respuesta en segundos.",
+    "body": "Reglas rapidas: menor esfuerzo operativo -> servicio administrado/serverless; escalable automaticamente -> Auto Scaling o serverless; sin intervencion manual -> eventos + automatizacion; multi-cuenta -> Organizations + StackSets; auditoria -> CloudTrail + Config; tiempo real -> eventos/EventBridge, no polling.",
+    "explanation": "Estas pistas te ayudan a arrancar una pregunta larga sin abrir todo el arbol de posibilidades.",
+    "tags": [
+      "matrix",
+      "exam",
+      "patterns",
+      "operations"
+    ],
+    "source": "notes",
+    "questionIds": [
+      1,
+      8,
+      15,
+      16,
+      17,
+      18,
+      68,
+      85,
+      94
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "theme-classic-traps",
+    "type": "learn",
+    "title": "Trampas clasicas del examen",
+    "prompt": "Muchas respuestas son tecnicamente validas, pero no cumplen todos los requisitos o meten mas operacion.",
+    "body": "Trampas clasicas: opcion correcta a medias, solucion valida pero con mas carga operativa, servicio correcto en el nivel equivocado, ignorar palabras como automatico, sin intervencion, menor costo operativo y respuestas que funcionan pero no escalan.",
+    "explanation": "DOP-C02 no premia solo que algo funcione; premia que sea la mejor respuesta bajo las restricciones dadas.",
+    "tags": [
+      "exam",
+      "traps",
+      "scale",
+      "managed",
+      "scope"
+    ],
+    "source": "notes",
+    "questionIds": [
+      12,
+      16,
+      18,
+      39,
+      54,
+      68,
+      85,
+      94,
+      120
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-config-core",
+    "type": "learn",
+    "title": "AWS Config",
+    "prompt": "AWS Config gana cuando la pregunta pide cumplimiento continuo.",
+    "body": "Piensa en required tags, restricted-ssh, cloudtrail-enabled, drift/compliance continuo y remediacion automatica con SSM.",
+    "explanation": "Config responde 'cumple o no cumple' a lo largo del tiempo. No es la respuesta correcta si el problema es solo un evento puntual o una metrica operacional.",
+    "tags": [
+      "config",
+      "compliance",
+      "security"
+    ],
+    "source": "notes",
+    "questionIds": [
+      7,
+      9,
+      15,
+      18
+    ],
+    "difficulty": 1
+  },
+  {
+    "id": "concept-eventbridge-core",
+    "type": "learn",
+    "title": "EventBridge",
+    "prompt": "EventBridge gana cuando la pregunta realmente dice 'cuando pase X, dispara Y'.",
+    "body": "Es un enrutador de eventos. Va bien con pull requests, build terminado, push a repositorio o hallazgos puntuales que deben enviarse a otro servicio.",
+    "explanation": "EventBridge reacciona a eventos. No reemplaza compliance continuo ni monitoreo por umbrales.",
+    "tags": [
+      "eventbridge",
+      "events",
+      "operations"
+    ],
+    "source": "notes",
+    "questionIds": [
+      8,
+      18,
+      68,
+      118
+    ],
+    "difficulty": 1
+  },
+  {
+    "id": "concept-cloudwatch-core",
+    "type": "learn",
+    "title": "CloudWatch",
+    "prompt": "CloudWatch se divide mentalmente en logs, metric filters y alarms.",
+    "body": "Logs almacena y consulta logs. Metric filter convierte patrones de logs en metricas. Alarm decide sobre una metrica y suele disparar notificacion o rollback.",
+    "explanation": "Muchas preguntas se fallan por confundir una metrica con una alarma o por meter Lambda cuando CloudWatch ya resuelve el patron.",
+    "tags": [
+      "cloudwatch",
+      "logs",
+      "metric-filter",
+      "cloudwatch-alarm",
+      "observability"
+    ],
+    "source": "notes",
+    "questionIds": [
+      3,
+      4,
+      11,
+      16,
+      44,
+      100
+    ],
+    "difficulty": 1
+  },
+  {
+    "id": "concept-sns-core",
+    "type": "learn",
+    "title": "SNS",
+    "prompt": "SNS distribuye; SNS no deberia cargar con el filtro principal si ya conoces el evento exacto.",
+    "body": "Usalo para notificar a personas o sistemas. No lo conviertas en la capa donde decides que evento importa si EventBridge o Config ya pueden filtrar antes.",
+    "explanation": "Si la opcion mueve el filtro a SNS sin necesidad, suele perder frente a una que filtra antes.",
+    "tags": [
+      "sns",
+      "notifications",
+      "operations"
+    ],
+    "source": "notes",
+    "questionIds": [
+      3,
+      8,
+      16,
+      18
+    ],
+    "difficulty": 1
+  },
+  {
+    "id": "concept-trusted-advisor-core",
+    "type": "learn",
+    "title": "Trusted Advisor",
+    "prompt": "Trusted Advisor gana cuando AWS ya trae el check administrado y la pregunta pide menor esfuerzo.",
+    "body": "Ejemplo tipico: underutilized EC2. Sirve para mejores practicas y recomendaciones, no para compliance fino continuo ni enforcement de tags.",
+    "explanation": "Si la opcion artesanal tiene varias Lambdas y AWS ya trae el check, sospecha que Trusted Advisor sea la correcta.",
+    "tags": [
+      "trusted-advisor",
+      "managed",
+      "operations"
+    ],
+    "source": "notes",
+    "questionIds": [
+      15,
+      85
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-ssm-automation-core",
+    "type": "learn",
+    "title": "Systems Manager Automation",
+    "prompt": "SSM Automation entra cuando el flujo pide remediacion, runbooks o aprobacion manual.",
+    "body": "Piensa en autoremediacion de Config, pasos con aprobacion manual, patching o workflows operativos.",
+    "explanation": "SSM Automation ejecuta el flujo. Config detecta el incumplimiento; SNS notifica; EventBridge enruta eventos.",
+    "tags": [
+      "ssm-automation",
+      "automation",
+      "operations"
+    ],
+    "source": "notes",
+    "questionIds": [
+      7,
+      15,
+      18,
+      85
+    ],
+    "difficulty": 1
+  },
+  {
+    "id": "concept-codedeploy-core",
+    "type": "learn",
+    "title": "CodeDeploy",
+    "prompt": "CodeDeploy es despliegue controlado con hooks, traffic shifting y rollback por alarmas.",
+    "body": "Domina Blue/Green, canary, deployment groups, BeforeAllowTraffic y rollback con CloudWatch alarms.",
+    "explanation": "La trampa comun es usar el servicio correcto pero la feature equivocada, como hook equivocado o metrica sin alarma.",
+    "tags": [
+      "codedeploy",
+      "deployments",
+      "ci-cd"
+    ],
+    "source": "notes",
+    "questionIds": [
+      5,
+      10,
+      19,
+      25,
+      58,
+      72,
+      93,
+      97
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-beanstalk-core",
+    "type": "learn",
+    "title": "Elastic Beanstalk",
+    "prompt": "Beanstalk tiene su patron nativo: entornos y CNAME swap.",
+    "body": "Blue/Green en Beanstalk suele significar dos entornos y cambio de CNAME. No es el mismo modelo mental de CodeDeploy.",
+    "explanation": "Muchas preguntas caen por pensar Beanstalk como si fuera CodeDeploy.",
+    "tags": [
+      "elastic-beanstalk",
+      "platform",
+      "ci-cd"
+    ],
+    "source": "notes",
+    "questionIds": [
+      61,
+      62,
+      69,
+      75,
+      76
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-codepipeline-core",
+    "type": "learn",
+    "title": "CodePipeline / CodeBuild / CodeCommit",
+    "prompt": "Separa orquestacion, build y repositorio sin dudar.",
+    "body": "CodePipeline orquesta. CodeBuild compila y prueba. CodeCommit es el repositorio. Aprobacion manual no corrige una branch de source mal elegida.",
+    "explanation": "Una gran cantidad de preguntas de CI/CD se resuelven encontrando la branch exacta y el origen real del artefacto.",
+    "tags": [
+      "codepipeline",
+      "codebuild",
+      "codecommit",
+      "ci-cd"
+    ],
+    "source": "notes",
+    "questionIds": [
+      30,
+      36,
+      39,
+      63,
+      68,
+      72,
+      120
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-lambda-concurrency",
+    "type": "learn",
+    "title": "Lambda concurrency",
+    "prompt": "Provisioned concurrency reduce cold starts. Reserved concurrency no.",
+    "body": "Provisioned concurrency mantiene entornos inicializados. Reserved concurrency reserva o limita capacidad, pero no elimina cold starts.",
+    "explanation": "La trampa del examen es poner el servicio correcto con la feature equivocada.",
+    "tags": [
+      "lambda",
+      "provisioned-concurrency",
+      "reserved-concurrency",
+      "resilience"
+    ],
+    "source": "notes",
+    "questionIds": [
+      17,
+      54,
+      97,
+      107
+    ],
+    "difficulty": 1
+  },
+  {
+    "id": "concept-eks-cross-account",
+    "type": "learn",
+    "title": "EKS cross-account",
+    "prompt": "En EKS cross-account no basta con AssumeRole: el cluster debe mapear el rol.",
+    "body": "El patron correcto suele ser: asumir rol en cuenta destino, permisos correctos y mapear el rol en aws-auth.",
+    "explanation": "Las preguntas cross-account suelen fallarse por poner la trust policy o el permiso del lado equivocado.",
+    "tags": [
+      "eks",
+      "assume-role",
+      "aws-auth",
+      "security"
+    ],
+    "source": "notes",
+    "questionIds": [
+      20
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-cloudformation-core",
+    "type": "learn",
+    "title": "CloudFormation y StackSets",
+    "prompt": "CloudFormation gana cuando el problema es declarativo: stack, import, retain, drift o despliegue multi-cuenta.",
+    "body": "Domina change sets, DeletionPolicy, import de recursos, drift detection y StackSets con service-managed permissions.",
+    "explanation": "No metas scripts externos cuando CloudFormation ya trae la capacidad exacta.",
+    "tags": [
+      "cloudformation",
+      "stacksets",
+      "iac"
+    ],
+    "source": "notes",
+    "questionIds": [
+      1,
+      2,
+      9,
+      22,
+      34,
+      35,
+      94
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-iam-sts-core",
+    "type": "learn",
+    "title": "IAM y STS",
+    "prompt": "En cross-account, la trust policy decide quien puede asumir; la permissions policy decide que puede hacer.",
+    "body": "No mezcles trust policy, permissions policy y permisos del recurso. Son capas distintas.",
+    "explanation": "Muchas opciones tienen el servicio correcto pero con la direccion de confianza invertida.",
+    "tags": [
+      "iam",
+      "sts",
+      "assume-role",
+      "security"
+    ],
+    "source": "notes",
+    "questionIds": [
+      20,
+      23,
+      24,
+      39,
+      43,
+      47,
+      82
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-kms-core",
+    "type": "learn",
+    "title": "KMS",
+    "prompt": "Cuando KMS bloquea el flujo, separa key policy, IAM policy y permisos del servicio que usa la clave.",
+    "body": "La pregunta suele sonar a CI/CD o cross-account, pero el bloqueo real vive en la clave y su politica.",
+    "explanation": "Si una opcion arregla solo IAM pero no la key policy correcta, suele seguir mal.",
+    "tags": [
+      "kms",
+      "security",
+      "cross-account"
+    ],
+    "source": "notes",
+    "questionIds": [
+      24,
+      43,
+      47,
+      98
+    ],
+    "difficulty": 3
+  },
+  {
+    "id": "concept-route53-core",
+    "type": "learn",
+    "title": "Route 53",
+    "prompt": "Route 53 se decide por la politica exacta: failover, weighted, latency o geolocation.",
+    "body": "No todas las preguntas de DNS son iguales. Si la pista dice latencia, no marques failover. Si la pista dice primario/secundario, no marques latency-based.",
+    "explanation": "La politica exacta decide la respuesta.",
+    "tags": [
+      "route53",
+      "dns",
+      "resilience"
+    ],
+    "source": "notes",
+    "questionIds": [
+      17,
+      41,
+      59,
+      74,
+      82,
+      86
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-autoscaling-core",
+    "type": "learn",
+    "title": "Auto Scaling",
+    "prompt": "Auto Scaling no siempre piensa como humano: rebalance, mixed instances y scale-in rompen intuiciones.",
+    "body": "Recuerda que rebalancing puede exceder temporalmente capacidad y mixed instances puede causar desbalance temporal entre AZs durante scale-in.",
+    "explanation": "Si ves Spot + On-Demand + comportamiento raro de termination, piensa en la logica interna del ASG.",
+    "tags": [
+      "auto-scaling",
+      "mixed-instances-policy",
+      "rebalancing",
+      "resilience"
+    ],
+    "source": "notes",
+    "questionIds": [
+      6,
+      14,
+      17,
+      46,
+      59,
+      74,
+      87,
+      105,
+      116
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-dr-core",
+    "type": "learn",
+    "title": "Disaster Recovery",
+    "prompt": "DR se decide por implementacion real: RTO, RPO, replica activa, restore y costo.",
+    "body": "No marques Pilot Light, Warm Standby o Active/Active solo por el nombre. Mira como resuelven la base de datos y el tiempo real de recuperacion.",
+    "explanation": "La etiqueta de la estrategia no basta; importa si usa read replica, backup restore o entorno caliente.",
+    "tags": [
+      "dr",
+      "pilot-light",
+      "warm-standby",
+      "resilience"
+    ],
+    "source": "notes",
+    "questionIds": [
+      17,
+      31,
+      41,
+      59,
+      74,
+      82,
+      86
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "matrix-compliance",
+    "type": "learn",
+    "title": "Matriz: Compliance continuo",
+    "prompt": "Si ves NON_COMPLIANT, tags obligatorios, logging obligatorio o enforcement continuo, empieza por AWS Config.",
+    "body": "Luego decide el detalle fino: recurso exacto, regla exacta, estado exacto y si necesitas remediacion con SSM o solo notificacion.",
+    "explanation": "La familia de decision es Config; la respuesta final se decide en el scope exacto.",
+    "tags": [
+      "matrix",
+      "config",
+      "compliance",
+      "security"
+    ],
+    "source": "notes",
+    "questionIds": [
+      7,
+      12,
+      15,
+      18,
+      21,
+      32
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "matrix-logs-alert",
+    "type": "learn",
+    "title": "Matriz: Alerta por patron en logs",
+    "prompt": "Si los logs ya estan en CloudWatch Logs y solo quieres alertar por una palabra o patron, empieza por metric filter.",
+    "body": "El patron corto es metric filter -> custom metric -> alarm -> SNS.",
+    "explanation": "Subscription filters, Firehose o Lambda suelen sobrar si solo piden una alerta operacional.",
+    "tags": [
+      "matrix",
+      "cloudwatch",
+      "metric-filter",
+      "sns",
+      "observability"
+    ],
+    "source": "notes",
+    "questionIds": [
+      3,
+      4,
+      11,
+      16,
+      44,
+      66
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "matrix-events-not-polling",
+    "type": "learn",
+    "title": "Matriz: Evento nativo, no polling",
+    "prompt": "Si ves pull request, push, build terminado o reaccion en tiempo real, empieza por el trigger nativo del servicio o EventBridge.",
+    "body": "Sospecha de cron cada 5 minutos, Lambda esperando procesos largos o arquitecturas de polling artesanal.",
+    "explanation": "Cuando AWS ya tiene el evento, el polling suele perder.",
+    "tags": [
+      "matrix",
+      "eventbridge",
+      "ci-cd",
+      "operations"
+    ],
+    "source": "notes",
+    "questionIds": [
+      8,
+      30,
+      48,
+      63,
+      68,
+      118
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "matrix-source-branch",
+    "type": "learn",
+    "title": "Matriz: Rama fuente correcta",
+    "prompt": "Si la historia habla de master, production, aprobacion manual o source stage, gana la branch que realmente genera el artefacto.",
+    "body": "La aprobacion manual no cambia la branch fuente.",
+    "explanation": "El examen mete narrativa de pipeline, pero la fuente real del artefacto manda.",
+    "tags": [
+      "matrix",
+      "codepipeline",
+      "branch",
+      "ci-cd"
+    ],
+    "source": "notes",
+    "questionIds": [
+      39,
+      54,
+      62,
+      81,
+      101,
+      120
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "trap-scope-exacto",
+    "type": "learn",
+    "title": "Trampa: Scope exacto manda",
+    "prompt": "La opcion correcta suele ser la que respeta exactamente el alcance pedido.",
+    "body": "Revisa siempre: esta regla vs todas, este recurso vs otro parecido, esta branch vs otra cercana, esta cuenta vs la cuenta opuesta.",
+    "explanation": "Si la opcion amplia el scope mas de lo pedido, suele perder.",
+    "tags": [
+      "trap",
+      "scope",
+      "exam"
+    ],
+    "source": "notes",
+    "questionIds": [
+      12,
+      15,
+      18,
+      54,
+      89,
+      103,
+      120
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "trap-filter-layer",
+    "type": "learn",
+    "title": "Trampa: El filtro vive en la capa correcta",
+    "prompt": "Si ya sabes el evento exacto, filtra lo antes posible.",
+    "body": "Origen del evento, luego enrutamiento, luego entrega. EventBridge filtra; SNS distribuye. Config evalua; EventBridge reacciona.",
+    "explanation": "Muchas respuestas usan los mismos servicios; gana la que filtra en el punto correcto.",
+    "tags": [
+      "trap",
+      "eventbridge",
+      "sns",
+      "config",
+      "exam"
+    ],
+    "source": "notes",
+    "questionIds": [
+      15,
+      18,
+      68,
+      88,
+      118
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "trap-managed-vs-custom",
+    "type": "learn",
+    "title": "Trampa: Managed suele ganar a custom",
+    "prompt": "Si AWS ya trae una capacidad administrada que cumple exacto, casi siempre gana sobre la version custom.",
+    "body": "Palabras senal: sin codigo personalizado, menor esfuerzo, administrado.",
+    "explanation": "No construyas con Lambda lo que AWS ya resuelve con una regla, accion o policy administrada.",
+    "tags": [
+      "trap",
+      "managed",
+      "custom",
+      "exam"
+    ],
+    "source": "notes",
+    "questionIds": [
+      12,
+      18,
+      68,
+      85,
+      94
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "trap-feature-exacta",
+    "type": "learn",
+    "title": "Trampa: Feature exacta",
+    "prompt": "No basta el servicio correcto; importa la feature exacta.",
+    "body": "Ejemplos: reserved vs provisioned concurrency, metric vs alarm, AfterAllowTestTraffic vs BeforeAllowTraffic.",
+    "explanation": "Despues de identificar el servicio, pregunta: que feature exacta resuelve este dolor?",
+    "tags": [
+      "trap",
+      "feature",
+      "exam"
+    ],
+    "source": "notes",
+    "questionIds": [
+      17,
+      19,
+      25,
+      57,
+      58
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "matrix-cross-account",
+    "type": "learn",
+    "title": "Matriz: Cross-account en el lado correcto",
+    "prompt": "Si ves Unauthorized, AssumeRole o despliegue entre cuentas, empieza por trust policy y permisos del lado destino.",
+    "body": "El patrón típico es: quién inicia la acción, dónde vive el recurso, qué rol se asume, dónde va la trust policy y qué permiso extra exige el recurso.",
+    "explanation": "Las preguntas cross-account se fallan mucho por invertir la dirección de la confianza o por olvidar permisos del recurso además del rol.",
+    "tags": [
+      "matrix",
+      "security",
+      "assume-role",
+      "cross-account",
+      "iam"
+    ],
+    "source": "notes",
+    "questionIds": [
+      20,
+      23,
+      24,
+      39,
+      43,
+      47,
+      82
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "matrix-kms-blocker",
+    "type": "learn",
+    "title": "Matriz: KMS bloqueando el flujo",
+    "prompt": "Si el error suena a AccessDenied con artefactos, secretos o lectura cross-account, empieza por KMS.",
+    "body": "Separa key policy, IAM policy y permisos del servicio que usa la clave. Arreglar solo IAM suele dejar el problema a medias.",
+    "explanation": "Cuando KMS aparece, la clave y su política suelen ser el bloqueo real aunque la historia de la pregunta hable de CI/CD o secrets.",
+    "tags": [
+      "matrix",
+      "kms",
+      "security",
+      "cross-account"
+    ],
+    "source": "notes",
+    "questionIds": [
+      23,
+      24,
+      43,
+      47,
+      82
+    ],
+    "difficulty": 3
+  },
+  {
+    "id": "matrix-asg-raro",
+    "type": "learn",
+    "title": "Matriz: Auto Scaling haciendo algo raro",
+    "prompt": "Si ves Spot más On-Demand, rebalanceo, lifecycle hook o scale-in extraño, empieza por la lógica real del ASG.",
+    "body": "Mixed instances policy, rebalance temporal y termination logic no siguen siempre la intuición humana de balance perfecto.",
+    "explanation": "Estas preguntas no se ganan con sentido común general; se ganan recordando cómo actúa realmente Auto Scaling.",
+    "tags": [
+      "matrix",
+      "auto-scaling",
+      "mixed-instances-policy",
+      "rebalancing",
+      "resilience"
+    ],
+    "source": "notes",
+    "questionIds": [
+      6,
+      14,
+      17,
+      33,
+      46,
+      59,
+      73,
+      74,
+      87,
+      105,
+      116
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "matrix-ssm-ops",
+    "type": "learn",
+    "title": "Matriz: Operacion repetible y auditable",
+    "prompt": "Si la pregunta pide runbooks, patching, aprobacion o remediacion operativa, empieza por Systems Manager.",
+    "body": "Luego afina entre Automation, Run Command, Patch Manager o State Manager según lo que pida el flujo.",
+    "explanation": "Systems Manager gana cuando el valor está en operación repetible, auditada y menos artesanal.",
+    "tags": [
+      "matrix",
+      "ssm-automation",
+      "operations",
+      "systems-manager"
+    ],
+    "source": "notes",
+    "questionIds": [
+      29,
+      47,
+      87,
+      98
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "matrix-lambda-flow",
+    "type": "learn",
+    "title": "Matriz: Lambda, concurrencia o flujo largo",
+    "prompt": "Si el dolor es cold start, aislamiento de capacidad o orquestacion multi-paso, separa esas tres cosas antes de responder.",
+    "body": "Provisioned concurrency para cold start, reserved concurrency para aislamiento o límite, y orquestación dedicada para flujos largos o esperas entre pasos.",
+    "explanation": "La trampa típica es responder con el servicio correcto pero la feature equivocada o con una orquestación innecesaria.",
+    "tags": [
+      "matrix",
+      "lambda",
+      "provisioned-concurrency",
+      "reserved-concurrency",
+      "step-functions"
+    ],
+    "source": "notes",
+    "questionIds": [
+      57,
+      115
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "matrix-s3-artifacts",
+    "type": "learn",
+    "title": "Matriz: S3 y artefactos",
+    "prompt": "Si la pregunta habla de artefactos, logs en S3, bucket policy, cifrado o eventos S3, empieza por bucket, policy y principal correctos.",
+    "body": "Luego revisa si el detalle fino es versionado, KMS, trigger de S3 o permisos del servicio consumidor.",
+    "explanation": "En muchas preguntas el fallo parece del pipeline, Lambda o consumidor, pero la raíz está en S3 o su cifrado.",
+    "tags": [
+      "matrix",
+      "s3",
+      "artifacts",
+      "kms",
+      "iac"
+    ],
+    "source": "notes",
+    "questionIds": [
+      27,
+      38,
+      45,
+      94
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "trap-source-real",
+    "type": "learn",
+    "title": "Trampa: Source real vence narrativa",
+    "prompt": "La historia del pipeline puede ser larga, pero la branch y el source reales del artefacto siguen mandando.",
+    "body": "Aprobación manual, promotion o stages extra no cambian automáticamente la rama que generó el build.",
+    "explanation": "Si una respuesta arregla aprobaciones pero no corrige el source stage o la branch, suele seguir mal.",
+    "tags": [
+      "trap",
+      "branch",
+      "codepipeline",
+      "ci-cd",
+      "exam"
+    ],
+    "source": "notes",
+    "questionIds": [
+      54,
+      62,
+      81,
+      101,
+      120
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "trap-dr-implementacion",
+    "type": "learn",
+    "title": "Trampa: DR se decide por implementacion",
+    "prompt": "No marques Pilot Light, Warm Standby o active/active solo por la etiqueta.",
+    "body": "Mira siempre: réplica activa o restore de backup, RTO real, RPO real y costo real.",
+    "explanation": "Dos opciones pueden decir la misma estrategia y una seguir siendo peor porque implementa mal la base de datos o el failover.",
+    "tags": [
+      "trap",
+      "dr",
+      "pilot-light",
+      "warm-standby",
+      "exam"
+    ],
+    "source": "notes",
+    "questionIds": [
+      17,
+      31,
+      41,
+      59,
+      74,
+      82,
+      86
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "trap-asg-no-humano",
+    "type": "learn",
+    "title": "Trampa: El ASG no piensa como humano",
+    "prompt": "No asumas que Auto Scaling va a elegir la instancia o la AZ que a ti te parece más lógica.",
+    "body": "Mixed instances, rebalance y scale-in siguen reglas internas de capacidad, disponibilidad y política, no intuición humana de orden.",
+    "explanation": "Si una opción se apoya en una intuición demasiado simple de balance, sospecha.",
+    "tags": [
+      "trap",
+      "auto-scaling",
+      "mixed-instances-policy",
+      "rebalancing",
+      "exam"
+    ],
+    "source": "notes",
+    "questionIds": [
+      6,
+      14,
+      17,
+      46,
+      59,
+      74,
+      87,
+      105,
+      116
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "trap-hooks-momento",
+    "type": "learn",
+    "title": "Trampa: El momento del hook importa",
+    "prompt": "No elijas un hook por nombre bonito; elige por el instante exacto del flujo.",
+    "body": "BeforeAllowTraffic no es lo mismo que AfterAllowTestTraffic, y test traffic no es lo mismo que tráfico real.",
+    "explanation": "Muchas opciones usan el servicio correcto pero fallan justo en el punto del lifecycle.",
+    "tags": [
+      "trap",
+      "codedeploy",
+      "hooks",
+      "before-allow-traffic",
+      "exam"
+    ],
+    "source": "notes",
+    "questionIds": [
+      19,
+      25,
+      49,
+      50,
+      51,
+      52,
+      97,
+      113
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-secrets-vs-parameter-store",
+    "type": "learn",
+    "title": "Secrets Manager vs Parameter Store",
+    "prompt": "Si la pregunta exige rotacion nativa de secretos, empieza por Secrets Manager.",
+    "body": "Secrets Manager gana cuando el foco es secreto sensible, rotacion y manejo administrado del ciclo de vida. Parameter Store gana mejor cuando el foco es configuracion o parametros runtime y la rotacion no es el requisito central.",
+    "explanation": "La trampa comun es elegir Parameter Store cuando la pregunta realmente pide secretos administrados con rotacion.",
+    "tags": [
+      "security",
+      "secrets-manager",
+      "parameter-store",
+      "exam"
+    ],
+    "source": "notes",
+    "questionIds": [
+      69,
+      98
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-cloudtrail-config-securityhub",
+    "type": "learn",
+    "title": "CloudTrail vs Config vs Security Hub",
+    "prompt": "Auditoria, compliance y hallazgos no son lo mismo. Separa esos tres planos antes de responder.",
+    "body": "CloudTrail se usa para saber quién hizo qué y cuándo. Config se usa para evaluar si la configuración cumple. Security Hub agrega y centraliza hallazgos de seguridad y cumplimiento.",
+    "explanation": "Muchas preguntas meten los tres nombres porque suenan a seguridad, pero cada uno resuelve un problema distinto.",
+    "tags": [
+      "security",
+      "cloudtrail",
+      "config",
+      "security-hub",
+      "exam"
+    ],
+    "source": "notes",
+    "questionIds": [
+      1,
+      12,
+      18,
+      26,
+      70,
+      98,
+      110,
+      119
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-route53-routing-policies",
+    "type": "learn",
+    "title": "Route 53: politicas de routing",
+    "prompt": "En Route 53, la politica correcta depende de si el requisito es failover, latencia, reparto o ubicacion.",
+    "body": "Failover es primario/secundario. Weighted es reparto porcentual. Latency-based elige por menor latencia. Geolocation responde por ubicacion del usuario.",
+    "explanation": "El examen suele poner respuestas buenas de DNS, pero gana la politica exacta que coincide con la restriccion.",
+    "tags": [
+      "route53",
+      "dns",
+      "latency-based-routing",
+      "failover",
+      "resilience"
+    ],
+    "source": "notes",
+    "questionIds": [
+      17,
+      41,
+      59,
+      74,
+      82,
+      84,
+      86
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-organizations-controltower-stacksets",
+    "type": "learn",
+    "title": "Organizations, Control Tower y StackSets",
+    "prompt": "Multi-cuenta no significa acceso automático. Governance y despliegue centralizado son capas distintas.",
+    "body": "Organizations y Control Tower ordenan cuentas y gobernanza. StackSets resuelve despliegue multi-cuenta o multi-region. Los permisos reales al recurso siguen necesitando trust policy, AssumeRole y permisos correctos.",
+    "explanation": "Una trampa muy comun es asumir que por estar bajo la misma organizacion ya existe acceso o despliegue resuelto.",
+    "tags": [
+      "organizations",
+      "control-tower",
+      "stacksets",
+      "cross-account",
+      "security"
+    ],
+    "source": "notes",
+    "questionIds": [
+      1,
+      20,
+      21,
+      44,
+      65,
+      90
+    ],
+    "difficulty": 2
+  },
+  {
+    "id": "concept-beanstalk-vs-codedeploy",
+    "type": "learn",
+    "title": "Elastic Beanstalk vs CodeDeploy",
+    "prompt": "Si la pregunta habla de entornos y CNAME swap, piensa Beanstalk. Si habla de hooks, traffic shifting y deployment groups, piensa CodeDeploy.",
+    "body": "Beanstalk opera como plataforma con entornos completos. CodeDeploy opera como motor de despliegue controlado.",
+    "explanation": "Ambos pueden sonar a deployment, pero el modelo operativo que describe la pregunta suele decidir el ganador.",
+    "tags": [
+      "elastic-beanstalk",
+      "codedeploy",
+      "ci-cd",
+      "exam"
+    ],
+    "source": "notes",
+    "questionIds": [
+      5,
+      19,
+      25,
+      61,
+      62,
+      69,
+      75,
+      76,
+      97
+    ],
+    "difficulty": 2
+  }
+]

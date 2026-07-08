@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1300 360" role="img" aria-label="KMS cross-account">
+  <rect width="1300" height="360" fill="#0f1218"/>
+  <text x="34" y="40" fill="#f1b356" font-family="Arial, sans-serif" font-size="26" font-weight="700">KMS cross-account</text>
+  <g font-family="Arial, sans-serif">
+    <rect x="60" y="90" width="360" height="200" rx="22" fill="#152032" stroke="#8fc3ff"/>
+    <text x="240" y="124" fill="#cfe6ff" font-size="22" text-anchor="middle">Cuenta origen</text>
+    <rect x="110" y="160" width="120" height="60" rx="14" fill="#17304a" stroke="#8fc3ff"/><text x="170" y="197" fill="#fff" font-size="18" text-anchor="middle">Principal</text>
+    <rect x="250" y="160" width="120" height="60" rx="14" fill="#1a2f23" stroke="#9fe3b1"/><text x="310" y="197" fill="#fff" font-size="18" text-anchor="middle">IAM policy</text>
+    <rect x="490" y="120" width="320" height="140" rx="22" fill="#22171a" stroke="#f1b356"/>
+    <text x="650" y="154" fill="#ffe0c0" font-size="22" text-anchor="middle">Cuenta de la llave</text>
+    <rect x="555" y="185" width="190" height="40" rx="12" fill="#3a2415" stroke="#f1b356"/><text x="650" y="210" fill="#fff" font-size="16" text-anchor="middle">KMS key policy</text>
+    <rect x="900" y="120" width="300" height="140" rx="22" fill="#2d2611" stroke="#f1d37a"/>
+    <text x="1050" y="154" fill="#fff0c2" font-size="22" text-anchor="middle">Recurso cifrado</text>
+    <rect x="960" y="185" width="180" height="40" rx="12" fill="#17304a" stroke="#8fc3ff"/><text x="1050" y="210" fill="#fff" font-size="16" text-anchor="middle">Artifact / Secret</text>
+  </g>
+  <path d="M420 190 H490 M810 190 H900" stroke="#9fd1ff" stroke-width="6" marker-end="url(#a)"/>
+  <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#9fd1ff"/></marker></defs>
+</svg>
