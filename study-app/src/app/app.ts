@@ -223,7 +223,7 @@ export class App {
   private readonly http = inject(HttpClient);
   private readonly sanitizer = inject(DomSanitizer);
   private audioContext: AudioContext | null = null;
-  readonly appVersion = 'v1.3.7';
+  readonly appVersion = 'v1.3.8';
 
   readonly cards = signal<StudyCard[]>([]);
   readonly conceptCards = signal<StudyCard[]>([]);
