@@ -462,7 +462,7 @@
               <h2>{{ isQuickQuiz() ? 'Quiz rapido' : isTraining() ? 'Entrenamiento ' + simulatorPosition() : 'Pregunta ' + simulatorPosition() }}</h2>
               <div class="header-actions-right">
                 @if (isQuickQuiz()) {
-                  <button type="button" class="ghost compact-ghost" (click)="finishSimulator()">Terminar</button>
+                  <button type="button" class="ghost compact-ghost" (click)="confirmFinishSimulator()">Terminar</button>
                 }
                 @if (isTraining()) {
                   <button
@@ -509,6 +509,24 @@
           </div>
         }
       </header>
+
+      <section class="question-navigation" aria-label="Navegacion de pregunta">
+        <span class="feed-hint">
+          Respondidas: {{ simulatorAnsweredCount() }}/{{ simulatorTotal() }}
+          @if (!isQuickQuiz()) {
+            · Pendientes: {{ simulatorUnansweredCount() }}
+          }
+        </span>
+        <div class="simulator-actions">
+          <button type="button" class="secondary" [disabled]="simulatorPosition() === 1" (click)="prevSimulatorQuestion()">
+            Anterior
+          </button>
+          <button type="button" class="next" (click)="nextSimulatorQuestion()">
+            {{ simulatorPosition() === simulatorTotal() ? (isQuickQuiz() || isTraining() ? 'Ver resultado' : 'Finalizar') : 'Siguiente' }}
+          </button>
+        </div>
+      </section>
+
       @if (isReporting(isQuickQuiz() ? 'quick-quiz' : 'question', '' + question.id)) {
         <section class="report-panel">
           <p class="body">Anota si la pregunta, respuesta o explicacion necesitan correccion.</p>
@@ -574,29 +592,37 @@
         <div class="confidence-block">
           <p class="metadata-label">Confianza</p>
           <div class="confidence-scale" role="radiogroup" [attr.aria-label]="'Confianza para pregunta ' + question.id">
-            @for (value of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; track value) {
-              <label class="confidence-choice" [class.selected]="simulatorConfidenceValue(question.id) === value">
+            @for (option of confidenceOptions; track option.value) {
+              <label class="confidence-choice" [class.selected]="simulatorConfidenceValue(question.id) === option.value">
                 <input
                   type="radio"
                   name="confidence-{{ question.id }}"
-                  [checked]="simulatorConfidenceValue(question.id) === value"
-                  (change)="setSimulatorConfidence(question.id, value)"
+                  [checked]="simulatorConfidenceValue(question.id) === option.value"
+                  (change)="setSimulatorConfidence(question.id, option.value)"
                 />
-                <span>{{ value }}</span>
+                <span class="confidence-number">{{ option.value }}</span>
+                <span class="confidence-text">{{ option.label }}</span>
               </label>
             }
           </div>
         </div>
 
-        <label class="notes-block">
-          <span class="metadata-label">Notas opcionales</span>
-          <textarea
-            class="report-textarea simulator-notes"
-            [value]="simulatorNotesValue(question.id)"
-            (input)="setSimulatorNotes(question.id, $any($event.target).value)"
-            placeholder="Duda, descarte entre opciones o razonamiento breve."
-          ></textarea>
-        </label>
+        <div class="notes-block">
+          <div class="notes-header">
+            <span class="metadata-label">Notas opcionales</span>
+            @if (!isSimulatorNotesOpen(question.id)) {
+              <button type="button" class="ghost compact-ghost" (click)="openSimulatorNotes(question.id)">Agregar nota</button>
+            }
+          </div>
+          @if (isSimulatorNotesOpen(question.id)) {
+            <textarea
+              class="report-textarea simulator-notes"
+              [value]="simulatorNotesValue(question.id)"
+              (input)="setSimulatorNotes(question.id, $any($event.target).value)"
+              placeholder="Duda, descarte entre opciones o razonamiento breve."
+            ></textarea>
+          }
+        </div>
       </section>
 
       @if (isQuickQuiz() && quickQuizRevealed()) {
@@ -648,12 +674,6 @@
                 Verificar respuesta
               </button>
             }
-            <button type="button" class="secondary" [disabled]="simulatorPosition() === 1" (click)="prevSimulatorQuestion()">
-              Anterior
-            </button>
-            <button type="button" class="next" (click)="nextSimulatorQuestion()">
-              {{ simulatorPosition() === simulatorTotal() ? 'Ver resultado' : 'Siguiente' }}
-            </button>
           </div>
         } @else if (isTraining()) {
           <span class="feed-hint">Pregunta {{ simulatorPosition() }} de {{ simulatorTotal() }} en orden.</span>
@@ -663,33 +683,27 @@
                 Verificar respuesta
               </button>
             }
-            <button type="button" class="secondary" [disabled]="simulatorPosition() === 1" (click)="prevSimulatorQuestion()">
-              Anterior
-            </button>
-            <button type="button" class="next" (click)="nextSimulatorQuestion()">
-              {{ simulatorPosition() === simulatorTotal() ? 'Ver resultado' : 'Siguiente' }}
-            </button>
           </div>
         } @else {
-          <span class="feed-hint">Respondidas: {{ simulatorAnsweredCount() }}/{{ simulatorTotal() }}</span>
+          <span class="feed-hint">Acciones de examen</span>
           <div class="simulator-actions">
             @if (question.questionType === 'multi') {
               <button type="button" class="secondary" [disabled]="isExamQuestionChecked(question.id) || !hasCurrentExamSelection()" (click)="verifyCurrentExamAnswer()">
                 Verificar respuesta
               </button>
             }
-            <button type="button" class="secondary" [disabled]="simulatorPosition() === 1" (click)="prevSimulatorQuestion()">
-              Anterior
-            </button>
-            <button type="button" class="ghost" (click)="finishSimulator()">Entregar</button>
-            <button type="button" class="next" (click)="nextSimulatorQuestion()">
-              {{ simulatorPosition() === simulatorTotal() ? 'Finalizar' : 'Siguiente' }}
-            </button>
+            <button type="button" class="ghost finish-exam-button" (click)="confirmFinishSimulator()">Entregar examen</button>
           </div>
         }
       </footer>
 
       @if (!isQuickQuiz()) {
+        <div class="simulator-nav-legend" aria-label="Leyenda de preguntas">
+          <span class="legend-current">Actual</span>
+          <span class="legend-answered">Respondida</span>
+          <span class="legend-note">Con nota</span>
+          <span class="legend-confidence">Con confianza</span>
+        </div>
         <div class="simulator-nav-grid">
           @for (simQuestion of simulatorQueue(); track simQuestion.id; let idx = $index) {
             <button
@@ -698,6 +712,8 @@
               [class.current]="simulatorQuestionState(idx) === 'current'"
               [class.answered]="simulatorQuestionState(idx) === 'answered'"
               [class.bookmarked]="isTraining() && isTrainingBookmarked(simQuestion.id)"
+              [class.has-note]="simulatorQuestionHasNote(simQuestion.id)"
+              [class.has-confidence]="simulatorQuestionHasConfidence(simQuestion.id)"
               (click)="goToSimulatorQuestion(idx)"
             >
               @if (isTraining() && isTrainingBookmarked(simQuestion.id)) {

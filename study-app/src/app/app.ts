@@ -97,16 +97,19 @@ interface SimulatorAnswerExportRecord {
   topic: string | null;
   domain_name: string | null;
   question_type: 'single' | 'multi';
+  selected_answers: string[];
+  correct_answers: string[];
   answer: string[];
   correct_answer: string[];
   answered: boolean;
   is_correct: boolean;
-  confidence: number;
+  confidence: number | null;
   time_seconds: number;
   notes: string;
 }
 
 interface SimulatorSessionExport {
+  schemaVersion: '2.0';
   id: string;
   appVersion: string;
   assessmentMode: AssessmentMode;
@@ -199,7 +202,7 @@ interface RuntimeSnapshot {
   remainingSeconds: number;
   simulatorStartedAt: number | null;
   simulatorDeadlineAt: number | null;
-  simulatorConfidence: Record<number, number>;
+  simulatorConfidence: Record<number, number | null>;
   simulatorNotes: Record<number, string>;
   simulatorQuestionTimeSeconds: Record<number, number>;
   simulatorQuestionStartedAt: number | null;
@@ -223,7 +226,15 @@ export class App {
   private readonly http = inject(HttpClient);
   private readonly sanitizer = inject(DomSanitizer);
   private audioContext: AudioContext | null = null;
-  readonly appVersion = 'v1.3.8';
+  private simulatorNavigationPending = false;
+  readonly appVersion = 'v1.3.10';
+  readonly confidenceOptions = [
+    { value: 1, label: 'Guessing' },
+    { value: 2, label: 'Low' },
+    { value: 3, label: 'Moderate' },
+    { value: 4, label: 'High' },
+    { value: 5, label: 'Very high' }
+  ];
 
   readonly cards = signal<StudyCard[]>([]);
   readonly conceptCards = signal<StudyCard[]>([]);
@@ -260,8 +271,9 @@ export class App {
   readonly remainingSeconds = signal(SIMULATOR_DURATION_SECONDS);
   readonly simulatorStartedAt = signal<number | null>(null);
   readonly simulatorDeadlineAt = signal<number | null>(null);
-  readonly simulatorConfidence = signal<Record<number, number>>({});
+  readonly simulatorConfidence = signal<Record<number, number | null>>({});
   readonly simulatorNotes = signal<Record<number, string>>({});
+  readonly simulatorNotesOpen = signal<Record<number, boolean>>({});
   readonly simulatorQuestionTimeSeconds = signal<Record<number, number>>({});
   readonly simulatorQuestionStartedAt = signal<number | null>(null);
   readonly quickQuizRevealed = signal(false);
@@ -316,6 +328,9 @@ export class App {
   });
   readonly simulatorAnsweredCount = computed(() =>
     Object.values(this.simulatorAnswers()).filter((answers) => answers.length > 0).length
+  );
+  readonly simulatorUnansweredCount = computed(() =>
+    Math.max(0, this.simulatorTotal() - this.simulatorAnsweredCount())
   );
   readonly quickQuizCorrectCount = computed(() =>
     this.simulatorQueue().reduce((sum, question) => {
@@ -983,12 +998,12 @@ export class App {
     return (this.simulatorAnswers()[questionId] ?? []).includes(optionId);
   }
 
-  simulatorConfidenceValue(questionId: number): number {
-    return this.simulatorConfidence()[questionId] ?? 5;
+  simulatorConfidenceValue(questionId: number): number | null {
+    return this.simulatorConfidence()[questionId] ?? null;
   }
 
   setSimulatorConfidence(questionId: number, confidence: number): void {
-    const normalized = Math.min(10, Math.max(1, Math.round(confidence)));
+    const normalized = Math.min(5, Math.max(1, Math.round(confidence)));
     this.simulatorConfidence.update((current) => ({
       ...current,
       [questionId]: normalized
@@ -997,6 +1012,17 @@ export class App {
 
   simulatorNotesValue(questionId: number): string {
     return this.simulatorNotes()[questionId] ?? '';
+  }
+
+  isSimulatorNotesOpen(questionId: number): boolean {
+    return !!this.simulatorNotesOpen()[questionId] || this.simulatorNotesValue(questionId).trim().length > 0;
+  }
+
+  openSimulatorNotes(questionId: number): void {
+    this.simulatorNotesOpen.update((current) => ({
+      ...current,
+      [questionId]: true
+    }));
   }
 
   setSimulatorNotes(questionId: number, notes: string): void {
@@ -1101,12 +1127,31 @@ export class App {
     this.setSimulatorIndex(index);
   }
 
+  confirmFinishSimulator(): void {
+    const unanswered = this.simulatorUnansweredCount();
+    const message = unanswered
+      ? `Te ${unanswered === 1 ? 'falta' : 'faltan'} ${unanswered} ${unanswered === 1 ? 'pregunta' : 'preguntas'} sin responder. ¿Quieres entregar el examen ahora?`
+      : 'Todas las preguntas tienen respuesta. ¿Quieres entregar el examen ahora?';
+
+    if (window.confirm(message)) {
+      this.finishSimulator();
+    }
+  }
+
   simulatorQuestionState(index: number): 'current' | 'answered' | 'unanswered' {
     if (index === this.simulatorIndex()) {
       return 'current';
     }
     const question = this.simulatorQueue()[index];
     return (this.simulatorAnswers()[question.id] ?? []).length ? 'answered' : 'unanswered';
+  }
+
+  simulatorQuestionHasNote(questionId: number): boolean {
+    return this.simulatorNotesValue(questionId).trim().length > 0;
+  }
+
+  simulatorQuestionHasConfidence(questionId: number): boolean {
+    return this.simulatorConfidenceValue(questionId) !== null;
   }
 
   finishSimulator(): void {
@@ -1374,15 +1419,29 @@ export class App {
   }
 
   private setSimulatorIndex(index: number): void {
-    if (index < 0 || index >= this.simulatorQueue().length || index === this.simulatorIndex()) {
+    if (
+      this.simulatorNavigationPending ||
+      index < 0 ||
+      index >= this.simulatorQueue().length ||
+      index === this.simulatorIndex()
+    ) {
       return;
     }
 
+    this.simulatorNavigationPending = true;
     this.captureCurrentSimulatorQuestionTime();
     this.simulatorIndex.set(index);
     this.beginCurrentSimulatorQuestionTimer();
     this.syncQuickQuizRevealState();
+    this.scrollSimulatorQuestionToTop();
     this.playTone('next');
+  }
+
+  private scrollSimulatorQuestionToTop(): void {
+    setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      this.simulatorNavigationPending = false;
+    }, 0);
   }
 
   isCurrentTrainingAnswerCorrect(): boolean {
@@ -1890,6 +1949,7 @@ export class App {
   private resetSimulatorResponseTracking(): void {
     this.simulatorConfidence.set({});
     this.simulatorNotes.set({});
+    this.simulatorNotesOpen.set({});
     this.simulatorQuestionTimeSeconds.set({});
     this.simulatorQuestionStartedAt.set(null);
   }
@@ -1931,6 +1991,7 @@ export class App {
       : null;
 
     return {
+      schemaVersion: '2.0',
       id: `${completedAt}-${this.assessmentMode()}-${this.simulatorBankType()}`,
       appVersion: this.appVersion,
       assessmentMode: this.assessmentMode(),
@@ -1975,11 +2036,13 @@ export class App {
           topic: question.topic,
           domain_name: question.domainName,
           question_type: question.questionType,
+          selected_answers: selected,
+          correct_answers: expected,
           answer: selected,
           correct_answer: expected,
           answered: selected.length > 0,
           is_correct: isCorrect,
-          confidence: confidence[question.id] ?? 5,
+          confidence: confidence[question.id] ?? null,
           time_seconds: timeSeconds[question.id] ?? 0,
           notes: notes[question.id]?.trim() ?? ''
         };
