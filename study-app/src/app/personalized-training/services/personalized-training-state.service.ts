@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import {
   DrillAttempt,
+  ImportedExamSession,
   PersonalizedSession,
   PersonalizedTrainingState,
   TopicMastery
 } from '../models/personalized-training.models';
+import { IMPORT_PARSER_VERSION } from '../utils/exam-session-normalization';
 import { isConfidence, isErrorCause, isRecord } from '../utils/personalized-training-validation';
 
 export const PERSONALIZED_TRAINING_STORAGE_KEY = 'dop-c02-personalized-training-v1';
@@ -19,7 +21,7 @@ export class PersonalizedTrainingStateService {
 
     try {
       const parsed: unknown = JSON.parse(raw);
-      return this.isPersistedState(parsed) ? parsed : this.createEmptyState();
+      return this.isPersistedState(parsed) ? this.withStateDefaults(parsed) : this.createEmptyState();
     } catch {
       return this.createEmptyState();
     }
@@ -33,6 +35,8 @@ export class PersonalizedTrainingStateService {
       sessions: [],
       reviewSchedule: {},
       importedExamSessions: [],
+      importHistory: [],
+      importParserVersion: IMPORT_PARSER_VERSION,
       recommendations: [],
       updatedAt: new Date().toISOString()
     };
@@ -68,6 +72,57 @@ export class PersonalizedTrainingStateService {
     const next: PersonalizedTrainingState = {
       ...state,
       sessions: [...state.sessions, session],
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PERSONALIZED_TRAINING_STORAGE_KEY, JSON.stringify(next));
+    return next;
+  }
+
+  getImportedSessions(): ImportedExamSession[] {
+    return this.loadState().importedExamSessions;
+  }
+
+  findImportedSession(importId: string): ImportedExamSession | null {
+    return this.getImportedSessions().find((session) => session.id === importId) ?? null;
+  }
+
+  hasImportedSession(importId: string): boolean {
+    return this.findImportedSession(importId) !== null;
+  }
+
+  commitImportedSession(session: ImportedExamSession): PersonalizedTrainingState {
+    const state = this.loadState();
+    if (state.importedExamSessions.some((importedSession) => importedSession.id === session.id)) {
+      return state;
+    }
+
+    const next: PersonalizedTrainingState = {
+      ...state,
+      importedExamSessions: [...state.importedExamSessions, session],
+      importHistory: [
+        ...state.importHistory,
+        {
+          importId: session.id,
+          importedAt: session.importedAt,
+          sourceFileName: session.sourceFileName,
+          status: this.getImportFlags(session).some((flag) => flag.severity === 'warning' || flag.severity === 'info')
+            ? 'valid_with_warnings'
+            : 'valid',
+          flagCodes: this.getImportFlags(session).map((flag) => flag.code)
+        }
+      ],
+      importParserVersion: IMPORT_PARSER_VERSION,
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PERSONALIZED_TRAINING_STORAGE_KEY, JSON.stringify(next));
+    return next;
+  }
+
+  removeImportedSession(importId: string): PersonalizedTrainingState {
+    const state = this.loadState();
+    const next: PersonalizedTrainingState = {
+      ...state,
+      importedExamSessions: state.importedExamSessions.filter((session) => session.id !== importId),
       updatedAt: new Date().toISOString()
     };
     localStorage.setItem(PERSONALIZED_TRAINING_STORAGE_KEY, JSON.stringify(next));
@@ -183,9 +238,23 @@ export class PersonalizedTrainingStateService {
       Array.isArray(value['sessions']) &&
       isRecord(value['reviewSchedule']) &&
       Array.isArray(value['importedExamSessions']) &&
+      (!Object.prototype.hasOwnProperty.call(value, 'importHistory') || Array.isArray(value['importHistory'])) &&
+      (!Object.prototype.hasOwnProperty.call(value, 'importParserVersion') || typeof value['importParserVersion'] === 'string') &&
       Array.isArray(value['recommendations']) &&
       typeof value['updatedAt'] === 'string'
     );
+  }
+
+  private withStateDefaults(state: PersonalizedTrainingState): PersonalizedTrainingState {
+    return {
+      ...state,
+      importHistory: state.importHistory ?? [],
+      importParserVersion: state.importParserVersion ?? IMPORT_PARSER_VERSION
+    };
+  }
+
+  private getImportFlags(session: ImportedExamSession) {
+    return [...session.qualityFlags, ...session.attempts.flatMap((attempt) => attempt.qualityFlags)];
   }
 
   private isDrillAttempt(value: unknown): value is DrillAttempt {

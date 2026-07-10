@@ -8,6 +8,8 @@ import {
   personalizedSessionFixture,
   weakTopicMasteryFixture
 } from '../testing/personalized-training.fixtures';
+import { currentSchemaImportFixture } from '../testing/imported-session.fixtures';
+import { normalizeImportedExamSession } from '../utils/exam-session-normalization';
 
 describe('PersonalizedTrainingStateService', () => {
   let service: PersonalizedTrainingStateService;
@@ -58,6 +60,39 @@ describe('PersonalizedTrainingStateService', () => {
     service.recordPersonalizedSession(personalizedSessionFixture);
 
     expect(service.loadState().sessions[0]?.id).toBe('session-1');
+  });
+
+  it('commits and finds imported sessions', () => {
+    const normalized = normalizeImportedExamSession(currentSchemaImportFixture).session;
+    expect(normalized).not.toBeNull();
+
+    service.commitImportedSession(normalized!);
+
+    expect(service.hasImportedSession('source:sim-session-current-1')).toBe(true);
+    expect(service.findImportedSession('source:sim-session-current-1')?.totalRecords).toBe(3);
+  });
+
+  it('does not persist the same imported session twice', () => {
+    const normalized = normalizeImportedExamSession(currentSchemaImportFixture).session;
+    expect(normalized).not.toBeNull();
+
+    service.commitImportedSession(normalized!);
+    service.commitImportedSession(normalized!);
+
+    expect(service.getImportedSessions().length).toBe(1);
+  });
+
+  it('removing an import leaves drill attempts untouched', () => {
+    const normalized = normalizeImportedExamSession(currentSchemaImportFixture).session;
+    expect(normalized).not.toBeNull();
+    service.recordDrillAttempt(drillAttemptFixture);
+    service.commitImportedSession(normalized!);
+
+    service.removeImportedSession(normalized!.id);
+
+    const state = service.loadState();
+    expect(state.importedExamSessions).toEqual([]);
+    expect(state.drillAttempts).toEqual([drillAttemptFixture]);
   });
 
   it('returns review-due topics', () => {

@@ -37,17 +37,45 @@ export type MasteryStatus = 'untested' | 'weak' | 'developing' | 'moderate' | 's
 export type PersonalizedSessionStepKind = 'topic_review' | 'mental_map' | 'comparison' | 'drill' | 'bank_return';
 export type PersonalizedSessionStepResult = 'not_started' | 'completed' | 'skipped';
 export type TrainingPriority = 'low' | 'medium' | 'high' | 'urgent';
-export type ImportQualityFlag =
+export type ImportQualityFlagCode =
+  | 'malformed_json'
+  | 'unsupported_schema'
+  | 'missing_session_metadata'
+  | 'missing_answer_records'
+  | 'malformed_answer_record'
+  | 'missing_question_id'
+  | 'invalid_answer_value'
+  | 'missing_correct_answers'
+  | 'correctness_not_verifiable'
+  | 'invalid_confidence'
   | 'missing_confidence'
-  | 'missing_time'
-  | 'unknown_question'
-  | 'schema_mismatch'
-  | 'empty_answers'
-  | 'incomplete_session';
+  | 'suspicious_constant_confidence'
+  | 'missing_response_time'
+  | 'anomalous_short_response_time'
+  | 'anomalous_long_response_time'
+  | 'elapsed_time_inconsistency'
+  | 'possible_long_pause'
+  | 'possible_rushed_segment'
+  | 'incomplete_session'
+  | 'duplicate_import'
+  | 'known_bank_data_issue';
+export type ImportQualitySeverity = 'info' | 'warning' | 'error';
+export type ImportQualityScope = 'session' | 'question';
+export type ImportedQuestionResult = 'correct' | 'partial' | 'wrong' | 'unanswered' | 'unknown';
+export type ImportResultStatus = 'valid' | 'valid_with_warnings' | 'invalid' | 'duplicate';
 
 export interface SourceQuestionReference {
   bank: SimulatorBankReference;
   questionId: number;
+}
+
+export interface ImportQualityFlag {
+  code: ImportQualityFlagCode;
+  severity: ImportQualitySeverity;
+  scope: ImportQualityScope;
+  questionId?: number;
+  message: string;
+  details?: Record<string, unknown>;
 }
 
 export interface LearnerPreferences {
@@ -224,25 +252,58 @@ export interface PersonalizedSession {
 }
 
 export interface ImportedQuestionAttempt {
-  question: number;
+  questionId: number;
+  order: number;
+  questionType: string | null;
   selectedAnswers: string[];
   correctAnswers: string[];
-  answered: boolean;
-  isCorrect: boolean;
+  result: ImportedQuestionResult;
   confidence: Confidence;
-  timeSeconds: number;
+  responseTimeSeconds: number | null;
+  notes: string | null;
   topic: string | null;
   domainName: string | null;
-  source: SourceQuestionReference;
+  qualityFlags: ImportQualityFlag[];
 }
 
 export interface ImportedExamSession {
   id: StableId;
-  importedAt: string;
+  sourceSessionId: string | null;
   sourceSchemaVersion: string | null;
+  sourceAppVersion: string | null;
+  bankType: string | null;
+  assessmentMode: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  elapsedSeconds: number | null;
+  activeElapsedSeconds: number | null;
+  importedAt: string;
+  sourceFileName: string | null;
+  totalRecords: number;
+  answeredCount: number;
+  correctCount: number;
+  partialCount: number;
+  wrongCount: number;
+  unansweredCount: number;
   scorePercent: number | null;
   attempts: ImportedQuestionAttempt[];
   qualityFlags: ImportQualityFlag[];
+  suspectedRushedSegment: SuspectedRushedSegment | null;
+  importParserVersion: string;
+}
+
+export interface SuspectedRushedSegment {
+  startIndex: number;
+  questionId: number | null;
+  evidence: Record<string, unknown>;
+}
+
+export interface ImportAuditSummary {
+  importId: StableId;
+  importedAt: string;
+  sourceFileName: string | null;
+  status: ImportResultStatus;
+  flagCodes: ImportQualityFlagCode[];
 }
 
 export interface TrainingSessionPlan {
@@ -279,6 +340,8 @@ export interface PersonalizedTrainingState {
   sessions: PersonalizedSession[];
   reviewSchedule: Record<StableId, ReviewSchedule>;
   importedExamSessions: ImportedExamSession[];
+  importHistory: ImportAuditSummary[];
+  importParserVersion: string;
   recommendations: TrainingRecommendation[];
   updatedAt: string;
 }
