@@ -4,12 +4,16 @@ import {
   ImportedExamSession,
   PersonalizedSession,
   PersonalizedTrainingState,
+  PersonalizedDrillAttempt,
+  PersonalizedTrainingRuntimeSession,
+  TrainingEvidenceItem,
   TrainingPrioritySnapshot,
   TrainingSessionPlan,
   TopicMastery
 } from '../models/personalized-training.models';
 import { IMPORT_PARSER_VERSION } from '../utils/exam-session-normalization';
 import { PRIORITY_ENGINE_VERSION } from '../config/priority-engine.config';
+import { DRILL_EVALUATION_ENGINE_VERSION } from '../config/drill-engine.config';
 import { isConfidence, isErrorCause, isRecord } from '../utils/personalized-training-validation';
 
 export const PERSONALIZED_TRAINING_STORAGE_KEY = 'dop-c02-personalized-training-v1';
@@ -44,6 +48,11 @@ export class PersonalizedTrainingStateService {
       latestTrainingSessionPlan: null,
       trainingSessionPlanHistory: [],
       priorityEngineVersion: PRIORITY_ENGINE_VERSION,
+      activeRuntimeSession: null,
+      runtimeSessionHistory: [],
+      personalizedDrillAttempts: [],
+      generatedEvidence: [],
+      drillEngineVersion: DRILL_EVALUATION_ENGINE_VERSION,
       recommendations: [],
       updatedAt: new Date().toISOString()
     };
@@ -185,6 +194,78 @@ export class PersonalizedTrainingStateService {
     return next;
   }
 
+  getActiveRuntimeSession(): PersonalizedTrainingRuntimeSession | null {
+    return this.loadState().activeRuntimeSession;
+  }
+
+  saveActiveRuntimeSession(session: PersonalizedTrainingRuntimeSession): PersonalizedTrainingState {
+    const state = this.loadState();
+    const next: PersonalizedTrainingState = {
+      ...state,
+      activeRuntimeSession: session,
+      drillEngineVersion: DRILL_EVALUATION_ENGINE_VERSION,
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PERSONALIZED_TRAINING_STORAGE_KEY, JSON.stringify(next));
+    return next;
+  }
+
+  clearActiveRuntimeSession(): PersonalizedTrainingState {
+    const state = this.loadState();
+    const next: PersonalizedTrainingState = {
+      ...state,
+      activeRuntimeSession: null,
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PERSONALIZED_TRAINING_STORAGE_KEY, JSON.stringify(next));
+    return next;
+  }
+
+  appendDrillAttempt(attempt: PersonalizedDrillAttempt): PersonalizedTrainingState {
+    const state = this.loadState();
+    const next: PersonalizedTrainingState = {
+      ...state,
+      personalizedDrillAttempts: [...state.personalizedDrillAttempts, attempt],
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PERSONALIZED_TRAINING_STORAGE_KEY, JSON.stringify(next));
+    return next;
+  }
+
+  getDrillAttempts(): PersonalizedDrillAttempt[] {
+    return this.loadState().personalizedDrillAttempts;
+  }
+
+  appendRuntimeSessionHistory(session: PersonalizedTrainingRuntimeSession): PersonalizedTrainingState {
+    const state = this.loadState();
+    const next: PersonalizedTrainingState = {
+      ...state,
+      runtimeSessionHistory: [...state.runtimeSessionHistory, session],
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PERSONALIZED_TRAINING_STORAGE_KEY, JSON.stringify(next));
+    return next;
+  }
+
+  getRuntimeSessionHistory(): PersonalizedTrainingRuntimeSession[] {
+    return this.loadState().runtimeSessionHistory;
+  }
+
+  appendGeneratedEvidence(evidence: TrainingEvidenceItem): PersonalizedTrainingState {
+    const state = this.loadState();
+    const next: PersonalizedTrainingState = {
+      ...state,
+      generatedEvidence: [...state.generatedEvidence, evidence],
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PERSONALIZED_TRAINING_STORAGE_KEY, JSON.stringify(next));
+    return next;
+  }
+
+  getGeneratedEvidence(): TrainingEvidenceItem[] {
+    return this.loadState().generatedEvidence;
+  }
+
   updateTopicMastery(topicId: string, attempt: DrillAttempt): PersonalizedTrainingState {
     const state = this.loadState();
     const current = state.topicMastery[topicId] ?? this.createUntestedMastery(topicId);
@@ -306,6 +387,15 @@ export class PersonalizedTrainingStateService {
       (!Object.prototype.hasOwnProperty.call(value, 'priorityEngineVersion') ||
         typeof value['priorityEngineVersion'] === 'string' ||
         value['priorityEngineVersion'] === null) &&
+      (!Object.prototype.hasOwnProperty.call(value, 'activeRuntimeSession') ||
+        value['activeRuntimeSession'] === null ||
+        isRecord(value['activeRuntimeSession'])) &&
+      (!Object.prototype.hasOwnProperty.call(value, 'runtimeSessionHistory') || Array.isArray(value['runtimeSessionHistory'])) &&
+      (!Object.prototype.hasOwnProperty.call(value, 'personalizedDrillAttempts') || Array.isArray(value['personalizedDrillAttempts'])) &&
+      (!Object.prototype.hasOwnProperty.call(value, 'generatedEvidence') || Array.isArray(value['generatedEvidence'])) &&
+      (!Object.prototype.hasOwnProperty.call(value, 'drillEngineVersion') ||
+        typeof value['drillEngineVersion'] === 'string' ||
+        value['drillEngineVersion'] === null) &&
       Array.isArray(value['recommendations']) &&
       typeof value['updatedAt'] === 'string'
     );
@@ -319,7 +409,12 @@ export class PersonalizedTrainingStateService {
       latestPrioritySnapshot: state.latestPrioritySnapshot ?? null,
       latestTrainingSessionPlan: state.latestTrainingSessionPlan ?? null,
       trainingSessionPlanHistory: state.trainingSessionPlanHistory ?? [],
-      priorityEngineVersion: state.priorityEngineVersion ?? PRIORITY_ENGINE_VERSION
+      priorityEngineVersion: state.priorityEngineVersion ?? PRIORITY_ENGINE_VERSION,
+      activeRuntimeSession: state.activeRuntimeSession ?? null,
+      runtimeSessionHistory: state.runtimeSessionHistory ?? [],
+      personalizedDrillAttempts: state.personalizedDrillAttempts ?? [],
+      generatedEvidence: state.generatedEvidence ?? [],
+      drillEngineVersion: state.drillEngineVersion ?? DRILL_EVALUATION_ENGINE_VERSION
     };
   }
 

@@ -10,9 +10,11 @@ import {
 } from '../testing/personalized-training.fixtures';
 import { currentSchemaImportFixture } from '../testing/imported-session.fixtures';
 import { priorityEngineNow, topicDescriptorsFixture } from '../testing/priority-engine.fixtures';
+import { correctDraftFixture, singleChoiceDrillFixture } from '../testing/drill-engine.fixtures';
 import { normalizeImportedExamSession } from '../utils/exam-session-normalization';
 import { DOP_C02_BLUEPRINT_VERSION } from '../config/dop-c02-blueprint';
 import { PLANNING_ENGINE_VERSION, PRIORITY_ENGINE_VERSION } from '../config/priority-engine.config';
+import { evaluateDrillAttempt } from '../utils/drill-attempt-evaluation';
 
 describe('PersonalizedTrainingStateService', () => {
   let service: PersonalizedTrainingStateService;
@@ -136,6 +138,42 @@ describe('PersonalizedTrainingStateService', () => {
     expect(state.trainingSessionPlanHistory).toEqual([]);
     expect(state.importedExamSessions.length).toBe(1);
     expect(state.drillAttempts).toEqual([drillAttemptFixture]);
+  });
+
+  it('clearing generated plans and removing imports preserve personalized attempts', () => {
+    const assessment = evaluateDrillAttempt({ definition: singleChoiceDrillFixture, draft: correctDraftFixture });
+    const imported = normalizeImportedExamSession(currentSchemaImportFixture).session;
+    expect(imported).not.toBeNull();
+    service.commitImportedSession(imported!);
+    service.appendDrillAttempt({
+      attemptId: 'personalized-attempt-1',
+      runtimeSessionId: 'runtime-1',
+      activityId: 'activity-1',
+      drillId: singleChoiceDrillFixture.drillId,
+      topicId: singleChoiceDrillFixture.topicId,
+      domainId: singleChoiceDrillFixture.domainId,
+      activityType: singleChoiceDrillFixture.activityType,
+      drillForm: singleChoiceDrillFixture.drillForm,
+      difficulty: singleChoiceDrillFixture.difficulty,
+      sourceQuestionRefs: [],
+      selectedAnswers: ['A'],
+      orderedItems: [],
+      mappingSelections: {},
+      confidence: 4,
+      reasoning: correctDraftFixture,
+      submittedAt: priorityEngineNow.toISOString(),
+      responseTimeSeconds: 30,
+      activeTimeSeconds: 28,
+      assessment,
+      drillEngineVersion: 'test',
+      runtimeEngineVersion: 'test'
+    });
+
+    service.clearGeneratedPlans();
+    service.removeImportedSession(imported!.id);
+
+    expect(service.getDrillAttempts().length).toBe(1);
+    expect(service.getImportedSessions()).toEqual([]);
   });
 
   it('returns review-due topics', () => {

@@ -3,6 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 import { PersonalizedTrainingContentService } from './personalized-training-content.service';
+import { singleChoiceDrillFixture } from '../testing/drill-engine.fixtures';
 
 describe('PersonalizedTrainingContentService', () => {
   let service: PersonalizedTrainingContentService;
@@ -40,5 +41,17 @@ describe('PersonalizedTrainingContentService', () => {
       mapFiles: [],
       drillFiles: []
     });
+  });
+
+  it('loads and validates a drill definition', async () => {
+    const promise = firstValueFrom(service.loadDrillDefinition('fixture.json'));
+
+    http.expectOne('assets/personalized-training/drill-definitions/fixture.json').flush(singleChoiceDrillFixture);
+
+    await expect(promise).resolves.toMatchObject({ drillId: 'drill-single' });
+  });
+
+  it('resolves a planned activity to a supplied drill definition', () => {
+    expect(service.resolvePlannedActivityToDrillDefinition('drill-single', [singleChoiceDrillFixture])?.drillId).toBe('drill-single');
   });
 });

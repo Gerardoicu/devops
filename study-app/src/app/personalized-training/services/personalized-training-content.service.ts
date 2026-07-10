@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
 import {
   DrillSet,
+  DrillDefinition,
   MentalMap,
   PersonalizedTrainingManifest,
   PersonalizedTrainingProfile,
@@ -13,6 +14,7 @@ import {
   isPersonalizedTrainingManifest,
   isRecord
 } from '../utils/personalized-training-validation';
+import { validateDrillDefinition } from '../utils/drill-definition-validation';
 
 const BASE_PATH = 'assets/personalized-training';
 
@@ -53,6 +55,30 @@ export class PersonalizedTrainingContentService {
       map((value) => (isDrillSet(value) ? value : null)),
       catchError(() => of(null))
     );
+  }
+
+  loadDrillDefinition(fileName: string): Observable<DrillDefinition | null> {
+    return this.http.get<unknown>(`${BASE_PATH}/drill-definitions/${encodeURIComponent(fileName)}`).pipe(
+      map((value) => (this.isDrillDefinition(value) && validateDrillDefinition(value).valid ? value : null)),
+      catchError(() => of(null))
+    );
+  }
+
+  loadDrillDefinitions(fileNames: readonly string[]): Observable<DrillDefinition[]> {
+    if (fileNames.length === 0) {
+      return of([]);
+    }
+    return this.http.get<unknown[]>(`${BASE_PATH}/drill-definitions/index.json`).pipe(
+      map((values) => values.filter((value): value is DrillDefinition => this.isDrillDefinition(value) && validateDrillDefinition(value).valid)),
+      catchError(() => of([]))
+    );
+  }
+
+  resolvePlannedActivityToDrillDefinition(
+    activityId: string,
+    definitions: readonly DrillDefinition[]
+  ): DrillDefinition | null {
+    return definitions.find((definition) => definition.drillId === activityId || definition.activityType === activityId) ?? null;
   }
 
   private emptyManifest(): PersonalizedTrainingManifest {
@@ -97,6 +123,22 @@ export class PersonalizedTrainingContentService {
       typeof value['id'] === 'string' &&
       typeof value['topicId'] === 'string' &&
       Array.isArray(value['steps'])
+    );
+  }
+
+  private isDrillDefinition(value: unknown): value is DrillDefinition {
+    return (
+      isRecord(value) &&
+      typeof value['drillId'] === 'string' &&
+      typeof value['topicId'] === 'string' &&
+      typeof value['domainId'] === 'string' &&
+      typeof value['activityType'] === 'string' &&
+      typeof value['title'] === 'string' &&
+      Array.isArray(value['answerOptions']) &&
+      Array.isArray(value['sourceQuestionRefs']) &&
+      isRecord(value['expectedAnswer']) &&
+      isRecord(value['evaluationRules']) &&
+      isRecord(value['explanation'])
     );
   }
 }

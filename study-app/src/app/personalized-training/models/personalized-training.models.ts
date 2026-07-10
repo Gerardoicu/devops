@@ -120,6 +120,31 @@ export type PlannedActivityType =
   | 'exam_scenario'
   | 'bank_return'
   | 'spaced_review';
+export type DrillActivityType = DrillForm | 'mechanism_review' | 'spaced_review';
+export type DrillDefinitionSchemaVersion = 'drill-definition-v1';
+export type DrillEvaluationResult = ImportedQuestionResult | 'completed';
+export type RuntimeSessionStatus = 'not_started' | 'active' | 'paused' | 'completed' | 'abandoned';
+export type ActivityRuntimeStatus = 'pending' | 'active' | 'submitted' | 'completed' | 'skipped' | 'abandoned' | 'unavailable';
+export type RuntimeStopReason = 'fatigue' | 'time_expired' | 'interrupted' | 'learner_choice' | 'content_unavailable' | 'technical_issue';
+export type DrillPromptLanguage = 'en';
+export type DrillReviewLanguage = 'es' | 'en';
+export type RootCauseSource = 'none' | 'distractor_metadata' | 'evaluation_metadata' | 'learner_reasoning' | 'manual_override';
+export type DrillValidationCode =
+  | 'missing_drill_id'
+  | 'missing_topic_id'
+  | 'unsupported_activity_type'
+  | 'duplicate_option_ids'
+  | 'invalid_expected_answer'
+  | 'expected_option_not_present'
+  | 'invalid_workflow_sequence'
+  | 'duplicate_workflow_ids'
+  | 'invalid_mapping_ids'
+  | 'missing_explanation'
+  | 'bank_return_missing_source_reference'
+  | 'bank_return_contains_copied_content'
+  | 'invalid_estimated_minutes'
+  | 'invalid_difficulty'
+  | 'unsupported_review_language';
 
 export interface SourceQuestionReference {
   bank: SimulatorBankReference;
@@ -238,6 +263,88 @@ export interface DrillQuestion {
   correctOptionIds: StableId[];
   explanation: DrillExplanation;
   sourceQuestions: SourceQuestionReference[];
+}
+
+export interface DrillAnswerOption {
+  id: StableId;
+  label: string;
+}
+
+export interface WorkflowItem {
+  id: StableId;
+  label: string;
+}
+
+export interface MappingItem {
+  id: StableId;
+  label: string;
+}
+
+export interface DrillExpectedAnswer {
+  optionIds?: StableId[];
+  workflowOrder?: StableId[];
+  equivalentWorkflowOrders?: StableId[][];
+  mappings?: Record<StableId, StableId>;
+  binarySelection?: StableId;
+}
+
+export interface DrillEvaluationRules {
+  allowPartialCredit: boolean;
+  partialMappingCredit: boolean;
+}
+
+export interface DrillDistractorMetadata {
+  optionId: StableId;
+  errorCause: ErrorCause;
+  attraction: string;
+  failure: string;
+}
+
+export interface DrillExplanationContent {
+  concise: string;
+  testedPattern: string;
+  correctChoiceWins: string;
+  distractorReview: DrillDistractorMetadata[];
+}
+
+export interface DrillDefinition {
+  drillId: StableId;
+  version: DrillDefinitionSchemaVersion;
+  topicId: StableId;
+  domainId: DopC02DomainId;
+  activityType: DrillActivityType;
+  drillForm: DrillForm | 'mechanism_review' | 'spaced_review';
+  title: string;
+  difficulty: RecommendedDifficulty;
+  estimatedMinutes: number;
+  promptLanguage: DrillPromptLanguage;
+  reviewLanguage: DrillReviewLanguage;
+  instructions: string;
+  prompt: string;
+  answerOptions: DrillAnswerOption[];
+  workflowItems: WorkflowItem[];
+  mappingItems: MappingItem[];
+  expectedAnswer: DrillExpectedAnswer;
+  evaluationRules: DrillEvaluationRules;
+  decisiveKeywords: string[];
+  distractorMetadata: DrillDistractorMetadata[];
+  explanation: DrillExplanationContent;
+  sourceQuestionRefs: SourceQuestionReference[];
+  prerequisiteTopicIds: StableId[];
+  tags: string[];
+  active: boolean;
+}
+
+export interface ResolvedBankQuestion {
+  reference: SourceQuestionReference;
+  prompt: string;
+  answerOptions: DrillAnswerOption[];
+  correctOptionIds: StableId[];
+  knownIssue: boolean;
+}
+
+export interface BankQuestionResolver {
+  resolve(reference: SourceQuestionReference): Readonly<ResolvedBankQuestion> | null;
 }
 
 export interface DrillSet {
@@ -478,6 +585,137 @@ export interface TrainingSessionPlan {
   planningReasonCodes: PriorityReasonCode[];
 }
 
+export interface DrillAttemptDraft {
+  identifiedKeywords: string[];
+  eliminatedOptions: StableId[];
+  eliminationReasons: Record<StableId, string>;
+  uncertaintyNotes: string | null;
+  reasoningSummary: string | null;
+  selectedAnswers: StableId[];
+  orderedItems: StableId[];
+  mappingSelections: Record<StableId, StableId>;
+  confidence: Confidence;
+  responseTimeSeconds: number | null;
+  activeTimeSeconds: number | null;
+  manualCauseOverride?: ErrorCause | null;
+}
+
+export interface DrillAttemptAssessment {
+  result: DrillEvaluationResult;
+  normalizedSelectedAnswers: StableId[];
+  correctAnswerIds: StableId[];
+  expectedWorkflowOrder: StableId[];
+  expectedMappings: Record<StableId, StableId>;
+  reliability: EvidenceReliabilityClass;
+  qualityFlags: ImportQualityFlag[];
+  inferredCause: ErrorCause | null;
+  finalCause: ErrorCause | null;
+  causeSource: RootCauseSource;
+  causeEvidence: string[];
+  manualOverride: ErrorCause | null;
+  bankDataIssueAffectedDiagnosis: boolean;
+  evaluationEngineVersion: string;
+}
+
+export interface DrillReviewView {
+  result: DrillEvaluationResult;
+  correctAnswerIds: StableId[];
+  expectedWorkflowOrder: StableId[];
+  expectedMappings: Record<StableId, StableId>;
+  conciseExplanation: string;
+  decisiveKeywords: string[];
+  testedExamPattern: string;
+  correctChoiceWins: string;
+  selectedDistractorAttractions: string[];
+  selectedDistractorFailures: string[];
+  rootCause: ErrorCause | null;
+  confidenceObservation: string | null;
+  recommendedNextAction: RecommendedTrainingAction;
+  sourceQuestionRefs: SourceQuestionReference[];
+  bankDataIssueAffectedDiagnosis: boolean;
+}
+
+export interface PersonalizedDrillAttempt {
+  attemptId: StableId;
+  runtimeSessionId: StableId;
+  activityId: StableId;
+  drillId: StableId;
+  topicId: StableId;
+  domainId: DopC02DomainId;
+  activityType: DrillActivityType;
+  drillForm: DrillDefinition['drillForm'];
+  difficulty: RecommendedDifficulty;
+  sourceQuestionRefs: SourceQuestionReference[];
+  selectedAnswers: StableId[];
+  orderedItems: StableId[];
+  mappingSelections: Record<StableId, StableId>;
+  confidence: Confidence;
+  reasoning: DrillAttemptDraft;
+  submittedAt: string;
+  responseTimeSeconds: number | null;
+  activeTimeSeconds: number | null;
+  assessment: DrillAttemptAssessment;
+  drillEngineVersion: string;
+  runtimeEngineVersion: string;
+}
+
+export interface DrillActivityView {
+  activityId: StableId;
+  drillId: StableId;
+  activityType: DrillActivityType;
+  title: string;
+  instructions: string;
+  prompt: string;
+  answerOptions: DrillAnswerOption[];
+  workflowItems: WorkflowItem[];
+  mappingItems: MappingItem[];
+  progressLabel: string;
+  estimatedMinutes: number;
+}
+
+export interface PersonalizedTrainingActivityRuntime {
+  activityId: StableId;
+  planActivityId: StableId;
+  drillId: StableId;
+  topicId: StableId;
+  status: ActivityRuntimeStatus;
+  startedAt: string | null;
+  submittedAt: string | null;
+  completedAt: string | null;
+  draft: DrillAttemptDraft | null;
+  attemptId: StableId | null;
+  unavailableReason: string | null;
+}
+
+export interface PersonalizedTrainingRuntimeSession {
+  runtimeSessionId: StableId;
+  planId: StableId;
+  runtimeEngineVersion: string;
+  startedAt: string | null;
+  lastUpdatedAt: string;
+  completedAt: string | null;
+  status: RuntimeSessionStatus;
+  energyLevel: TrainingEnergyLevel;
+  availableMinutes: number;
+  currentActivityIndex: number;
+  activities: PersonalizedTrainingActivityRuntime[];
+  activeElapsedSeconds: number;
+  pausedElapsedSeconds: number;
+  completedActivityCount: number;
+  stopReason: RuntimeStopReason | null;
+}
+
+export interface DrillValidationFailure {
+  code: DrillValidationCode;
+  message: string;
+  details?: Record<string, unknown>;
+}
+
+export interface DrillValidationResult {
+  valid: boolean;
+  failures: DrillValidationFailure[];
+}
+
 export interface TrainingRecommendation {
   id: StableId;
   topicId: StableId;
@@ -510,6 +748,11 @@ export interface PersonalizedTrainingState {
   latestTrainingSessionPlan: TrainingSessionPlan | null;
   trainingSessionPlanHistory: TrainingSessionPlan[];
   priorityEngineVersion: string | null;
+  activeRuntimeSession: PersonalizedTrainingRuntimeSession | null;
+  runtimeSessionHistory: PersonalizedTrainingRuntimeSession[];
+  personalizedDrillAttempts: PersonalizedDrillAttempt[];
+  generatedEvidence: TrainingEvidenceItem[];
+  drillEngineVersion: string | null;
   recommendations: TrainingRecommendation[];
   updatedAt: string;
 }
