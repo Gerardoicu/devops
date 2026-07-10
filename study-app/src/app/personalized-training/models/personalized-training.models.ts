@@ -63,6 +63,63 @@ export type ImportQualitySeverity = 'info' | 'warning' | 'error';
 export type ImportQualityScope = 'session' | 'question';
 export type ImportedQuestionResult = 'correct' | 'partial' | 'wrong' | 'unanswered' | 'unknown';
 export type ImportResultStatus = 'valid' | 'valid_with_warnings' | 'invalid' | 'duplicate';
+export type DopC02DomainId =
+  | 'sdlc_automation'
+  | 'configuration_management_iac'
+  | 'resilient_cloud_solutions'
+  | 'monitoring_logging'
+  | 'incident_event_response'
+  | 'security_compliance';
+export type EvidenceReliabilityClass = 'high' | 'medium' | 'low' | 'excluded';
+export type TrainingEvidenceSourceType =
+  | 'imported_exam'
+  | 'drill_attempt'
+  | 'manual_coaching'
+  | 'learner_profile'
+  | 'review_schedule'
+  | 'session_history';
+export type TrainingObservedResult = 'correct' | 'partial' | 'wrong' | 'unanswered' | 'unknown' | 'reinforced';
+export type PriorityReasonCode =
+  | 'untested_topic'
+  | 'weak_topic'
+  | 'repeated_reliable_errors'
+  | 'repeated_cross_session_error'
+  | 'high_weight_domain'
+  | 'review_due'
+  | 'prerequisite_gap'
+  | 'multi_select_failure'
+  | 'wrong_resource_scope_pattern'
+  | 'service_confusion_pattern'
+  | 'missed_keyword_pattern'
+  | 'reliable_high_confidence_wrong'
+  | 'recent_improvement'
+  | 'recently_reinforced'
+  | 'strong_topic_capped'
+  | 'overtraining_cap'
+  | 'rushed_evidence_discounted'
+  | 'known_bank_issue_excluded'
+  | 'insufficient_evidence'
+  | 'coverage_gap'
+  | 'bank_return_failure';
+export type RecommendedTrainingAction =
+  | 'review_mechanism'
+  | 'repair_misconception'
+  | 'practice_elimination'
+  | 'reinforce_success'
+  | 'scheduled_review'
+  | 'collect_evidence';
+export type RecommendedDifficulty = 'intro' | 'practice' | 'exam_like';
+export type ReviewUrgency = 'none' | 'low' | 'medium' | 'high' | 'urgent';
+export type TrainingEnergyLevel = 'low' | 'normal' | 'high';
+export type PlannedActivityType =
+  | 'mechanism_review'
+  | 'binary_comparison'
+  | 'workflow_ordering'
+  | 'architecture_mapping'
+  | 'distractor_elimination'
+  | 'exam_scenario'
+  | 'bank_return'
+  | 'spaced_review';
 
 export interface SourceQuestionReference {
   bank: SimulatorBankReference;
@@ -306,12 +363,119 @@ export interface ImportAuditSummary {
   flagCodes: ImportQualityFlagCode[];
 }
 
+export interface TrainingTopicDescriptor {
+  topicId: StableId;
+  title: string;
+  domainId: DopC02DomainId;
+  blueprintRelevance: number;
+  currentStatus: MasteryStatus;
+  prerequisiteTopicIds: StableId[];
+  relatedPatternIds: StableId[];
+  sourceQuestions: SourceQuestionReference[];
+}
+
+export interface TrainingEvidenceItem {
+  evidenceId: StableId;
+  sourceType: TrainingEvidenceSourceType;
+  topicId: StableId | null;
+  domainId: DopC02DomainId | null;
+  observedResult: TrainingObservedResult;
+  occurredAt: string;
+  reliability: EvidenceReliabilityClass;
+  reliabilityWeight: number;
+  exclusionReason: PriorityReasonCode | null;
+  relatedQuestionId: number | null;
+  sourceSessionId: StableId | null;
+  qualityFlags: ImportQualityFlag[];
+  errorCause: ErrorCause | 'unknown' | null;
+}
+
+export interface ManualCoachingEvidence {
+  evidenceId: StableId;
+  topicId: StableId;
+  domainId: DopC02DomainId;
+  observedResult: TrainingObservedResult;
+  occurredAt: string;
+  reliability: EvidenceReliabilityClass;
+  errorCause: ErrorCause | 'unknown' | null;
+  notes?: string;
+}
+
+export interface PriorityScoreComponent {
+  code: string;
+  label: string;
+  value: number;
+  details?: Record<string, unknown>;
+}
+
+export interface TrainingPriorityRecommendation {
+  topicId: StableId;
+  domainId: DopC02DomainId;
+  rank: number;
+  totalScore: number;
+  scoreComponents: PriorityScoreComponent[];
+  reasonCodes: PriorityReasonCode[];
+  evidenceSummary: {
+    totalEvidence: number;
+    reliableErrors: number;
+    crossSessionErrorCount: number;
+    correctEvidence: number;
+    excludedEvidence: number;
+    latestEvidenceAt: string | null;
+  };
+  reliabilitySummary: {
+    high: number;
+    medium: number;
+    low: number;
+    excluded: number;
+  };
+  recommendedTrainingAction: RecommendedTrainingAction;
+  recommendedDifficulty: RecommendedDifficulty;
+  reviewUrgency: ReviewUrgency;
+  sourceQuestionRefs: SourceQuestionReference[];
+}
+
+export interface TrainingPrioritySnapshot {
+  snapshotId: StableId;
+  generatedAt: string;
+  priorityEngineVersion: string;
+  blueprintVersion: string;
+  evidenceCount: number;
+  priorities: TrainingPriorityRecommendation[];
+}
+
+export interface PlannedTrainingTopic {
+  topicId: StableId;
+  domainId: DopC02DomainId;
+  rank: number;
+  plannedMinutes: number;
+  reasonCodes: PriorityReasonCode[];
+}
+
+export interface PlannedTrainingActivity {
+  activityId: StableId;
+  topicId: StableId;
+  type: PlannedActivityType;
+  estimatedMinutes: number;
+  reasonCodes: PriorityReasonCode[];
+}
+
 export interface TrainingSessionPlan {
-  id: StableId;
-  createdAt: string;
-  goal: TrainingGoal;
-  priority: TrainingPriority;
-  steps: PersonalizedSessionStep[];
+  planId: StableId;
+  generatedAt: string;
+  planningEngineVersion: string;
+  priorityEngineVersion: string;
+  availableMinutes: number;
+  energyLevel: TrainingEnergyLevel;
+  primaryObjective: string;
+  selectedTopics: PlannedTrainingTopic[];
+  plannedActivities: PlannedTrainingActivity[];
+  estimatedMinutes: number;
+  deferredPriorities: Array<{
+    topicId: StableId;
+    reasonCodes: PriorityReasonCode[];
+  }>;
+  planningReasonCodes: PriorityReasonCode[];
 }
 
 export interface TrainingRecommendation {
@@ -342,6 +506,10 @@ export interface PersonalizedTrainingState {
   importedExamSessions: ImportedExamSession[];
   importHistory: ImportAuditSummary[];
   importParserVersion: string;
+  latestPrioritySnapshot: TrainingPrioritySnapshot | null;
+  latestTrainingSessionPlan: TrainingSessionPlan | null;
+  trainingSessionPlanHistory: TrainingSessionPlan[];
+  priorityEngineVersion: string | null;
   recommendations: TrainingRecommendation[];
   updatedAt: string;
 }

@@ -4,9 +4,12 @@ import {
   ImportedExamSession,
   PersonalizedSession,
   PersonalizedTrainingState,
+  TrainingPrioritySnapshot,
+  TrainingSessionPlan,
   TopicMastery
 } from '../models/personalized-training.models';
 import { IMPORT_PARSER_VERSION } from '../utils/exam-session-normalization';
+import { PRIORITY_ENGINE_VERSION } from '../config/priority-engine.config';
 import { isConfidence, isErrorCause, isRecord } from '../utils/personalized-training-validation';
 
 export const PERSONALIZED_TRAINING_STORAGE_KEY = 'dop-c02-personalized-training-v1';
@@ -37,6 +40,10 @@ export class PersonalizedTrainingStateService {
       importedExamSessions: [],
       importHistory: [],
       importParserVersion: IMPORT_PARSER_VERSION,
+      latestPrioritySnapshot: null,
+      latestTrainingSessionPlan: null,
+      trainingSessionPlanHistory: [],
+      priorityEngineVersion: PRIORITY_ENGINE_VERSION,
       recommendations: [],
       updatedAt: new Date().toISOString()
     };
@@ -123,6 +130,55 @@ export class PersonalizedTrainingStateService {
     const next: PersonalizedTrainingState = {
       ...state,
       importedExamSessions: state.importedExamSessions.filter((session) => session.id !== importId),
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PERSONALIZED_TRAINING_STORAGE_KEY, JSON.stringify(next));
+    return next;
+  }
+
+  savePrioritySnapshot(snapshot: TrainingPrioritySnapshot): PersonalizedTrainingState {
+    const state = this.loadState();
+    const next: PersonalizedTrainingState = {
+      ...state,
+      latestPrioritySnapshot: snapshot,
+      priorityEngineVersion: snapshot.priorityEngineVersion,
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PERSONALIZED_TRAINING_STORAGE_KEY, JSON.stringify(next));
+    return next;
+  }
+
+  getLatestPrioritySnapshot(): TrainingPrioritySnapshot | null {
+    return this.loadState().latestPrioritySnapshot;
+  }
+
+  saveTrainingSessionPlan(plan: TrainingSessionPlan): PersonalizedTrainingState {
+    const state = this.loadState();
+    const next: PersonalizedTrainingState = {
+      ...state,
+      latestTrainingSessionPlan: plan,
+      trainingSessionPlanHistory: [...state.trainingSessionPlanHistory, plan],
+      priorityEngineVersion: plan.priorityEngineVersion,
+      updatedAt: new Date().toISOString()
+    };
+    localStorage.setItem(PERSONALIZED_TRAINING_STORAGE_KEY, JSON.stringify(next));
+    return next;
+  }
+
+  getLatestTrainingSessionPlan(): TrainingSessionPlan | null {
+    return this.loadState().latestTrainingSessionPlan;
+  }
+
+  getTrainingSessionPlanHistory(): TrainingSessionPlan[] {
+    return this.loadState().trainingSessionPlanHistory;
+  }
+
+  clearGeneratedPlans(): PersonalizedTrainingState {
+    const state = this.loadState();
+    const next: PersonalizedTrainingState = {
+      ...state,
+      latestTrainingSessionPlan: null,
+      trainingSessionPlanHistory: [],
       updatedAt: new Date().toISOString()
     };
     localStorage.setItem(PERSONALIZED_TRAINING_STORAGE_KEY, JSON.stringify(next));
@@ -240,6 +296,16 @@ export class PersonalizedTrainingStateService {
       Array.isArray(value['importedExamSessions']) &&
       (!Object.prototype.hasOwnProperty.call(value, 'importHistory') || Array.isArray(value['importHistory'])) &&
       (!Object.prototype.hasOwnProperty.call(value, 'importParserVersion') || typeof value['importParserVersion'] === 'string') &&
+      (!Object.prototype.hasOwnProperty.call(value, 'latestPrioritySnapshot') ||
+        value['latestPrioritySnapshot'] === null ||
+        isRecord(value['latestPrioritySnapshot'])) &&
+      (!Object.prototype.hasOwnProperty.call(value, 'latestTrainingSessionPlan') ||
+        value['latestTrainingSessionPlan'] === null ||
+        isRecord(value['latestTrainingSessionPlan'])) &&
+      (!Object.prototype.hasOwnProperty.call(value, 'trainingSessionPlanHistory') || Array.isArray(value['trainingSessionPlanHistory'])) &&
+      (!Object.prototype.hasOwnProperty.call(value, 'priorityEngineVersion') ||
+        typeof value['priorityEngineVersion'] === 'string' ||
+        value['priorityEngineVersion'] === null) &&
       Array.isArray(value['recommendations']) &&
       typeof value['updatedAt'] === 'string'
     );
@@ -249,7 +315,11 @@ export class PersonalizedTrainingStateService {
     return {
       ...state,
       importHistory: state.importHistory ?? [],
-      importParserVersion: state.importParserVersion ?? IMPORT_PARSER_VERSION
+      importParserVersion: state.importParserVersion ?? IMPORT_PARSER_VERSION,
+      latestPrioritySnapshot: state.latestPrioritySnapshot ?? null,
+      latestTrainingSessionPlan: state.latestTrainingSessionPlan ?? null,
+      trainingSessionPlanHistory: state.trainingSessionPlanHistory ?? [],
+      priorityEngineVersion: state.priorityEngineVersion ?? PRIORITY_ENGINE_VERSION
     };
   }
 

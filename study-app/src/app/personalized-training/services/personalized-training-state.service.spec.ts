@@ -9,7 +9,10 @@ import {
   weakTopicMasteryFixture
 } from '../testing/personalized-training.fixtures';
 import { currentSchemaImportFixture } from '../testing/imported-session.fixtures';
+import { priorityEngineNow, topicDescriptorsFixture } from '../testing/priority-engine.fixtures';
 import { normalizeImportedExamSession } from '../utils/exam-session-normalization';
+import { DOP_C02_BLUEPRINT_VERSION } from '../config/dop-c02-blueprint';
+import { PLANNING_ENGINE_VERSION, PRIORITY_ENGINE_VERSION } from '../config/priority-engine.config';
 
 describe('PersonalizedTrainingStateService', () => {
   let service: PersonalizedTrainingStateService;
@@ -92,6 +95,46 @@ describe('PersonalizedTrainingStateService', () => {
 
     const state = service.loadState();
     expect(state.importedExamSessions).toEqual([]);
+    expect(state.drillAttempts).toEqual([drillAttemptFixture]);
+  });
+
+  it('saves generated priority snapshots and plans separately from imported sessions and drill attempts', () => {
+    const snapshot = {
+      snapshotId: 'snapshot-1',
+      generatedAt: priorityEngineNow.toISOString(),
+      priorityEngineVersion: PRIORITY_ENGINE_VERSION,
+      blueprintVersion: DOP_C02_BLUEPRINT_VERSION,
+      evidenceCount: 0,
+      priorities: []
+    };
+    const plan = {
+      planId: 'plan-1',
+      generatedAt: priorityEngineNow.toISOString(),
+      planningEngineVersion: PLANNING_ENGINE_VERSION,
+      priorityEngineVersion: PRIORITY_ENGINE_VERSION,
+      availableMinutes: 5,
+      energyLevel: 'low' as const,
+      primaryObjective: topicDescriptorsFixture[0].topicId,
+      selectedTopics: [],
+      plannedActivities: [],
+      estimatedMinutes: 0,
+      deferredPriorities: [],
+      planningReasonCodes: []
+    };
+    const imported = normalizeImportedExamSession(currentSchemaImportFixture).session;
+    expect(imported).not.toBeNull();
+    service.recordDrillAttempt(drillAttemptFixture);
+    service.commitImportedSession(imported!);
+
+    service.savePrioritySnapshot(snapshot);
+    service.saveTrainingSessionPlan(plan);
+    service.clearGeneratedPlans();
+
+    const state = service.loadState();
+    expect(state.latestPrioritySnapshot?.snapshotId).toBe('snapshot-1');
+    expect(state.latestTrainingSessionPlan).toBeNull();
+    expect(state.trainingSessionPlanHistory).toEqual([]);
+    expect(state.importedExamSessions.length).toBe(1);
     expect(state.drillAttempts).toEqual([drillAttemptFixture]);
   });
 
