@@ -1,0 +1,43 @@
+@if (facade.uiState().summary; as summary) {
+  <article class="pt-card" aria-labelledby="summary-title">
+    <p class="pt-kicker">Resumen de sesion</p>
+    <h2 id="summary-title">Entrenamiento personalizado</h2>
+    <p class="pt-body">
+      Actividades completadas: {{ summary.completedActivities }}.
+      @if (summary.stopReason) {
+        Motivo de cierre: {{ summary.stopReason }}.
+      }
+    </p>
+
+    <div class="pt-stats">
+      <div><span>Correctas</span><strong>{{ summary.correct }}</strong></div>
+      <div><span>Parciales</span><strong>{{ summary.partial }}</strong></div>
+      <div><span>Incorrectas</span><strong>{{ summary.wrong }}</strong></div>
+      <div><span>Sin responder</span><strong>{{ summary.unanswered }}</strong></div>
+      <div><span>Completadas</span><strong>{{ summary.completed }}</strong></div>
+    </div>
+
+    @if (summary.topicsPracticed.length) {
+      <section>
+        <h3>Temas practicados</h3>
+        <p class="pt-body">{{ summary.topicsPracticed.join(', ') }}</p>
+      </section>
+    }
+
+    @if (summary.groundedCauses.length) {
+      <section>
+        <h3>Causas observadas</h3>
+        <p class="pt-body">{{ summary.groundedCauses.join(', ') }}</p>
+      </section>
+    }
+
+    <p class="pt-body">Siguiente accion: {{ summary.nextRecommendedAction }}</p>
+    @if (summary.hasUnfinishedActivities) {
+      <p class="pt-warning">Quedaron actividades sin terminar. No se convirtieron en intentos.</p>
+    }
+
+    <div class="pt-actions">
+      <button type="button" class="primary" (click)="facade.returnToDashboard()">Volver al panel</button>
+    </div>
+  </article>
+}

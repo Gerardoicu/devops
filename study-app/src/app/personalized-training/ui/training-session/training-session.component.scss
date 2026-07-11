@@ -1,0 +1,161 @@
+:host {
+  display: block;
+}
+
+.session-card {
+  overflow-wrap: anywhere;
+}
+
+.question-text {
+  margin: 18px 0 0;
+  font-size: 1.18rem;
+  line-height: 1.35;
+  white-space: pre-line;
+}
+
+.answers {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  border: 0;
+  padding: 0;
+}
+
+.answers legend,
+.confidence-field legend {
+  color: #d4c8ae;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.answer-option {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  gap: 10px;
+  align-items: start;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 248, 231, 0.12);
+  background: rgba(255, 248, 231, 0.04);
+  cursor: pointer;
+}
+
+.answer-option.selected {
+  border-color: rgba(159, 209, 255, 0.72);
+  background: rgba(71, 136, 196, 0.18);
+}
+
+.option-id {
+  display: inline-flex;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: rgba(255, 248, 231, 0.1);
+  font-weight: 700;
+}
+
+.reasoning-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(159, 209, 255, 0.14);
+  background: rgba(159, 209, 255, 0.05);
+}
+
+.reasoning-panel h3 {
+  margin: 0;
+}
+
+.field-label {
+  display: grid;
+  gap: 8px;
+  color: #d4c8ae;
+  font-weight: 700;
+}
+
+input[type='text'],
+textarea,
+select {
+  width: 100%;
+  border: 1px solid rgba(159, 209, 255, 0.18);
+  border-radius: 14px;
+  background: rgba(8, 12, 18, 0.4);
+  color: #f4efe1;
+  padding: 0.8rem 0.9rem;
+  font: inherit;
+}
+
+textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.elimination-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.elimination-row {
+  display: grid;
+  grid-template-columns: minmax(120px, auto) 1fr;
+  gap: 10px;
+  align-items: center;
+}
+
+.workflow-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.compact-button {
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+}
+
+.confidence-field {
+  border: 0;
+  padding: 0;
+}
+
+.confidence-scale {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.confidence-scale label,
+.confidence-unset {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 248, 231, 0.12);
+  background: rgba(255, 248, 231, 0.04);
+  cursor: pointer;
+}
+
+.confidence-scale label.selected,
+.confidence-unset.selected {
+  border-color: rgba(159, 209, 255, 0.72);
+  background: rgba(71, 136, 196, 0.18);
+}
+
+.pt-footer {
+  margin-top: 18px;
+}
+
+@media (max-width: 720px) {
+  .elimination-row,
+  .workflow-row {
+    grid-template-columns: 1fr;
+  }
+
+  .confidence-scale {
+    grid-template-columns: repeat(5, minmax(40px, 1fr));
+  }
+}

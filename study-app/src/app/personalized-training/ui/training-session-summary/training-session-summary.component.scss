@@ -1,0 +1,38 @@
+:host {
+  display: block;
+}
+
+.pt-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.pt-stats div {
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 248, 231, 0.1);
+  background: rgba(255, 248, 231, 0.04);
+}
+
+.pt-stats span {
+  display: block;
+  color: #d4c8ae;
+  font-size: 0.78rem;
+}
+
+.pt-stats strong {
+  display: block;
+  margin-top: 4px;
+}
+
+h3 {
+  margin: 18px 0 0;
+}
+
+@media (max-width: 720px) {
+  .pt-stats {
+    grid-template-columns: 1fr;
+  }
+}

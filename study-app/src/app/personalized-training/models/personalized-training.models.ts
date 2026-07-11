@@ -129,6 +129,28 @@ export type RuntimeStopReason = 'fatigue' | 'time_expired' | 'interrupted' | 'le
 export type DrillPromptLanguage = 'en';
 export type DrillReviewLanguage = 'es' | 'en';
 export type RootCauseSource = 'none' | 'distractor_metadata' | 'evaluation_metadata' | 'learner_reasoning' | 'manual_override';
+export type PersonalizedTrainingContentStatus = 'valid' | 'valid_with_warnings' | 'partially_available' | 'invalid' | 'unavailable';
+export type PersonalizedTrainingContentIssueCode =
+  | 'manifest_unavailable'
+  | 'unsupported_manifest_schema'
+  | 'duplicate_package_id'
+  | 'package_unavailable'
+  | 'package_version_mismatch'
+  | 'unsupported_package_schema'
+  | 'duplicate_topic_id'
+  | 'duplicate_map_id'
+  | 'duplicate_comparison_id'
+  | 'duplicate_drill_id'
+  | 'unsupported_domain_id'
+  | 'invalid_prerequisite_reference'
+  | 'invalid_topic_reference'
+  | 'invalid_drill_reference'
+  | 'invalid_map_reference'
+  | 'invalid_source_question_reference'
+  | 'invalid_drill_definition'
+  | 'inactive_or_malformed_content'
+  | 'profile_unavailable'
+  | 'unsupported_profile_schema';
 export type DrillValidationCode =
   | 'missing_drill_id'
   | 'missing_topic_id'
@@ -196,6 +218,41 @@ export interface PersonalizedTrainingProfile {
   updatedAt: string;
 }
 
+export interface PersonalizedTrainingPackageManifestEntry {
+  packageId: StableId;
+  version: string;
+  file: string;
+  enabled: boolean;
+  order: number;
+}
+
+export interface PersonalizedTrainingContentManifest {
+  schemaVersion: SchemaVersion;
+  contentVersion: string;
+  updatedAt?: string;
+  defaultProfileFile?: string;
+  packages: PersonalizedTrainingPackageManifestEntry[];
+}
+
+export interface PersonalizedTrainingLearnerProfile {
+  schemaVersion: SchemaVersion;
+  profileId: StableId;
+  learnerId: StableId;
+  displayName: string;
+  targetCertification: string;
+  examDate: string | null;
+  manuallyCuratedWeakPatterns: WeakAreaProfile[];
+  manualCoachingEvidence: ManualCoachingEvidence[];
+  topicStatuses: Record<StableId, MasteryStatus>;
+  preferences: LearnerPreferences;
+  priorityTopicIds: StableId[];
+  studyConstraints: {
+    preferredSessionMinutes: number[];
+    maxSessionMinutes: number | null;
+    notes: string | null;
+  };
+}
+
 export interface LearningObjective {
   id: StableId;
   description: string;
@@ -242,6 +299,24 @@ export interface ServiceComparison {
   rightService: string;
   dimensions: ComparisonDimension[];
   sourceQuestions: SourceQuestionReference[];
+}
+
+export interface PersonalizedTrainingContentPackage {
+  schemaVersion: SchemaVersion;
+  packageId: StableId;
+  version: string;
+  title: string;
+  description: string;
+  topicDescriptors: TrainingTopicDescriptor[];
+  conceptMaps: MentalMap[];
+  comparisons: ServiceComparison[];
+  drillDefinitions: DrillDefinition[];
+  sourceQuestionRefs: SourceQuestionReference[];
+  prerequisiteRelationships: Array<{
+    topicId: StableId;
+    prerequisiteTopicIds: StableId[];
+  }>;
+  tags: string[];
 }
 
 export interface DrillOption {
@@ -729,10 +804,41 @@ export interface PersonalizedTrainingManifest {
   schemaVersion: SchemaVersion;
   contentVersion: string;
   updatedAt: string;
+  defaultProfileFile?: string;
+  packages?: PersonalizedTrainingPackageManifestEntry[];
   profileFiles: string[];
   topicFiles: string[];
   mapFiles: string[];
   drillFiles: string[];
+}
+
+export interface PersonalizedTrainingContentIssue {
+  code: PersonalizedTrainingContentIssueCode;
+  severity: 'warning' | 'error';
+  scope: 'manifest' | 'profile' | 'package' | 'topic' | 'map' | 'comparison' | 'drill';
+  packageId?: StableId;
+  contentId?: StableId;
+  message: string;
+  details?: Record<string, unknown>;
+}
+
+export interface PersonalizedTrainingLoadedContent {
+  status: PersonalizedTrainingContentStatus;
+  loadedPackageCount: number;
+  rejectedPackageCount: number;
+  topicCount: number;
+  mapCount: number;
+  comparisonCount: number;
+  drillCount: number;
+  issues: PersonalizedTrainingContentIssue[];
+  activeProfile: PersonalizedTrainingLearnerProfile | null;
+  contentVersion: string;
+  manifest: PersonalizedTrainingContentManifest;
+  topics: TrainingTopicDescriptor[];
+  maps: MentalMap[];
+  comparisons: ServiceComparison[];
+  drills: DrillDefinition[];
+  packages: PersonalizedTrainingContentPackage[];
 }
 
 export interface PersonalizedTrainingState {

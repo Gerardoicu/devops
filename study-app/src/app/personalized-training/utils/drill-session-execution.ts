@@ -13,19 +13,22 @@ export function createRuntimeSession(
   definitions: readonly DrillDefinition[],
   now: Date
 ): PersonalizedTrainingRuntimeSession {
-  const activities = plan.plannedActivities.map((activity, index) => ({
-    activityId: `runtime:${plan.planId}:${activity.activityId}`,
-    planActivityId: activity.activityId,
-    drillId: definitions[index]?.drillId ?? activity.activityId,
-    topicId: activity.topicId,
-    status: 'pending' as const,
-    startedAt: null,
-    submittedAt: null,
-    completedAt: null,
-    draft: null,
-    attemptId: null,
-    unavailableReason: definitions[index] ? null : 'content_unavailable'
-  }));
+  const activities = plan.plannedActivities.map((activity) => {
+    const definition = definitions.find((item) => item.topicId === activity.topicId && item.activityType === activity.type);
+    return {
+      activityId: `runtime:${plan.planId}:${activity.activityId}`,
+      planActivityId: activity.activityId,
+      drillId: definition?.drillId ?? activity.activityId,
+      topicId: activity.topicId,
+      status: 'pending' as const,
+      startedAt: null,
+      submittedAt: null,
+      completedAt: null,
+      draft: null,
+      attemptId: null,
+      unavailableReason: definition ? null : 'content_unavailable'
+    };
+  });
   return {
     runtimeSessionId: `runtime:${plan.planId}:${now.toISOString()}`,
     planId: plan.planId,

@@ -1,0 +1,83 @@
+<section class="pt-card" aria-labelledby="import-title">
+  <header class="pt-section-head">
+    <div>
+      <p class="pt-kicker">Importar resultados</p>
+      <h2 id="import-title">Vista previa antes de guardar</h2>
+    </div>
+  </header>
+
+  <div class="import-grid">
+    <label class="field-label">
+      Archivo JSON
+      <input type="file" accept="application/json,.json" (change)="previewFile($event)" />
+    </label>
+
+    <label class="field-label">
+      Pegar JSON
+      <textarea
+        [value]="jsonText()"
+        (input)="jsonText.set($any($event.target).value)"
+        placeholder="Pega aqui el JSON exportado por el simulador."
+      ></textarea>
+    </label>
+  </div>
+
+  <div class="pt-actions">
+    <button type="button" class="primary" (click)="previewText()">Previsualizar texto</button>
+    <button type="button" class="ghost" (click)="facade.cancelImport()">Cancelar</button>
+  </div>
+
+  @if (fileName()) {
+    <p class="pt-body" aria-live="polite">Archivo seleccionado: {{ fileName() }}</p>
+  }
+
+  @if (facade.uiState().importPreview; as preview) {
+    <section class="preview" aria-live="polite">
+      <div class="preview-status" [class.warning]="preview.status !== 'valid'" [class.error]="preview.status === 'invalid'">
+        <strong>{{ preview.status }}</strong>
+        <span>
+          @if (preview.session) {
+            {{ preview.session.totalRecords }} registros detectados
+          } @else {
+            Importacion no persistible
+          }
+        </span>
+      </div>
+
+      @if (preview.session; as session) {
+        <div class="pt-stats">
+          <div><span>Correctas</span><strong>{{ session.correctCount }}</strong></div>
+          <div><span>Parciales</span><strong>{{ session.partialCount }}</strong></div>
+          <div><span>Incorrectas</span><strong>{{ session.wrongCount }}</strong></div>
+          <div><span>Sin responder</span><strong>{{ session.unansweredCount }}</strong></div>
+          <div><span>Desconocidas</span><strong>{{ session.totalRecords - session.correctCount - session.partialCount - session.wrongCount - session.unansweredCount }}</strong></div>
+        </div>
+
+        @if (session.scorePercent !== null) {
+          <p class="pt-body">Score verificable: {{ session.scorePercent }}%</p>
+        }
+
+        <p class="pt-body">Advertencias de calidad: {{ preview.flags.length }}</p>
+
+        @if (session.suspectedRushedSegment) {
+          <p class="pt-warning">Possible rushed segment detected.</p>
+        }
+
+        @for (label of warningLabels(preview.flags); track label) {
+          <p class="pt-warning">{{ label }}</p>
+        }
+
+        @if (preview.status !== 'invalid' && preview.status !== 'duplicate') {
+          <button type="button" class="primary" (click)="facade.commitImport()">Confirmar importacion</button>
+        }
+      }
+
+      @if (preview.status === 'duplicate') {
+        <p class="pt-warning">Importacion duplicada. No se guardo nada.</p>
+      }
+      @if (preview.status === 'invalid') {
+        <p class="pt-warning">El archivo no es valido para entrenamiento personalizado.</p>
+      }
+    </section>
+  }
+</section>

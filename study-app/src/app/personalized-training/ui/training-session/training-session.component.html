@@ -1,0 +1,126 @@
+@if (facade.uiState().currentActivityView; as activity) {
+  <article class="pt-card session-card" aria-labelledby="activity-title">
+    <header class="pt-section-head">
+      <div>
+        <p class="pt-kicker">{{ activity.progressLabel }} · {{ activity.estimatedMinutes }} min</p>
+        <h2 id="activity-title">{{ activity.title }}</h2>
+      </div>
+      <div class="pt-actions compact">
+        <button type="button" class="secondary" (click)="saveDraft()">Pausar y guardar</button>
+        <button type="button" class="ghost" (click)="stop('fatigue')">Fatiga</button>
+      </div>
+    </header>
+
+    <p class="pt-body">{{ activity.instructions }}</p>
+    <p class="question-text">{{ activity.prompt }}</p>
+
+    @if (activity.answerOptions.length) {
+      <fieldset class="answers">
+        <legend>{{ isMultiSelect() ? 'Select multiple answers when the prompt requires it.' : 'Select one answer.' }}</legend>
+        @for (option of activity.answerOptions; track option.id) {
+          <label class="answer-option" [class.selected]="isSelected(option.id)">
+            <input
+              [type]="isMultiSelect() ? 'checkbox' : 'radio'"
+              name="pt-answer"
+              [checked]="isSelected(option.id)"
+              (change)="toggleOption(option, isMultiSelect())"
+            />
+            <span class="option-id">{{ option.id }}</span>
+            <span>{{ option.label }}</span>
+          </label>
+        }
+      </fieldset>
+    }
+
+    @if (activity.workflowItems.length) {
+      <section class="reasoning-panel" aria-label="Workflow ordering">
+        <h3>Orden de flujo</h3>
+        @for (item of orderedWorkflowItems(); track item.id) {
+          <div class="workflow-row">
+            <span>{{ item.label }}</span>
+            <button type="button" class="ghost compact-button" (click)="moveWorkflow(item, -1)">Subir</button>
+            <button type="button" class="ghost compact-button" (click)="moveWorkflow(item, 1)">Bajar</button>
+          </div>
+        }
+      </section>
+    }
+
+    @if (activity.mappingItems.length) {
+      <section class="reasoning-panel" aria-label="Architecture mapping">
+        <h3>Mapeo de arquitectura</h3>
+        @for (source of activity.mappingItems; track source.id) {
+          <label class="field-label">
+            {{ source.label }}
+            <select [value]="mappingValue(source.id)" (change)="setMapping(source, $any($event.target).value)">
+              <option value="">Sin seleccionar</option>
+              @for (target of activity.mappingItems; track target.id) {
+                <option [value]="target.id">{{ target.label }}</option>
+              }
+            </select>
+          </label>
+        }
+      </section>
+    }
+
+    <section class="reasoning-panel" aria-label="Reasoning capture">
+      <h3>Razonamiento</h3>
+      <label class="field-label">
+        English keywords identificadas
+        <input type="text" [value]="draft().identifiedKeywords.join(', ')" (input)="setKeywords($any($event.target).value)" />
+      </label>
+
+      @if (activity.answerOptions.length) {
+        <div class="elimination-grid">
+          @for (option of activity.answerOptions; track option.id) {
+            <div class="elimination-row">
+              <label>
+                <input type="checkbox" [checked]="draft().eliminatedOptions.includes(option.id)" (change)="toggleEliminated(option.id)" />
+                Elimine {{ option.id }}
+              </label>
+              <input
+                type="text"
+                [value]="eliminationReason(option.id)"
+                (input)="setEliminationReason(option.id, $any($event.target).value)"
+                placeholder="Razon opcional"
+              />
+            </div>
+          }
+        </div>
+      }
+
+      <label class="field-label">
+        Incertidumbre
+        <textarea [value]="draft().uncertaintyNotes ?? ''" (input)="setText('uncertaintyNotes', $any($event.target).value)"></textarea>
+      </label>
+      <label class="field-label">
+        Resumen de razonamiento
+        <textarea [value]="draft().reasoningSummary ?? ''" (input)="setText('reasoningSummary', $any($event.target).value)"></textarea>
+      </label>
+
+      <fieldset class="confidence-field">
+        <legend>Confianza</legend>
+        <label class="confidence-unset" [class.selected]="draft().confidence === null">
+          <input type="radio" name="pt-confidence" [checked]="draft().confidence === null" (change)="setConfidence(null)" />
+          Sin seleccionar
+        </label>
+        <div class="confidence-scale">
+          @for (option of confidenceOptions; track option) {
+            <label [class.selected]="draft().confidence === option">
+              <input type="radio" name="pt-confidence" [checked]="draft().confidence === option" (change)="setConfidence(option)" />
+              {{ option }}
+            </label>
+          }
+        </div>
+      </fieldset>
+    </section>
+
+    <footer class="pt-footer">
+      <div class="pt-actions">
+        <button type="button" class="primary" (click)="submit()">Enviar actividad</button>
+        <button type="button" class="secondary" (click)="facade.pauseSession()">Pausar sesion</button>
+        <button type="button" class="ghost" (click)="stop('interrupted')">Interrupcion</button>
+        <button type="button" class="ghost" (click)="stop('time_expired')">Tiempo agotado</button>
+      </div>
+    </footer>
+  </article>
+}

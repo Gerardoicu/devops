@@ -77,6 +77,18 @@
         </div>
       </article>
 
+      <article class="mode-card personalized-training-entry">
+        <p class="mode-kicker">Personalizado</p>
+        <h2>Entrenamiento personalizado</h2>
+        <p>
+          Importa resultados del simulador, revisa advertencias y genera un plan adaptativo sin mezclarlo con el quiz rapido.
+        </p>
+        <button type="button" class="primary" (click)="openPersonalizedTraining()">
+          Abrir entrenamiento personalizado
+        </button>
+      </article>
+
+      @if (false) {
       <article class="mode-card">
         <p class="mode-kicker">Quiz</p>
         <h2>Quiz rapido</h2>
@@ -98,6 +110,7 @@
           }
         </div>
       </article>
+      }
 
       @for (mode of sessionModes; track mode) {
         <article class="mode-card">
@@ -222,6 +235,10 @@
         </div>
       </article>
     </section>
+  }
+
+  @if (phase() === 'personalized-training') {
+    <app-personalized-training-shell (exit)="goHome()" />
   }
 
   @if (phase() === 'notes') {

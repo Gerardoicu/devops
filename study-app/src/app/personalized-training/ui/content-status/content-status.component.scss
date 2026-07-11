@@ -1,0 +1,37 @@
+:host {
+  display: block;
+}
+
+.content-status {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(159, 209, 255, 0.16);
+  background: rgba(159, 209, 255, 0.06);
+  color: #d4c8ae;
+  overflow-wrap: anywhere;
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.content-warning {
+  color: #ffe4ba;
+}
+
+summary {
+  color: #f1b356;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+ul {
+  margin: 8px 0 0;
+  padding-left: 1.2rem;
+}

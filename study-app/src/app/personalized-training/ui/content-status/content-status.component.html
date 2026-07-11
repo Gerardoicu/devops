@@ -1,0 +1,32 @@
+<section class="content-status" aria-live="polite">
+  @if (facade.uiState().content; as content) {
+    <div class="status-row">
+      <strong>Contenido: {{ content.status }}</strong>
+      <span>{{ content.loadedPackageCount }} paquetes activos · {{ content.rejectedPackageCount }} rechazados</span>
+    </div>
+    <div class="status-row">
+      <span>{{ content.topicCount }} temas · {{ content.mapCount }} mapas · {{ content.drillCount }} drills</span>
+      <span>Version {{ content.contentVersion }}</span>
+    </div>
+    @if (content.activeProfile) {
+      <p>Perfil activo: {{ content.activeProfile.displayName }}</p>
+    } @else {
+      <p>Sin perfil activo configurado.</p>
+    }
+    @if (!content.loadedPackageCount) {
+      <p class="content-warning">Agrega material de estudio mediante manifest.json y packages/*.json para habilitar drills reales.</p>
+    }
+    @if (content.issues.length) {
+      <details>
+        <summary>Ver advertencias de contenido</summary>
+        <ul>
+          @for (issue of content.issues.slice(0, 6); track issue.code + issue.packageId + issue.contentId) {
+            <li>{{ issue.code }}: {{ issue.message }}</li>
+          }
+        </ul>
+      </details>
+    }
+  } @else {
+    <p>Cargando paquetes de contenido...</p>
+  }
+</section>

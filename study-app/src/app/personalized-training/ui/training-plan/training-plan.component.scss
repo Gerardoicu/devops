@@ -1,0 +1,102 @@
+:host {
+  display: block;
+}
+
+.priority-list,
+.plan-preview {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.priority-item {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 248, 231, 0.12);
+  background: rgba(255, 248, 231, 0.04);
+}
+
+.priority-item h3,
+.plan-preview h3,
+.plan-preview h4 {
+  margin: 0;
+}
+
+details {
+  color: #d4c8ae;
+}
+
+summary {
+  cursor: pointer;
+  color: #f1b356;
+  font-weight: 700;
+}
+
+.controls-grid {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+fieldset {
+  min-width: 0;
+  border: 1px solid rgba(159, 209, 255, 0.16);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+legend {
+  padding: 0 6px;
+  color: #d4c8ae;
+  font-weight: 700;
+}
+
+.choice-row,
+.energy-grid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.choice-row label,
+.energy-grid label {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 248, 231, 0.12);
+  background: rgba(255, 248, 231, 0.04);
+  cursor: pointer;
+}
+
+.choice-row label.selected,
+.energy-grid label.selected {
+  border-color: rgba(159, 209, 255, 0.72);
+  background: rgba(71, 136, 196, 0.18);
+}
+
+.energy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.energy-grid span {
+  color: #d4c8ae;
+  line-height: 1.35;
+}
+
+ol,
+ul {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: #d4c8ae;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 720px) {
+  .energy-grid {
+    grid-template-columns: 1fr;
+  }
+}

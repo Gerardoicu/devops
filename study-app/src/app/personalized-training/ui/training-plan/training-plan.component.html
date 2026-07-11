@@ -1,0 +1,103 @@
+<section class="pt-card" aria-labelledby="plan-title">
+  <header class="pt-section-head">
+    <div>
+      <p class="pt-kicker">Plan adaptativo</p>
+      <h2 id="plan-title">Prioridades y controles de sesion</h2>
+    </div>
+    <button type="button" class="secondary" (click)="generatePriorities()">Generar prioridades</button>
+  </header>
+
+  @if (facade.uiState().prioritySnapshot; as snapshot) {
+    <section class="priority-list" aria-label="Prioridades principales">
+      @for (priority of snapshot.priorities.slice(0, 5); track priority.topicId) {
+        <article class="priority-item">
+          <div>
+            <h3>{{ facade.topicTitle(priority.topicId) }}</h3>
+            <p class="pt-body">{{ facade.domainLabel(priority.domainId) }} · {{ facade.recommendedActionLabel(priority.recommendedTrainingAction) }} · {{ priority.recommendedDifficulty }} · {{ priority.reviewUrgency }}</p>
+          </div>
+          <details>
+            <summary>Why this topic?</summary>
+            <ul>
+              @for (reason of priority.reasonCodes; track reason) {
+                <li>{{ facade.reasonLabel(reason) }}</li>
+              }
+            </ul>
+          </details>
+        </article>
+      }
+    </section>
+  }
+
+  <div class="controls-grid">
+    <fieldset>
+      <legend>Tiempo disponible</legend>
+      <div class="choice-row">
+        @for (minutes of timeOptions; track minutes) {
+          <label [class.selected]="availableMinutes() === minutes">
+            <input
+              type="radio"
+              name="pt-minutes"
+              [checked]="availableMinutes() === minutes"
+              (change)="availableMinutes.set(minutes)"
+            />
+            {{ minutes }} min
+          </label>
+        }
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Nivel de carga</legend>
+      <div class="energy-grid">
+        @for (option of energyOptions; track option.value) {
+          <label [class.selected]="energyLevel() === option.value">
+            <input
+              type="radio"
+              name="pt-energy"
+              [checked]="energyLevel() === option.value"
+              (change)="energyLevel.set(option.value)"
+            />
+            <strong>{{ option.label }}</strong>
+            <span>{{ option.description }}</span>
+          </label>
+        }
+      </div>
+    </fieldset>
+  </div>
+
+  <div class="pt-actions">
+    <button type="button" class="primary" (click)="generatePlan()">Generar plan</button>
+    <button type="button" class="ghost" (click)="facade.returnToDashboard()">Volver al panel</button>
+  </div>
+
+  @if (facade.uiState().plan; as plan) {
+    <section class="plan-preview" aria-label="Plan generado">
+      <h3>Objetivo principal: {{ plan.primaryObjective }}</h3>
+      <p class="pt-body">{{ plan.estimatedMinutes }} de {{ plan.availableMinutes }} minutos · {{ plan.energyLevel }}</p>
+      @if (!planWithinLimit()) {
+        <p class="pt-warning">El total excede el tiempo seleccionado.</p>
+      }
+
+      <h4>Actividades ordenadas</h4>
+      <ol>
+        @for (activity of plan.plannedActivities; track activity.activityId) {
+          <li>{{ facade.activityLabel(activity.type) }} · {{ activity.estimatedMinutes }} min</li>
+        }
+      </ol>
+
+      @if (plan.deferredPriorities.length) {
+        <h4>Prioridades diferidas</h4>
+        <ul>
+          @for (deferred of plan.deferredPriorities.slice(0, 4); track deferred.topicId) {
+            <li>{{ facade.topicTitle(deferred.topicId) }}: {{ facade.reasonLabels(deferred.reasonCodes) }}</li>
+          }
+        </ul>
+      }
+
+      <div class="pt-actions">
+        <button type="button" class="primary" [disabled]="!plan.plannedActivities.length || !planWithinLimit()" (click)="startSession()">Iniciar sesion</button>
+        <button type="button" class="secondary" (click)="generatePlan()">Regenerar plan</button>
+      </div>
+    </section>
+  }
+</section>

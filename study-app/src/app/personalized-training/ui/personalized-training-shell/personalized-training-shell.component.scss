@@ -1,0 +1,138 @@
+:host {
+  display: block;
+}
+
+.pt-shell,
+.pt-hero,
+::ng-deep .pt-card {
+  width: min(100%, 960px);
+  margin-inline: auto;
+}
+
+.pt-shell {
+  display: grid;
+  gap: 16px;
+}
+
+.pt-topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.pt-hero {
+  display: grid;
+  gap: 10px;
+}
+
+.pt-hero h1 {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1;
+}
+
+::ng-deep .pt-card {
+  display: block;
+  border: 1px solid rgba(241, 179, 86, 0.18);
+  border-radius: 28px;
+  padding: 22px;
+  background: rgba(18, 16, 12, 0.76);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.28);
+}
+
+::ng-deep .pt-section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+::ng-deep .pt-kicker {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #9fd1ff;
+  font-size: 0.78rem;
+}
+
+::ng-deep .pt-body {
+  margin: 12px 0 0;
+  color: #d4c8ae;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+::ng-deep .pt-warning {
+  margin: 10px 0 0;
+  color: #ffe4ba;
+  line-height: 1.5;
+}
+
+::ng-deep .pt-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+::ng-deep .pt-actions.compact {
+  margin-top: 0;
+}
+
+.pt-notice {
+  width: min(100%, 960px);
+  margin: 0 auto;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(84, 166, 115, 0.42);
+  background: rgba(84, 166, 115, 0.12);
+}
+
+.pt-notice.warning {
+  border-color: rgba(241, 179, 86, 0.42);
+  background: rgba(241, 179, 86, 0.12);
+}
+
+.pt-notice.error {
+  border-color: rgba(197, 83, 67, 0.42);
+  background: rgba(197, 83, 67, 0.12);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.dashboard-grid div {
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(159, 209, 255, 0.16);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.dashboard-grid span {
+  display: block;
+  color: #d4c8ae;
+  font-size: 0.82rem;
+}
+
+.dashboard-grid strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 720px) {
+  ::ng-deep .pt-card {
+    padding: 18px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

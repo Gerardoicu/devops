@@ -1,0 +1,115 @@
+<section class="pt-shell" aria-labelledby="pt-title">
+  <div class="pt-topbar">
+    <button type="button" class="back-link" (click)="exit.emit()">Volver</button>
+    <span class="pill">personalized training</span>
+  </div>
+
+  <header class="pt-hero">
+    <p class="pt-kicker">Entrenamiento personalizado</p>
+    <h1 id="pt-title">Prioriza, planifica y practica con evidencia local.</h1>
+    <p class="pt-body">
+      Importa resultados del simulador, revisa la calidad, genera prioridades y ejecuta una sesion aislada.
+    </p>
+  </header>
+
+  @if (facade.uiState().notice; as notice) {
+    <p class="pt-notice" [class.warning]="notice.tone === 'warning'" [class.error]="notice.tone === 'error'" aria-live="polite">
+      {{ notice.message }}
+    </p>
+  }
+
+  @if (facade.uiState().mode === 'dashboard') {
+    <section class="pt-card" aria-labelledby="dashboard-title">
+      <div class="pt-section-head">
+        <div>
+          <p class="pt-kicker">Panel</p>
+          <h2 id="dashboard-title">Estado actual</h2>
+        </div>
+        <button type="button" class="secondary" (click)="facade.resumeActiveSession()" [disabled]="!facade.hasActiveOrPausedSession()">Reanudar sesion</button>
+      </div>
+
+      <app-content-status />
+
+      <div class="dashboard-grid">
+        <div>
+          <span>Sesiones importadas</span>
+          <strong>{{ facade.importedSessions().length }}</strong>
+        </div>
+        <div>
+          <span>Prioridades accionables</span>
+          <strong>{{ facade.actionablePriorityCount() }}</strong>
+        </div>
+        <div>
+          <span>Plan actual</span>
+          <strong>{{ facade.uiState().plan ? facade.uiState().plan?.estimatedMinutes + ' min' : 'Sin plan' }}</strong>
+        </div>
+      </div>
+
+      @if (facade.latestImportedSession(); as session) {
+        <p class="pt-body">
+          Ultima importacion: {{ session.totalRecords }} registros,
+          {{ session.correctCount }} correctas,
+          {{ session.partialCount }} parciales,
+          {{ session.wrongCount }} incorrectas.
+        </p>
+      } @else {
+        <p class="pt-body">
+          Aun no hay resultados importados. Puedes importar JSON del simulador; mas adelante el entrenamiento tambien podra usar un perfil manual.
+        </p>
+      }
+
+      <p class="pt-body">
+        Siguiente accion recomendada:
+        {{ facade.importedSessions().length ? 'Generar prioridades y plan de sesion.' : 'Importar resultados del simulador.' }}
+      </p>
+
+      <div class="pt-actions">
+        <button type="button" class="primary" (click)="facade.generatePriorities()">Generar prioridades</button>
+        <button type="button" class="secondary" (click)="facade.generatePlan(15, 'normal')">Plan rapido 15 min</button>
+        <button type="button" class="ghost" (click)="facade.returnToDashboard()">Actualizar panel</button>
+        @if (facade.hasActiveOrPausedSession()) {
+          <button type="button" class="ghost" (click)="abandon()">Abandonar sesion</button>
+        }
+      </div>
+    </section>
+
+    <app-training-import />
+    <app-training-plan />
+  } @else if (facade.uiState().mode === 'import_preview' || facade.uiState().mode === 'import_error') {
+    <app-training-import />
+  } @else if (facade.uiState().mode === 'planning' || facade.uiState().mode === 'plan_ready') {
+    <app-training-plan />
+  } @else if (facade.uiState().mode === 'session_active') {
+    <app-training-session />
+  } @else if (facade.uiState().mode === 'session_paused') {
+    <section class="pt-card">
+      <p class="pt-kicker">Sesion pausada</p>
+      <h2>Tu borrador esta conservado</h2>
+      <div class="pt-actions">
+        <button type="button" class="primary" (click)="facade.resumeActiveSession()">Reanudar sesion</button>
+        <button type="button" class="ghost" (click)="abandon()">Abandonar sesion</button>
+        <button type="button" class="secondary" (click)="facade.returnToDashboard()">Volver al panel</button>
+      </div>
+    </section>
+  } @else if (facade.uiState().mode === 'activity_review') {
+    <app-training-review />
+  } @else if (facade.uiState().mode === 'session_complete') {
+    <app-training-session-summary />
+  } @else if (facade.uiState().mode === 'content_unavailable') {
+    <section class="pt-card">
+      <p class="pt-kicker">Contenido no disponible</p>
+      <h2>Esta actividad aun no tiene drill de produccion</h2>
+      <p class="pt-body">No se fabrico pregunta, no se creo intento incorrecto y no se genero evidencia negativa.</p>
+      <div class="pt-actions">
+        <button type="button" class="primary" (click)="facade.returnToDashboard()">Volver al panel</button>
+        <button type="button" class="secondary" (click)="facade.generatePlan(15, 'normal')">Regenerar plan</button>
+      </div>
+    </section>
+  } @else if (facade.uiState().mode === 'fatal_error') {
+    <section class="pt-card">
+      <p class="pt-kicker">Error recuperable</p>
+      <h2>No se pudo abrir entrenamiento personalizado</h2>
+      <button type="button" class="primary" (click)="facade.initialize()">Reintentar</button>
+    </section>
+  }
+</section>

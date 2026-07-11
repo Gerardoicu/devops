@@ -24,7 +24,7 @@ export class PersonalizedTrainingContentService {
 
   loadManifest(): Observable<PersonalizedTrainingManifest> {
     return this.http.get<unknown>(`${BASE_PATH}/manifest.json`).pipe(
-      map((value) => (isPersonalizedTrainingManifest(value) ? value : this.emptyManifest())),
+      map((value) => this.toManifest(value)),
       catchError(() => of(this.emptyManifest()))
     );
   }
@@ -86,11 +86,32 @@ export class PersonalizedTrainingContentService {
       schemaVersion: '1.0',
       contentVersion: '0.0.0',
       updatedAt: '1970-01-01T00:00:00.000Z',
+      packages: [],
       profileFiles: [],
       topicFiles: [],
       mapFiles: [],
       drillFiles: []
     };
+  }
+
+  private toManifest(value: unknown): PersonalizedTrainingManifest {
+    if (isPersonalizedTrainingManifest(value)) {
+      return { ...value, packages: value.packages ?? [] };
+    }
+    if (isRecord(value) && value['schemaVersion'] === '1.0' && typeof value['contentVersion'] === 'string') {
+      return {
+        schemaVersion: '1.0',
+        contentVersion: value['contentVersion'],
+        updatedAt: typeof value['updatedAt'] === 'string' ? value['updatedAt'] : '1970-01-01T00:00:00.000Z',
+        defaultProfileFile: typeof value['defaultProfileFile'] === 'string' ? value['defaultProfileFile'] : undefined,
+        packages: Array.isArray(value['packages']) ? value['packages'] as PersonalizedTrainingManifest['packages'] : [],
+        profileFiles: Array.isArray(value['profileFiles']) ? value['profileFiles'].filter((item): item is string => typeof item === 'string') : [],
+        topicFiles: Array.isArray(value['topicFiles']) ? value['topicFiles'].filter((item): item is string => typeof item === 'string') : [],
+        mapFiles: Array.isArray(value['mapFiles']) ? value['mapFiles'].filter((item): item is string => typeof item === 'string') : [],
+        drillFiles: Array.isArray(value['drillFiles']) ? value['drillFiles'].filter((item): item is string => typeof item === 'string') : []
+      };
+    }
+    return this.emptyManifest();
   }
 
   private isProfile(value: unknown): value is PersonalizedTrainingProfile {

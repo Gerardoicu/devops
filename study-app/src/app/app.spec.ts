@@ -24,6 +24,36 @@ describe('App', () => {
     expect(compiled.querySelector('h1')?.textContent).toContain('Preparacion DOP-C02');
   });
 
+  it('shows personalized training entry on home and hides the Quick Quiz home entry', async () => {
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    expect(compiled.textContent).toContain('Entrenamiento personalizado');
+    expect(compiled.textContent).not.toContain('Quiz rapido');
+    expect(typeof fixture.componentInstance.startQuickQuiz).toBe('function');
+  });
+
+  it('opens and exits the personalized-training shell through internal phase navigation', async () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    const scrollSpy = vi.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+
+    app.openPersonalizedTraining();
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(app.phase()).toBe('personalized-training');
+    expect((fixture.nativeElement as HTMLElement).querySelector('app-personalized-training-shell')).not.toBeNull();
+
+    app.goHome();
+
+    expect(app.phase()).toBe('home');
+    scrollSpy.mockRestore();
+  });
+
   it('exports simulator answers with schema v2 names, arrays, nullable confidence, and preserved timing', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;

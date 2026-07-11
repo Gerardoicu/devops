@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { PersonalizedTrainingShellComponent } from './personalized-training/ui/personalized-training-shell/personalized-training-shell.component';
 
 type CardType = 'learn' | 'compare' | 'decision' | 'trap' | 'mini-quiz';
 type SessionMode = 'learn' | 'review';
@@ -13,7 +14,8 @@ type AppPhase =
   | 'notes'
   | 'official-links'
   | 'visual-scenarios'
-  | 'glossary';
+  | 'glossary'
+  | 'personalized-training';
 type SimulatorBankType = 'verified' | 'public';
 type AssessmentMode = 'quick-quiz' | 'exam' | 'training';
 
@@ -219,6 +221,7 @@ interface RuntimeSnapshot {
 
 @Component({
   selector: 'app-root',
+  imports: [PersonalizedTrainingShellComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -620,6 +623,10 @@ export class App {
         return;
       }
 
+      if (this.phase() === 'personalized-training') {
+        return;
+      }
+
       localStorage.setItem(RUNTIME_STORAGE_KEY, JSON.stringify(this.buildRuntimeSnapshot()));
     });
   }
@@ -756,6 +763,12 @@ export class App {
     this.visualReturnPhase.set(null);
     this.visualScenarioQuestionFilter.set(null);
     this.closeReportPanel();
+  }
+
+  openPersonalizedTraining(): void {
+    this.closeReportPanel();
+    this.phase.set('personalized-training');
+    window.scrollTo({ top: 0, behavior: 'auto' });
   }
 
   openNote(note: StudyNote): void {

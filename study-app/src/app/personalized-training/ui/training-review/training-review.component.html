@@ -1,0 +1,92 @@
+@if (facade.uiState().currentReview; as review) {
+  <article class="pt-card review-card" aria-labelledby="review-title">
+    <header class="pt-section-head">
+      <div>
+        <p class="pt-kicker">Revision posterior</p>
+        <h2 id="review-title">Resultado: {{ review.result }}</h2>
+      </div>
+    </header>
+
+    <div class="review-grid">
+      <section>
+        <h3>Respuesta esperada</h3>
+        @if (review.correctAnswerIds.length) {
+          <p class="pt-body">{{ review.correctAnswerIds.join(', ') }}</p>
+        }
+        @if (review.expectedWorkflowOrder.length) {
+          <p class="pt-body">{{ review.expectedWorkflowOrder.join(' -> ') }}</p>
+        }
+        @if (mappingEntries(review.expectedMappings); as mappings) {
+          @if (mappings.length) {
+            <ul>
+              @for (mapping of mappings; track mapping.key) {
+                <li>{{ mapping.key }}: {{ mapping.value }}</li>
+              }
+            </ul>
+          }
+        }
+      </section>
+
+      <section>
+        <h3>Explicacion</h3>
+        <p class="pt-body">{{ review.conciseExplanation }}</p>
+        <p class="pt-body"><strong>Patron:</strong> {{ review.testedExamPattern }}</p>
+        <p class="pt-body"><strong>Por que gana:</strong> {{ review.correctChoiceWins }}</p>
+      </section>
+    </div>
+
+    @if (review.decisiveKeywords.length) {
+      <section>
+        <h3>English keywords</h3>
+        <div class="tag-row">
+          @for (keyword of review.decisiveKeywords; track keyword) {
+            <span class="tag">{{ keyword }}</span>
+          }
+        </div>
+      </section>
+    }
+
+    @if (review.selectedDistractorAttractions.length || review.selectedDistractorFailures.length) {
+      <section>
+        <h3>Distractores seleccionados</h3>
+        @for (item of review.selectedDistractorAttractions; track item) {
+          <p class="pt-body">{{ item }}</p>
+        }
+        @for (item of review.selectedDistractorFailures; track item) {
+          <p class="pt-body">{{ item }}</p>
+        }
+      </section>
+    }
+
+    <section>
+      <h3>Causa</h3>
+      @if (review.rootCause) {
+        <p class="pt-body">{{ review.rootCause }}</p>
+      } @else {
+        <p class="pt-body">No hay evidencia suficiente para clasificar la causa.</p>
+      }
+      @if (review.confidenceObservation) {
+        <p class="pt-body">{{ review.confidenceObservation }}</p>
+      }
+      <p class="pt-body">Siguiente accion: {{ facade.recommendedActionLabel(review.recommendedNextAction) }}</p>
+    </section>
+
+    @if (review.sourceQuestionRefs.length) {
+      <section>
+        <h3>Referencia</h3>
+        @for (source of review.sourceQuestionRefs; track source.bank + source.questionId) {
+          <p class="pt-body">{{ source.bank }} Q{{ source.questionId }}</p>
+        }
+        @if (review.bankDataIssueAffectedDiagnosis) {
+          <p class="pt-warning">Known source-bank inconsistency</p>
+        }
+      </section>
+    }
+
+    <div class="pt-actions">
+      <button type="button" class="primary" (click)="facade.continueAfterReview()">Continuar</button>
+      <button type="button" class="secondary" (click)="facade.pauseSession()">Pausar</button>
+      <button type="button" class="ghost" (click)="facade.stopSession('fatigue')">Detener por fatiga</button>
+    </div>
+  </article>
+}
