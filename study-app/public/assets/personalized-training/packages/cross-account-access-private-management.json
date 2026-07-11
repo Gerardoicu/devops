@@ -1,0 +1,3850 @@
+{
+  "schemaVersion": "1.0",
+  "packageId": "cross-account-access-private-management",
+  "version": "1.0.0",
+  "title": "Cross-Account Access and Private Instance Management",
+  "description": "Operational DOP-C02 training for cross-account role placement, two-sided authorization, S3 and KMS resource-owner gates, CodePipeline artifact flow, network-versus-identity troubleshooting, and Systems Manager management of private Auto Scaling instances without public inbound access.",
+  "topicDescriptors": [
+    {
+      "topicId": "cross_account_role_flow",
+      "title": "Cross-Account Role Flow: Source Principal, Target Role, Temporary Session",
+      "domainId": "security_compliance",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "origin_vs_destination",
+        "trust_policy",
+        "sts_assume_role",
+        "temporary_credentials",
+        "wrong_resource_scope"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ]
+    },
+    {
+      "topicId": "cross_account_s3_kms",
+      "title": "Cross-Account S3 and KMS Authorization",
+      "domainId": "security_compliance",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "relatedPatternIds": [
+        "resource_policy",
+        "dual_authorization",
+        "kms_key_policy",
+        "kms_grant",
+        "bucket_policy"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 43
+        },
+        {
+          "bank": "verified",
+          "questionId": 82
+        }
+      ]
+    },
+    {
+      "topicId": "cross_account_codepipeline",
+      "title": "Cross-Account CodePipeline Artifact and Deployment Flow",
+      "domainId": "sdlc_automation",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow",
+        "cross_account_s3_kms"
+      ],
+      "relatedPatternIds": [
+        "cross_account_pipeline",
+        "artifact_store",
+        "customer_managed_kms_key",
+        "target_action_role",
+        "cross_region_trap"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 30
+        },
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 92
+        }
+      ]
+    },
+    {
+      "topicId": "cross_account_network_identity",
+      "title": "Cross-Account Network, Identity, and Service Authorization Layers",
+      "domainId": "resilient_cloud_solutions",
+      "blueprintRelevance": 0.95,
+      "currentStatus": "developing",
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "relatedPatternIds": [
+        "network_plus_identity",
+        "vpc_connectivity",
+        "service_local_authorization",
+        "eks_access_entry",
+        "efs_mount"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 23
+        }
+      ]
+    },
+    {
+      "topicId": "ssm_private_instance_management",
+      "title": "Private EC2 and Auto Scaling Management with AWS Systems Manager",
+      "domainId": "security_compliance",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "ssm_agent",
+        "instance_profile",
+        "launch_template",
+        "amazonssmmanagedinstancecore",
+        "private_subnet",
+        "interface_vpc_endpoint",
+        "no_inbound_ssh",
+        "managed_node_registration",
+        "incorrect_internet_assumption"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 47
+        }
+      ]
+    }
+  ],
+  "conceptMaps": [
+    {
+      "id": "map-cross-account-assume-role-chain",
+      "schemaVersion": "1.0",
+      "topicId": "cross_account_role_flow",
+      "title": "The five-link AssumeRole chain",
+      "steps": [
+        {
+          "id": "source-principal",
+          "label": "1. Source principal",
+          "detail": "Identify the user, role, CodeBuild project role, or pipeline service role that starts in the originating account.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 20
+            },
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "source-permission",
+          "label": "2. Permission to call STS",
+          "detail": "The source principal needs an identity policy that allows sts:AssumeRole on the exact target role ARN.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 20
+            },
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "target-trust",
+          "label": "3. Target role trust",
+          "detail": "The role lives in the account that owns the target resources. Its trust policy names the allowed source principal or account.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 20
+            },
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "temporary-session",
+          "label": "4. Temporary role session",
+          "detail": "STS returns temporary credentials. From this point, requests use the target role session, not the original permissions.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 20
+            }
+          ]
+        },
+        {
+          "id": "target-permissions",
+          "label": "5. Target operations",
+          "detail": "The target role permissions policy must allow the required API actions on the target resources; service-local authorization may still be required.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 20
+            },
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-cross-account-two-sided-evaluation",
+      "schemaVersion": "1.0",
+      "topicId": "cross_account_role_flow",
+      "title": "Cross-account authorization is a two-sided AND",
+      "steps": [
+        {
+          "id": "trusted-side",
+          "label": "Trusted/source account evaluation",
+          "detail": "The source identity must be allowed to make the cross-account request or call sts:AssumeRole.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 20
+            },
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "trusting-side",
+          "label": "Trusting/resource account evaluation",
+          "detail": "The target role trust policy or target resource policy must allow the external principal.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 20
+            },
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "explicit-deny",
+          "label": "Explicit denies still win",
+          "detail": "SCPs, permissions boundaries, session policies, identity policies, or resource policies can still block the request.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 24
+            }
+          ]
+        },
+        {
+          "id": "decision",
+          "label": "Final decision",
+          "detail": "Cross-account access succeeds only when every required side allows the action and no applicable explicit deny blocks it.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 20
+            },
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-cross-account-resource-gates",
+      "schemaVersion": "1.0",
+      "topicId": "cross_account_s3_kms",
+      "title": "Open every resource-owner gate",
+      "steps": [
+        {
+          "id": "resource-owner",
+          "label": "1. Locate the resource owner",
+          "detail": "Bucket policies live with the bucket. KMS key policies live with the key. AMI launch permissions live with the AMI.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            },
+            {
+              "bank": "verified",
+              "questionId": 43
+            }
+          ]
+        },
+        {
+          "id": "identity-delegation",
+          "label": "2. Delegate from the caller side",
+          "detail": "The source identity or assumed target role needs an identity policy for the exact S3 or KMS actions.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            },
+            {
+              "bank": "verified",
+              "questionId": 43
+            }
+          ]
+        },
+        {
+          "id": "resource-policy",
+          "label": "3. Allow from the owner side",
+          "detail": "For direct cross-account resource access, the resource-based policy must allow the external principal or account.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            },
+            {
+              "bank": "verified",
+              "questionId": 82
+            }
+          ]
+        },
+        {
+          "id": "kms-separate-gate",
+          "label": "4. Treat KMS as a separate authorization system",
+          "detail": "An encrypted resource can be reachable while decryption still fails. The key policy and caller permissions must both allow the KMS operation.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            },
+            {
+              "bank": "verified",
+              "questionId": 43
+            }
+          ]
+        },
+        {
+          "id": "service-grant",
+          "label": "5. Add a grant when an AWS service role needs delegated key use",
+          "detail": "Some service workflows, such as Auto Scaling launching from a shared encrypted AMI, require a KMS grant for the service-linked role.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 43
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-cross-account-codepipeline-flow",
+      "schemaVersion": "1.0",
+      "topicId": "cross_account_codepipeline",
+      "title": "Cross-account pipeline artifact flow",
+      "steps": [
+        {
+          "id": "pipeline-account",
+          "label": "1. Pipeline account owns orchestration",
+          "detail": "The pipeline service role and primary artifact store are in the tooling or pipeline account.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "artifact-encryption",
+          "label": "2. Artifact store uses a customer managed KMS key",
+          "detail": "Cross-account actions need artifact encryption that the target action role can use; an AWS managed key cannot be shared cross-account.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "target-action-role",
+          "label": "3. Target account owns the action role",
+          "detail": "Create the deployment/action role in the account that owns the destination resources.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "assume-and-read",
+          "label": "4. Pipeline assumes the target role",
+          "detail": "The pipeline service role can call sts:AssumeRole; the target role can read artifacts and decrypt them using the artifact key.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "deploy",
+          "label": "5. Target role deploys to target resources",
+          "detail": "The target role permissions policy authorizes the deployment operation in the destination account.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "region-check",
+          "label": "6. Separate cross-account from cross-Region",
+          "detail": "A cross-Region action additionally needs an artifact bucket and key in the action Region, still owned by the pipeline account.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 92
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-network-identity-service-layers",
+      "schemaVersion": "1.0",
+      "topicId": "cross_account_network_identity",
+      "title": "Three layers for cross-account service access",
+      "steps": [
+        {
+          "id": "network",
+          "label": "1. Network path",
+          "detail": "Confirm routing, peering or transit connectivity, DNS resolution, security groups, and the service port. IAM cannot create a route.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 23
+            }
+          ]
+        },
+        {
+          "id": "identity",
+          "label": "2. AWS identity authorization",
+          "detail": "The workload role needs the API permissions required by the service or access mechanism.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 20
+            },
+            {
+              "bank": "verified",
+              "questionId": 23
+            }
+          ]
+        },
+        {
+          "id": "service-local",
+          "label": "3. Service-local authorization",
+          "detail": "The service may require its own gate, such as an EFS file-system policy/access point or an EKS access entry plus Kubernetes authorization.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 20
+            },
+            {
+              "bank": "verified",
+              "questionId": 23
+            }
+          ]
+        },
+        {
+          "id": "test-layer",
+          "label": "4. Diagnose the failing layer",
+          "detail": "Timeout or connection refused suggests network. AccessDenied suggests AWS authorization. Kubernetes Forbidden suggests cluster authorization.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 20
+            },
+            {
+              "bank": "verified",
+              "questionId": 23
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-ssm-private-managed-node-flow",
+      "schemaVersion": "1.0",
+      "topicId": "ssm_private_instance_management",
+      "title": "What must exist for a private EC2 instance to become a Systems Manager managed node",
+      "steps": [
+        {
+          "id": "ssm-agent",
+          "label": "1. SSM Agent runs on the instance",
+          "detail": "The agent is software inside the operating system. It initiates outbound HTTPS connections to Systems Manager; Session Manager does not require inbound SSH or RDP.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "iam-role",
+          "label": "2. An IAM role grants Systems Manager permissions",
+          "detail": "The EC2 role normally receives AmazonSSMManagedInstanceCore or a least-privilege equivalent. The role defines AWS API permissions.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "instance-profile",
+          "label": "3. An instance profile attaches the role to EC2",
+          "detail": "EC2 receives the role through an instance profile. For an Auto Scaling group, the launch template must reference that instance profile.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "network-path",
+          "label": "4. The instance needs an outbound path to Systems Manager",
+          "detail": "Use outbound internet/NAT or interface VPC endpoints. A fully private design commonly uses endpoints for ssm and ssmmessages, plus any additional endpoints required by features such as logs, KMS, or S3.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "endpoint-security-group",
+          "label": "5. Endpoint security groups permit HTTPS from managed nodes",
+          "detail": "The security group on each interface endpoint must allow inbound TCP 443 from the managed-instance subnets or security groups.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "automatic-replacement",
+          "label": "6. Every replacement instance repeats the same bootstrap",
+          "detail": "Because the agent, instance profile, and network path are defined in the AMI and launch template architecture, new Auto Scaling instances register without manual SSH configuration.",
+          "sourceQuestions": []
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "comparison-trust-vs-permissions-policy",
+      "topicId": "cross_account_role_flow",
+      "leftService": "Role trust policy",
+      "rightService": "Role permissions policy",
+      "dimensions": [
+        {
+          "id": "question",
+          "label": "Answers",
+          "leftValue": "Who may assume this role?",
+          "rightValue": "What may the assumed role session do?"
+        },
+        {
+          "id": "location",
+          "label": "Location",
+          "leftValue": "Attached to the target role as its resource-based policy",
+          "rightValue": "Attached to the target role as an identity-based policy"
+        },
+        {
+          "id": "principal",
+          "label": "Key element",
+          "leftValue": "Principal and sts:AssumeRole",
+          "rightValue": "Action, Resource, and optional Condition"
+        },
+        {
+          "id": "trap",
+          "label": "Exam trap",
+          "leftValue": "Trust alone does not grant target API permissions",
+          "rightValue": "Permissions alone do not let an external caller assume the role"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ]
+    },
+    {
+      "id": "comparison-assume-role-vs-resource-policy",
+      "topicId": "cross_account_s3_kms",
+      "leftService": "Cross-account role",
+      "rightService": "Direct resource-based policy",
+      "dimensions": [
+        {
+          "id": "model",
+          "label": "Access model",
+          "leftValue": "Caller receives temporary credentials for a target-account role",
+          "rightValue": "External principal calls the resource directly"
+        },
+        {
+          "id": "best-for",
+          "label": "Best fit",
+          "leftValue": "Multiple target resources or services; centralized target permissions",
+          "rightValue": "A service that supports resource policies and a narrow resource share"
+        },
+        {
+          "id": "owner-gate",
+          "label": "Owner-side gate",
+          "leftValue": "Role trust policy",
+          "rightValue": "Bucket, key, queue, topic, or other resource policy"
+        },
+        {
+          "id": "trap",
+          "label": "Exam trap",
+          "leftValue": "Role must live in the target account",
+          "rightValue": "Not every AWS service supports direct resource policies"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ]
+    },
+    {
+      "id": "comparison-s3-vs-kms-cross-account",
+      "topicId": "cross_account_s3_kms",
+      "leftService": "Amazon S3 authorization",
+      "rightService": "AWS KMS authorization",
+      "dimensions": [
+        {
+          "id": "resource-policy",
+          "label": "Owner policy",
+          "leftValue": "Bucket policy can allow the external principal",
+          "rightValue": "Key policy must allow the external account or principal"
+        },
+        {
+          "id": "caller-policy",
+          "label": "Caller policy",
+          "leftValue": "Identity policy permits S3 operations",
+          "rightValue": "Identity policy delegates allowed KMS operations"
+        },
+        {
+          "id": "independence",
+          "label": "Independent gate",
+          "leftValue": "Object access may be allowed",
+          "rightValue": "Decrypt can still fail even when S3 access succeeds"
+        },
+        {
+          "id": "service-role",
+          "label": "AWS service use",
+          "leftValue": "Service role may need bucket/object permissions",
+          "rightValue": "Service-linked role may also need a grant"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 43
+        }
+      ]
+    },
+    {
+      "id": "comparison-cross-account-vs-cross-region-pipeline",
+      "topicId": "cross_account_codepipeline",
+      "leftService": "Cross-account action",
+      "rightService": "Cross-Region action",
+      "dimensions": [
+        {
+          "id": "primary-change",
+          "label": "Primary change",
+          "leftValue": "A target-account action role is assumed",
+          "rightValue": "The action runs in another Region"
+        },
+        {
+          "id": "artifact",
+          "label": "Artifacts",
+          "leftValue": "Target role reads/decrypts the pipeline artifact store",
+          "rightValue": "Separate artifact store and key are required in the action Region"
+        },
+        {
+          "id": "ownership",
+          "label": "Artifact ownership",
+          "leftValue": "Pipeline account owns the artifact store/key",
+          "rightValue": "Pipeline account still owns the per-Region artifact store/key"
+        },
+        {
+          "id": "trap",
+          "label": "Exam trap",
+          "leftValue": "Do not place the deployment role in the source account",
+          "rightValue": "Do not create a second pipeline unless the scenario requires it"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 92
+        }
+      ]
+    },
+    {
+      "id": "comparison-network-vs-iam-failure",
+      "topicId": "cross_account_network_identity",
+      "leftService": "Network failure",
+      "rightService": "Authorization failure",
+      "dimensions": [
+        {
+          "id": "symptom",
+          "label": "Typical symptom",
+          "leftValue": "Timeout, DNS failure, connection refused",
+          "rightValue": "AccessDenied or Kubernetes Forbidden"
+        },
+        {
+          "id": "controls",
+          "label": "Controls to inspect",
+          "leftValue": "Routes, peering, transit gateway, DNS, security groups, NACLs, ports",
+          "rightValue": "Identity policies, trust/resource policies, service access entries, RBAC"
+        },
+        {
+          "id": "assume-role",
+          "label": "AssumeRole effect",
+          "leftValue": "Does not create connectivity",
+          "rightValue": "Can change the active AWS principal"
+        },
+        {
+          "id": "exam-rule",
+          "label": "Exam rule",
+          "leftValue": "Private service access normally needs a real network path",
+          "rightValue": "After connectivity, every required authorization layer must still allow"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 23
+        }
+      ]
+    },
+    {
+      "id": "comparison-iam-role-vs-instance-profile",
+      "topicId": "ssm_private_instance_management",
+      "leftService": "IAM role",
+      "rightService": "EC2 instance profile",
+      "dimensions": [
+        {
+          "id": "purpose",
+          "label": "Purpose",
+          "leftValue": "Defines the AWS permissions available to the EC2 workload",
+          "rightValue": "Container used by EC2 to attach one IAM role to an instance"
+        },
+        {
+          "id": "configured-on",
+          "label": "Configured on",
+          "leftValue": "IAM",
+          "rightValue": "Launch template, launch configuration, or EC2 instance"
+        },
+        {
+          "id": "ssm-use",
+          "label": "Systems Manager role",
+          "leftValue": "Includes AmazonSSMManagedInstanceCore or equivalent permissions",
+          "rightValue": "Delivers that role to the running instance"
+        },
+        {
+          "id": "exam-trap",
+          "label": "Exam trap",
+          "leftValue": "Creating the role alone does not attach it to EC2",
+          "rightValue": "An instance profile does not invent permissions; it carries the role"
+        }
+      ],
+      "sourceQuestions": []
+    },
+    {
+      "id": "comparison-ssm-nat-vs-vpc-endpoints",
+      "topicId": "ssm_private_instance_management",
+      "leftService": "Outbound internet or NAT",
+      "rightService": "Interface VPC endpoints",
+      "dimensions": [
+        {
+          "id": "internet",
+          "label": "Public internet dependency",
+          "leftValue": "Requires an outbound path to public AWS service endpoints",
+          "rightValue": "Keeps managed-node traffic on private IP connectivity"
+        },
+        {
+          "id": "inbound",
+          "label": "Inbound instance access",
+          "leftValue": "Still does not require inbound SSH for Session Manager",
+          "rightValue": "Still does not require inbound SSH for Session Manager"
+        },
+        {
+          "id": "operations",
+          "label": "Operational tradeoff",
+          "leftValue": "Simpler endpoint inventory but incurs NAT design and egress dependencies",
+          "rightValue": "Requires endpoint, DNS, security-group, and endpoint-policy configuration"
+        },
+        {
+          "id": "exam-clue",
+          "label": "Decisive clue",
+          "leftValue": "Private subnet may use NAT when outbound internet is acceptable",
+          "rightValue": "Use when the requirement says no internet, private connectivity, or AWS PrivateLink"
+        }
+      ],
+      "sourceQuestions": []
+    }
+  ],
+  "drillDefinitions": [
+    {
+      "drillId": "cag-role-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_role_flow",
+      "domainId": "security_compliance",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "The cross-account role sentence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the rule and picture two accounts before choosing a policy.",
+      "prompt": "The source principal initiates the request. The role is created in the target account. The source identity policy permits sts:AssumeRole. The target role trust policy permits the source principal. The target role permissions policy controls target actions.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "source principal",
+        "target account",
+        "sts:AssumeRole",
+        "trust policy",
+        "permissions policy"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La frase separa las tres políticas que suelen mezclarse: permiso del llamador, confianza del rol destino y permisos de la sesión asumida.",
+        "testedPattern": "Cross-account AssumeRole ownership",
+        "correctChoiceWins": "El rol vive con los recursos que va a administrar; así la cuenta destino conserva el control de lo que la sesión puede hacer.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "cross-account",
+        "assume-role",
+        "mechanism"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-role-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_role_flow",
+      "domainId": "security_compliance",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Where does the deployment role live?",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the account that should own the role used to deploy to production.",
+      "prompt": "A CodeBuild project in a tooling account deploys to resources owned by a production account. Where should the cross-account deployment role be created?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "In the tooling account, because CodeBuild starts there."
+        },
+        {
+          "id": "B",
+          "label": "In the production account, because that account owns the resources and permissions."
+        },
+        {
+          "id": "C",
+          "label": "In the AWS Organizations management account."
+        },
+        {
+          "id": "D",
+          "label": "In both accounts with identical permissions."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "tooling account",
+        "production account",
+        "owns the resources"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "The caller starts in the tooling account, so placing every role there feels natural.",
+          "failure": "A source-account role cannot by itself become a target-account identity with permissions over production resources."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "The management account sounds central and authoritative.",
+          "failure": "Organizations management is unrelated to the execution identity required by this deployment."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Duplicating roles appears to cover both sides.",
+          "failure": "The workflow needs a source principal and one target role, not two equivalent deployment roles."
+        }
+      ],
+      "explanation": {
+        "concise": "El rol de despliegue pertenece a producción. La cuenta de herramientas solo necesita una identidad con permiso para asumirlo.",
+        "testedPattern": "Role lives with target resources",
+        "correctChoiceWins": "B mantiene la confianza y los permisos operativos bajo control de la cuenta que posee producción.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "The caller starts in the tooling account, so placing every role there feels natural.",
+            "failure": "A source-account role cannot by itself become a target-account identity with permissions over production resources."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "incorrect_assumption",
+            "attraction": "The management account sounds central and authoritative.",
+            "failure": "Organizations management is unrelated to the execution identity required by this deployment."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "elimination_failure",
+            "attraction": "Duplicating roles appears to cover both sides.",
+            "failure": "The workflow needs a source principal and one target role, not two equivalent deployment roles."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "role-ownership",
+        "target-account"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-role-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_role_flow",
+      "domainId": "security_compliance",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order the AssumeRole workflow",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the events in execution order.",
+      "prompt": "Order a cross-account API call that uses an IAM role.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "source-authorized",
+          "label": "The source principal is allowed to call sts:AssumeRole on the target role ARN."
+        },
+        {
+          "id": "trust-evaluated",
+          "label": "The target role trust policy accepts the source principal."
+        },
+        {
+          "id": "sts-session",
+          "label": "STS returns temporary credentials for the target role session."
+        },
+        {
+          "id": "target-action",
+          "label": "The session calls the target service using the role permissions."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "source-authorized",
+          "trust-evaluated",
+          "sts-session",
+          "target-action"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "sts:AssumeRole",
+        "trust policy",
+        "temporary credentials",
+        "role permissions"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Primero se autoriza y confía la asunción; después existe una sesión temporal capaz de ejecutar acciones en destino.",
+        "testedPattern": "STS temporary-credential workflow",
+        "correctChoiceWins": "El orden muestra que los permisos de destino no se usan hasta que STS crea la sesión asumida.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "workflow",
+        "sts"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-role-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_role_flow",
+      "domainId": "security_compliance",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map each policy to its owner",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each control to the source or target account.",
+      "prompt": "A central CI account deploys to an application account by assuming AppDeployRole.",
+      "answerOptions": [
+        {
+          "id": "source",
+          "label": "Central CI/source account"
+        },
+        {
+          "id": "target",
+          "label": "Application/target account"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "codebuild-policy",
+          "label": "Policy that lets the CodeBuild service role call sts:AssumeRole."
+        },
+        {
+          "id": "deploy-role",
+          "label": "AppDeployRole itself."
+        },
+        {
+          "id": "deploy-trust",
+          "label": "Trust policy that names the central CI principal."
+        },
+        {
+          "id": "deploy-permissions",
+          "label": "Policy that allows changes to application resources."
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "codebuild-policy": "source",
+          "deploy-role": "target",
+          "deploy-trust": "target",
+          "deploy-permissions": "target"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "source",
+        "target",
+        "trust policy",
+        "permissions policy"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Solo el permiso de iniciar AssumeRole vive en origen. El rol destino y sus dos políticas viven donde están los recursos.",
+        "testedPattern": "Cross-account policy placement",
+        "correctChoiceWins": "El mapeo evita el error recurrente de colocar el rol de despliegue en la cuenta central.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "mapping",
+        "policy-ownership"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-role-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_role_flow",
+      "domainId": "security_compliance",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Fix an Unauthorized cross-account deployment",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the BEST correction. Assume network connectivity already works.",
+      "prompt": "A CodeBuild project in Account A must deploy to an EKS cluster in Account B. The build role has no direct access to the cluster. Which design is correct?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create a deployment role in Account B, trust the CodeBuild role from Account A, allow the CodeBuild role to assume it, and grant that target role cluster access."
+        },
+        {
+          "id": "B",
+          "label": "Create the deployment role in Account A and add the Account B cluster ARN to its permissions policy."
+        },
+        {
+          "id": "C",
+          "label": "Add Account A to an SCP allow list in AWS Organizations."
+        },
+        {
+          "id": "D",
+          "label": "Use sts:AssumeRoleWithSAML from CodeBuild."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Account A",
+        "Account B",
+        "deploy",
+        "EKS",
+        "Unauthorized"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "The source build role is already executing the deployment commands.",
+          "failure": "A source role does not become a target-account role merely by listing a target ARN in its policy."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "SCPs are account-level permission controls in Organizations.",
+          "failure": "An SCP does not grant the missing role trust or EKS access."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "AssumeRoleWithSAML is another STS operation.",
+          "failure": "CodeBuild is an AWS service role, not a SAML-federated user session."
+        }
+      ],
+      "explanation": {
+        "concise": "El flujo correcto usa un rol en la cuenta del clúster. La identidad de CodeBuild lo asume y el clúster autoriza esa identidad.",
+        "testedPattern": "Target role plus service-local authorization",
+        "correctChoiceWins": "A resuelve el cambio de identidad y mantiene los permisos del clúster en la cuenta que lo posee.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "The source build role is already executing the deployment commands.",
+            "failure": "A source role does not become a target-account role merely by listing a target ARN in its policy."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "SCPs are account-level permission controls in Organizations.",
+            "failure": "An SCP does not grant the missing role trust or EKS access."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "AssumeRoleWithSAML is another STS operation.",
+            "failure": "CodeBuild is an AWS service role, not a SAML-federated user session."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "eks",
+        "codebuild",
+        "elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-role-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_role_flow",
+      "domainId": "security_compliance",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Central deployment role design",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST architecture with the least duplicated administration.",
+      "prompt": "A company has one tooling account and 40 application accounts. A central pipeline must deploy to each application account. Each application account must retain control over the exact resources the pipeline can change. Which approach is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create one administrator role in the tooling account and grant it resource ARNs from every application account."
+        },
+        {
+          "id": "B",
+          "label": "Create a least-privilege deployment role in each application account that trusts the central pipeline role; allow the pipeline role to assume each target role."
+        },
+        {
+          "id": "C",
+          "label": "Create IAM users with access keys in every application account and store the keys in the pipeline."
+        },
+        {
+          "id": "D",
+          "label": "Run the pipeline from the Organizations management account with the root user."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "central pipeline",
+        "each application account",
+        "retain control",
+        "exact resources"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "One central policy seems operationally simple.",
+          "failure": "The target accounts cannot govern deployment permissions through a role they do not own, and cross-account authorization is incomplete."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Static credentials appear to provide direct access.",
+          "failure": "Long-lived access keys add security and rotation overhead; role assumption is the intended cross-account model."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "The management account appears to have universal authority.",
+          "failure": "Organizations management does not grant root-level operational access to member-account resources."
+        }
+      ],
+      "explanation": {
+        "concise": "Cada cuenta de aplicación debe poseer su rol mínimo. El pipeline central solo recibe permiso para asumir esos roles.",
+        "testedPattern": "Distributed target roles with centralized orchestration",
+        "correctChoiceWins": "B combina control local, credenciales temporales y administración central sin claves permanentes.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "One central policy seems operationally simple.",
+            "failure": "The target accounts cannot govern deployment permissions through a role they do not own, and cross-account authorization is incomplete."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Static credentials appear to provide direct access.",
+            "failure": "Long-lived access keys add security and rotation overhead; role assumption is the intended cross-account model."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "incorrect_assumption",
+            "attraction": "The management account appears to have universal authority.",
+            "failure": "Organizations management does not grant root-level operational access to member-account resources."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "multi-account",
+        "least-privilege",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-role-bank-20",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_role_flow",
+      "domainId": "security_compliance",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: cross-account EKS deployment",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the verified bank question by drawing source account → target role → cluster authorization.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "cross-account",
+        "CodeBuild",
+        "deployment role",
+        "EKS"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Retorno al banco para comprobar el modelo de ubicación del rol y autorización local del servicio.",
+        "testedPattern": "Cross-account role bank return",
+        "correctChoiceWins": "La respuesta debe justificarse por quién asume el rol, dónde vive y cómo obtiene acceso al clúster.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "eks",
+        "assume-role"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-resource-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_s3_kms",
+      "domainId": "security_compliance",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "The resource-owner gate",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the rule and name the owner of each policy.",
+      "prompt": "Cross-account access is not solved only from the caller account. The bucket owner controls the bucket policy. The KMS key owner controls the key policy. The caller identity policy delegates only within the maximum that the owner-side policy permits.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "bucket owner",
+        "key owner",
+        "resource policy",
+        "identity policy"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La cuenta propietaria abre el acceso desde la política del recurso; la cuenta del llamador decide qué identidad puede usar ese acceso.",
+        "testedPattern": "Two-account authorization",
+        "correctChoiceWins": "El modelo impide creer que una política IAM en origen puede obligar a un recurso externo a aceptar la solicitud.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 43
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "resource-policy",
+        "kms",
+        "s3"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-resource-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_s3_kms",
+      "domainId": "security_compliance",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "S3 allowed, KMS denied",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the missing authorization layer.",
+      "prompt": "A role in Account B can call s3:GetObject on a bucket in Account A. The bucket policy allows the role. The object is encrypted with a customer managed KMS key in Account A, and the download fails with KMS AccessDenied. What is missing?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "A route table entry to the KMS key."
+        },
+        {
+          "id": "B",
+          "label": "Cross-account KMS authorization in the key policy and delegated KMS permissions for the role."
+        },
+        {
+          "id": "C",
+          "label": "S3 Versioning on the bucket."
+        },
+        {
+          "id": "D",
+          "label": "An SCP that grants kms:Decrypt."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "bucket policy allows",
+        "encrypted",
+        "KMS AccessDenied"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "service_confusion",
+          "attraction": "KMS is an AWS endpoint, so a networking explanation sounds possible.",
+          "failure": "The error is authorization, and routes do not grant key usage."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Versioning is frequently associated with S3 and pipelines.",
+          "failure": "Versioning does not grant decryption permission."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "SCPs participate in authorization boundaries.",
+          "failure": "An SCP can limit permissions but cannot grant KMS access."
+        }
+      ],
+      "explanation": {
+        "concise": "S3 y KMS son puertas separadas. El rol puede leer el objeto y aun así no poder descifrarlo.",
+        "testedPattern": "Independent S3 and KMS authorization",
+        "correctChoiceWins": "B agrega el permiso del propietario de la clave y la delegación al rol externo.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "service_confusion",
+            "attraction": "KMS is an AWS endpoint, so a networking explanation sounds possible.",
+            "failure": "The error is authorization, and routes do not grant key usage."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "Versioning is frequently associated with S3 and pipelines.",
+            "failure": "Versioning does not grant decryption permission."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "SCPs participate in authorization boundaries.",
+            "failure": "An SCP can limit permissions but cannot grant KMS access."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 43
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "kms",
+        "s3",
+        "dual-gate"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-resource-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_s3_kms",
+      "domainId": "security_compliance",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map controls to the resource owner",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each control to Account A or Account B.",
+      "prompt": "Account A owns an encrypted S3 bucket and KMS key. Account B owns the analytics role that reads the objects.",
+      "answerOptions": [
+        {
+          "id": "account-a",
+          "label": "Account A: resource owner"
+        },
+        {
+          "id": "account-b",
+          "label": "Account B: caller owner"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "bucket-policy",
+          "label": "Bucket policy allowing the analytics role."
+        },
+        {
+          "id": "key-policy",
+          "label": "KMS key policy allowing the external account or role."
+        },
+        {
+          "id": "caller-s3-policy",
+          "label": "Identity policy delegating s3:GetObject to the analytics role."
+        },
+        {
+          "id": "caller-kms-policy",
+          "label": "Identity policy delegating kms:Decrypt to the analytics role."
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "bucket-policy": "account-a",
+          "key-policy": "account-a",
+          "caller-s3-policy": "account-b",
+          "caller-kms-policy": "account-b"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "owns",
+        "bucket policy",
+        "key policy",
+        "identity policy"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Las políticas de recursos viven con sus recursos; las políticas de identidad viven con la identidad que hace la llamada.",
+        "testedPattern": "Resource-owner mapping",
+        "correctChoiceWins": "El mapeo muestra las dos evaluaciones necesarias para S3 y para KMS.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 43
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "mapping",
+        "resource-owner"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-resource-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_s3_kms",
+      "domainId": "security_compliance",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Share an encrypted AMI with Auto Scaling",
+      "difficulty": "practice",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select TWO controls that complete the design.",
+      "prompt": "Account A copies an unencrypted AMI and encrypts the copy with a customer managed KMS key. Account B must launch the shared AMI through an Auto Scaling group. Which TWO additional controls are required?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Share the encrypted AMI and allow Account B in the KMS key policy, including permission to create grants as required."
+        },
+        {
+          "id": "B",
+          "label": "Create a KMS grant that lets the Auto Scaling service-linked role in Account B use the key."
+        },
+        {
+          "id": "C",
+          "label": "Re-encrypt the AMI with an AWS managed KMS key because AWS managed keys are automatically shared."
+        },
+        {
+          "id": "D",
+          "label": "Attach AmazonEC2FullAccess to the Auto Scaling service-linked role."
+        },
+        {
+          "id": "E",
+          "label": "Add the KMS key ARN to the VPC route table in Account B."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "encrypted AMI",
+        "shared",
+        "Auto Scaling",
+        "Select TWO"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "AWS managed keys sound simpler and already integrated with services.",
+          "failure": "AWS managed KMS keys cannot be shared for this cross-account encrypted AMI workflow."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Broad EC2 permissions appear to cover instance launch.",
+          "failure": "The missing gate is KMS key usage by the service-linked role, not general EC2 API permission."
+        },
+        {
+          "optionId": "E",
+          "errorCause": "service_confusion",
+          "attraction": "KMS is a network-accessed service.",
+          "failure": "A route entry cannot authorize cryptographic operations on a key."
+        }
+      ],
+      "explanation": {
+        "concise": "La AMI compartida y la clave son recursos distintos. Además, Auto Scaling usa un service-linked role que necesita una delegación de uso de la clave.",
+        "testedPattern": "KMS key policy plus grant",
+        "correctChoiceWins": "A abre la clave y comparte la AMI; B delega el uso efectivo al rol de servicio que lanza las instancias.",
+        "distractorReview": [
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "AWS managed keys sound simpler and already integrated with services.",
+            "failure": "AWS managed KMS keys cannot be shared for this cross-account encrypted AMI workflow."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "elimination_failure",
+            "attraction": "Broad EC2 permissions appear to cover instance launch.",
+            "failure": "The missing gate is KMS key usage by the service-linked role, not general EC2 API permission."
+          },
+          {
+            "optionId": "E",
+            "errorCause": "service_confusion",
+            "attraction": "KMS is a network-accessed service.",
+            "failure": "A route entry cannot authorize cryptographic operations on a key."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 43
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "multi-select",
+        "ami",
+        "kms-grant"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-resource-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_s3_kms",
+      "domainId": "security_compliance",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Cross-account encrypted object access",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST complete solution.",
+      "prompt": "A reporting role in Account B must read objects from a bucket in Account A. The objects use a customer managed KMS key in Account A. The company requires least privilege and no role assumption. Which configuration is complete?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Allow the role in the bucket policy only; S3 automatically delegates KMS access."
+        },
+        {
+          "id": "B",
+          "label": "Allow the role in the bucket policy and key policy, and grant the role identity permissions for the required S3 and KMS actions."
+        },
+        {
+          "id": "C",
+          "label": "Grant s3:* and kms:* to the role in Account B only."
+        },
+        {
+          "id": "D",
+          "label": "Use an SCP in Account A to allow the role from Account B."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "no role assumption",
+        "bucket",
+        "customer managed KMS key",
+        "least privilege"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "elimination_failure",
+          "attraction": "The bucket policy is the obvious cross-account control.",
+          "failure": "It opens only the S3 gate; the KMS key remains independently protected."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Granting everything in the caller account appears comprehensive.",
+          "failure": "Caller permissions cannot substitute for the bucket and key owners allowing the external role."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "SCPs apply across Organizations accounts.",
+          "failure": "SCPs do not grant access to a bucket or KMS key."
+        }
+      ],
+      "explanation": {
+        "concise": "El acceso directo requiere permiso en ambos lados para cada recurso protegido. S3 y KMS se evalúan por separado.",
+        "testedPattern": "Direct cross-account resource access",
+        "correctChoiceWins": "B es la única opción que abre las políticas de propietario y delega las acciones exactas al rol.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "elimination_failure",
+            "attraction": "The bucket policy is the obvious cross-account control.",
+            "failure": "It opens only the S3 gate; the KMS key remains independently protected."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "Granting everything in the caller account appears comprehensive.",
+            "failure": "Caller permissions cannot substitute for the bucket and key owners allowing the external role."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "SCPs apply across Organizations accounts.",
+            "failure": "SCPs do not grant access to a bucket or KMS key."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 43
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "s3",
+        "kms",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-resource-spaced-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_s3_kms",
+      "domainId": "security_compliance",
+      "activityType": "spaced_review",
+      "drillForm": "spaced_review",
+      "title": "Name the two KMS sides",
+      "difficulty": "intro",
+      "estimatedMinutes": 2,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Complete the recall prompt.",
+      "prompt": "Say aloud: key-owner policy, caller identity policy. Then add “grant” when an AWS service role needs delegated key use.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "key policy",
+        "identity policy",
+        "grant"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Este repaso no califica una respuesta; refuerza que KMS cross-account no se resuelve con una sola política.",
+        "testedPattern": "Spaced KMS authorization review",
+        "correctChoiceWins": "La secuencia recupera rápidamente las dos autorizaciones y el caso especial de grants.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 43
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "spaced-review",
+        "kms"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-resource-bank-43",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_s3_kms",
+      "domainId": "security_compliance",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: encrypted AMI sharing",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the verified bank question by separating AMI sharing, KMS policy, and service-linked-role grant.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "D",
+          "E"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "encrypted AMI",
+        "cross-account",
+        "KMS grant",
+        "Auto Scaling"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Retorno al banco para verificar una arquitectura KMS con dos respuestas independientes.",
+        "testedPattern": "Encrypted AMI bank return",
+        "correctChoiceWins": "La justificación debe cubrir tanto el propietario de la clave como el principal real que la usará al lanzar instancias.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 43
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "bank-return",
+        "kms",
+        "multi-select"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-pipeline-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_codepipeline",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "The pipeline-account and target-account split",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the ownership rule before selecting a deployment architecture.",
+      "prompt": "Pipeline account: orchestration role, artifact bucket, and customer managed artifact key. Target account: action/deployment role and destination resources. The pipeline role assumes the target role; the target role can read and decrypt the artifact and perform the deployment.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "pipeline account",
+        "artifact bucket",
+        "customer managed key",
+        "target role"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El pipeline no “salta” de cuenta con su identidad original. Asume un rol destino que puede recuperar el artefacto cifrado y desplegar.",
+        "testedPattern": "Cross-account CodePipeline ownership",
+        "correctChoiceWins": "La separación conserva los artefactos con el pipeline y las acciones de producción con producción.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow",
+        "cross_account_s3_kms"
+      ],
+      "tags": [
+        "codepipeline",
+        "artifact-store",
+        "mechanism"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-pipeline-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_codepipeline",
+      "domainId": "sdlc_automation",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Cross-account or cross-Region?",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the primary architecture change required by the scenario.",
+      "prompt": "A pipeline and deployment target are in the same Region but different AWS accounts. What is the primary additional construct?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "A cross-account action role in the target account."
+        },
+        {
+          "id": "B",
+          "label": "A second artifact bucket in another Region."
+        },
+        {
+          "id": "C",
+          "label": "A second CodePipeline in the target account."
+        },
+        {
+          "id": "D",
+          "label": "A Route 53 latency record."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "same Region",
+        "different accounts"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "service_confusion",
+          "attraction": "Cross-Region pipelines require regional artifact stores.",
+          "failure": "The scenario changes account, not Region."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "A pipeline per account appears to isolate permissions.",
+          "failure": "Cross-account actions are designed to let one pipeline deploy through a target role."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "Route 53 handles cross-Region traffic decisions.",
+          "failure": "DNS routing is unrelated to pipeline authorization."
+        }
+      ],
+      "explanation": {
+        "concise": "“Same Region, different accounts” apunta a AssumeRole, no a un artifact store regional adicional.",
+        "testedPattern": "Cross-account versus cross-Region clue",
+        "correctChoiceWins": "A introduce la identidad necesaria en la cuenta destino sin duplicar la orquestación.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "service_confusion",
+            "attraction": "Cross-Region pipelines require regional artifact stores.",
+            "failure": "The scenario changes account, not Region."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "elimination_failure",
+            "attraction": "A pipeline per account appears to isolate permissions.",
+            "failure": "Cross-account actions are designed to let one pipeline deploy through a target role."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "Route 53 handles cross-Region traffic decisions.",
+            "failure": "DNS routing is unrelated to pipeline authorization."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 92
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "cross-region",
+        "cross-account",
+        "comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-pipeline-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_codepipeline",
+      "domainId": "sdlc_automation",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order the artifact handoff",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Order the cross-account action workflow.",
+      "prompt": "Order how a pipeline action in Account B consumes an artifact produced by a pipeline in Account A.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "artifact-written",
+          "label": "CodePipeline stores the encrypted artifact in the pipeline account artifact bucket."
+        },
+        {
+          "id": "role-assumed",
+          "label": "The pipeline service role assumes the action role in the target account."
+        },
+        {
+          "id": "artifact-read",
+          "label": "The target action role reads the artifact and uses the artifact KMS key to decrypt it."
+        },
+        {
+          "id": "target-deploy",
+          "label": "The action role performs the deployment against target-account resources."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "artifact-written",
+          "role-assumed",
+          "artifact-read",
+          "target-deploy"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "artifact",
+        "assumes",
+        "decrypt",
+        "deploy"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El artefacto existe primero; luego la acción cambia de identidad, recupera el artefacto y despliega.",
+        "testedPattern": "Cross-account artifact handoff",
+        "correctChoiceWins": "El orden evita colocar el bucket o la clave en la cuenta equivocada.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow",
+        "cross_account_s3_kms"
+      ],
+      "tags": [
+        "workflow",
+        "codepipeline"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-pipeline-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_codepipeline",
+      "domainId": "sdlc_automation",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map pipeline resources to accounts",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each resource to the pipeline or target account.",
+      "prompt": "A central pipeline in Account A deploys to an S3 bucket in Account B.",
+      "answerOptions": [
+        {
+          "id": "pipeline-account",
+          "label": "Account A: pipeline account"
+        },
+        {
+          "id": "target-account",
+          "label": "Account B: target account"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "pipeline-service-role",
+          "label": "CodePipeline service role."
+        },
+        {
+          "id": "artifact-bucket",
+          "label": "Primary artifact store bucket."
+        },
+        {
+          "id": "artifact-key",
+          "label": "Customer managed key for pipeline artifacts."
+        },
+        {
+          "id": "action-role",
+          "label": "Cross-account deployment action role."
+        },
+        {
+          "id": "destination-bucket",
+          "label": "Application destination bucket."
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "pipeline-service-role": "pipeline-account",
+          "artifact-bucket": "pipeline-account",
+          "artifact-key": "pipeline-account",
+          "action-role": "target-account",
+          "destination-bucket": "target-account"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "pipeline account",
+        "target account",
+        "artifact",
+        "action role"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Los artefactos pertenecen a la orquestación; la identidad de acción y el recurso desplegado pertenecen al destino.",
+        "testedPattern": "CodePipeline resource ownership",
+        "correctChoiceWins": "Este mapeo expone el error de crear la action role o el artifact key en la cuenta incorrecta.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow",
+        "cross_account_s3_kms"
+      ],
+      "tags": [
+        "mapping",
+        "codepipeline"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-pipeline-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_codepipeline",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Choose the complete cross-account pipeline configuration",
+      "difficulty": "practice",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select TWO independent requirements.",
+      "prompt": "A pipeline in Account A deploys to Account B in the same Region. The target action must consume pipeline artifacts. Which TWO configurations are required?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create an action role in Account B that trusts the pipeline role, and allow the pipeline role to assume it."
+        },
+        {
+          "id": "B",
+          "label": "Encrypt pipeline artifacts with a customer managed KMS key that the target action role is allowed to use."
+        },
+        {
+          "id": "C",
+          "label": "Use the default AWS managed S3 key because it is automatically available to every account."
+        },
+        {
+          "id": "D",
+          "label": "Create a second artifact bucket in Account B and move pipeline ownership there."
+        },
+        {
+          "id": "E",
+          "label": "Use a KMS alias name in the target action because aliases are globally resolvable."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "different account",
+        "same Region",
+        "consume artifacts",
+        "Select TWO"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "The default key is integrated automatically with S3.",
+          "failure": "An AWS managed key cannot be shared for cross-account artifact decryption."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Putting artifacts beside the target resources seems simpler.",
+          "failure": "The artifact store remains owned by the pipeline account; the target role receives access."
+        },
+        {
+          "optionId": "E",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Aliases are convenient and readable.",
+          "failure": "For cross-account actions, use the key ID or ARN; aliases are recognized only in the account that created them."
+        }
+      ],
+      "explanation": {
+        "concise": "La acción necesita identidad destino y acceso al artefacto cifrado. Son dos requisitos independientes.",
+        "testedPattern": "Cross-account CodePipeline multi-select",
+        "correctChoiceWins": "A resuelve AssumeRole; B resuelve el transporte seguro del artefacto hacia la sesión destino.",
+        "distractorReview": [
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "The default key is integrated automatically with S3.",
+            "failure": "An AWS managed key cannot be shared for cross-account artifact decryption."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "Putting artifacts beside the target resources seems simpler.",
+            "failure": "The artifact store remains owned by the pipeline account; the target role receives access."
+          },
+          {
+            "optionId": "E",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Aliases are convenient and readable.",
+            "failure": "For cross-account actions, use the key ID or ARN; aliases are recognized only in the account that created them."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow",
+        "cross_account_s3_kms"
+      ],
+      "tags": [
+        "multi-select",
+        "artifact-encryption"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-pipeline-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_codepipeline",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Diagnose a cross-account artifact failure",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST fix without redesigning the pipeline.",
+      "prompt": "A pipeline in Account A successfully assumes a deployment role in Account B, but the action fails when it downloads the input artifact. The S3 artifact bucket policy allows the role. The artifact bucket uses the default AWS managed S3 KMS key. What should be changed?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Replace the artifact encryption with a customer managed KMS key and allow the target action role to use the key."
+        },
+        {
+          "id": "B",
+          "label": "Add ec2:DescribeInstances to the target role."
+        },
+        {
+          "id": "C",
+          "label": "Create a NAT gateway in Account B."
+        },
+        {
+          "id": "D",
+          "label": "Move the pipeline to Account B."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "assumes successfully",
+        "downloads artifact",
+        "default AWS managed key"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "service_confusion",
+          "attraction": "Deployment roles often need service-specific permissions.",
+          "failure": "The failure occurs while reading/decrypting the pipeline artifact, before an EC2 deployment action."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Download failures can be caused by connectivity.",
+          "failure": "The action has S3 access; the decisive clue is the non-shareable AWS managed KMS key."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Co-locating pipeline and target would avoid cross-account complexity.",
+          "failure": "It abandons the required centralized design instead of fixing the key policy and encryption choice."
+        }
+      ],
+      "explanation": {
+        "concise": "La asunción ya funciona y S3 ya permite lectura. El bloqueo restante es la clave administrada por AWS, que no puede autorizar la sesión de otra cuenta.",
+        "testedPattern": "Layered pipeline troubleshooting",
+        "correctChoiceWins": "A corrige exactamente la capa KMS sin mover la orquestación ni agregar componentes innecesarios.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "service_confusion",
+            "attraction": "Deployment roles often need service-specific permissions.",
+            "failure": "The failure occurs while reading/decrypting the pipeline artifact, before an EC2 deployment action."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "Download failures can be caused by connectivity.",
+            "failure": "The action has S3 access; the decisive clue is the non-shareable AWS managed KMS key."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "elimination_failure",
+            "attraction": "Co-locating pipeline and target would avoid cross-account complexity.",
+            "failure": "It abandons the required centralized design instead of fixing the key policy and encryption choice."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow",
+        "cross_account_s3_kms"
+      ],
+      "tags": [
+        "troubleshooting",
+        "kms",
+        "codepipeline"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-pipeline-bank-39",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_codepipeline",
+      "domainId": "sdlc_automation",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: cross-account S3 deployment",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the verified bank question. Build two independent requirement lines: target role and artifact protection.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "E"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "cross-account",
+        "CodePipeline",
+        "S3 deployment",
+        "Select TWO"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Retorno al banco para verificar el flujo completo de role assumption y artefactos.",
+        "testedPattern": "Cross-account CodePipeline bank return",
+        "correctChoiceWins": "La selección debe cubrir identidad destino y requisitos del artifact store, no solo una de las dos capas.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow",
+        "cross_account_s3_kms"
+      ],
+      "tags": [
+        "bank-return",
+        "codepipeline",
+        "multi-select"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-network-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_network_identity",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Network, identity, service authorization",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the three-layer checklist.",
+      "prompt": "For private cross-account service access, verify in order: 1) a network path and port, 2) AWS identity/resource authorization, 3) service-local authorization. AssumeRole changes identity; it does not create routing, DNS, or Kubernetes RBAC.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "network path",
+        "AWS authorization",
+        "service-local authorization"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El checklist separa tres causas que producen síntomas distintos. Resolver IAM no corrige una ruta y resolver la ruta no autoriza el servicio.",
+        "testedPattern": "Three-layer access model",
+        "correctChoiceWins": "El orden permite diagnosticar por capa y evita usar AssumeRole como solución universal.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 23
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "network",
+        "identity",
+        "service-auth"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-network-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_network_identity",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Can AssumeRole create connectivity?",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the statement that is operationally correct.",
+      "prompt": "A Lambda function in Account B must mount an EFS file system in Account A. The VPCs have no peering or transit connection. Which statement is correct?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Assuming a role in Account A creates a private network path to the EFS mount target."
+        },
+        {
+          "id": "B",
+          "label": "The VPCs first need network connectivity and NFS reachability; IAM authorization is a separate layer."
+        },
+        {
+          "id": "C",
+          "label": "An SCP can route NFS traffic between member accounts."
+        },
+        {
+          "id": "D",
+          "label": "A KMS grant creates cross-VPC DNS resolution."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "mount EFS",
+        "no peering",
+        "network path"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "incorrect_assumption",
+          "attraction": "AssumeRole is the standard cross-account mechanism.",
+          "failure": "It returns credentials but does not modify VPC routes, DNS, or security groups."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "SCPs operate across AWS Organizations.",
+          "failure": "They constrain API permissions and have no networking function."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "KMS grants delegate service access.",
+          "failure": "They apply to cryptographic key usage, not VPC connectivity."
+        }
+      ],
+      "explanation": {
+        "concise": "EFS se monta por NFS. La función necesita alcanzar un mount target por red antes de que IAM o la file-system policy puedan importar.",
+        "testedPattern": "Network before authorization",
+        "correctChoiceWins": "B reconoce que conectividad y permisos son requisitos independientes.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "incorrect_assumption",
+            "attraction": "AssumeRole is the standard cross-account mechanism.",
+            "failure": "It returns credentials but does not modify VPC routes, DNS, or security groups."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "SCPs operate across AWS Organizations.",
+            "failure": "They constrain API permissions and have no networking function."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "KMS grants delegate service access.",
+            "failure": "They apply to cryptographic key usage, not VPC connectivity."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 23
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "efs",
+        "vpc-peering",
+        "assume-role-trap"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-network-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_network_identity",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Diagnose cross-account service access",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Order the diagnostic checks from lowest layer to service authorization.",
+      "prompt": "Order the troubleshooting flow for a private workload that cannot use a service in another account.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "network-path",
+          "label": "Verify routes, peering/transit connectivity, DNS, security groups, and the service port."
+        },
+        {
+          "id": "aws-principal",
+          "label": "Verify the active IAM principal and its identity-based permissions."
+        },
+        {
+          "id": "resource-gate",
+          "label": "Verify the target role trust or resource-based policy."
+        },
+        {
+          "id": "service-local",
+          "label": "Verify service-local controls such as EKS access entries/RBAC or EFS authorization."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "network-path",
+          "aws-principal",
+          "resource-gate",
+          "service-local"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "routes",
+        "IAM principal",
+        "resource policy",
+        "service-local"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La secuencia comienza por alcance de red y termina en la autorización específica del servicio.",
+        "testedPattern": "Layered troubleshooting",
+        "correctChoiceWins": "Cada paso elimina una clase distinta de falla sin mezclar síntomas.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 23
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "troubleshooting",
+        "workflow"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-network-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_network_identity",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map the failure symptom to the layer",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each symptom to the most likely layer to investigate first.",
+      "prompt": "A central deployment workload accesses private services in application accounts.",
+      "answerOptions": [
+        {
+          "id": "network",
+          "label": "Network path"
+        },
+        {
+          "id": "aws-auth",
+          "label": "AWS IAM/resource authorization"
+        },
+        {
+          "id": "service-auth",
+          "label": "Service-local authorization"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "timeout-2049",
+          "label": "NFS connection to an EFS mount target times out on port 2049."
+        },
+        {
+          "id": "sts-denied",
+          "label": "sts:AssumeRole returns AccessDenied."
+        },
+        {
+          "id": "eks-forbidden",
+          "label": "The role obtains EKS credentials but kubectl returns Forbidden."
+        },
+        {
+          "id": "kms-denied",
+          "label": "The object is readable but kms:Decrypt returns AccessDenied."
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "timeout-2049": "network",
+          "sts-denied": "aws-auth",
+          "eks-forbidden": "service-auth",
+          "kms-denied": "aws-auth"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "timeout",
+        "AccessDenied",
+        "Forbidden"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Los síntomas guían a la capa: timeout suele ser red, AccessDenied es autorización AWS y Forbidden de Kubernetes es autorización del clúster.",
+        "testedPattern": "Symptom-driven diagnosis",
+        "correctChoiceWins": "El mapeo evita cambiar políticas cuando la ruta está rota o cambiar rutas cuando falta RBAC.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 23
+        },
+        {
+          "bank": "verified",
+          "questionId": 43
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "mapping",
+        "diagnosis"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-network-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_network_identity",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Complete a cross-account EFS mount design",
+      "difficulty": "practice",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select TWO independent controls.",
+      "prompt": "A Lambda function in Account B runs in a VPC and must mount EFS in Account A. Which TWO controls address the essential cross-account layers?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Connect the VPCs with supported routing such as VPC peering or a transit gateway, and allow NFS traffic to the EFS mount target."
+        },
+        {
+          "id": "B",
+          "label": "Give the Lambda execution role the required EFS permissions and configure EFS authorization for the workload."
+        },
+        {
+          "id": "C",
+          "label": "Make the Lambda function assume the root user identity in Account A."
+        },
+        {
+          "id": "D",
+          "label": "Create an SCP that allows elasticfilesystem:ClientMount."
+        },
+        {
+          "id": "E",
+          "label": "Create a public IP address for the EFS mount target."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Lambda",
+        "EFS",
+        "another account",
+        "Select TWO"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Changing to an identity in Account A seems to solve cross-account access.",
+          "failure": "Root cannot be assumed, and identity alone does not provide NFS connectivity."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "SCPs can mention EFS actions.",
+          "failure": "An SCP does not grant permissions and cannot create the network path."
+        },
+        {
+          "optionId": "E",
+          "errorCause": "service_confusion",
+          "attraction": "Public addressing appears to make the file system reachable.",
+          "failure": "EFS mount targets are accessed through VPC networking; exposing a public target is not the design."
+        }
+      ],
+      "explanation": {
+        "concise": "El montaje necesita red NFS y autorización del cliente. Las dos respuestas cubren capas independientes.",
+        "testedPattern": "Network plus IAM/resource authorization",
+        "correctChoiceWins": "A crea alcance privado; B autoriza el workload para montar el sistema.",
+        "distractorReview": [
+          {
+            "optionId": "C",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Changing to an identity in Account A seems to solve cross-account access.",
+            "failure": "Root cannot be assumed, and identity alone does not provide NFS connectivity."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "SCPs can mention EFS actions.",
+            "failure": "An SCP does not grant permissions and cannot create the network path."
+          },
+          {
+            "optionId": "E",
+            "errorCause": "service_confusion",
+            "attraction": "Public addressing appears to make the file system reachable.",
+            "failure": "EFS mount targets are accessed through VPC networking; exposing a public target is not the design."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 23
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "efs",
+        "multi-select",
+        "network"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-network-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_network_identity",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "EKS authentication is not Kubernetes authorization",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST final correction after role assumption succeeds.",
+      "prompt": "A central build project assumes a deployment role in an application account. AWS STS succeeds and the EKS endpoint is reachable, but kubectl returns Forbidden. What should be configured?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create an EKS access entry for the deployment role and associate appropriate cluster access permissions, or use the legacy aws-auth mapping when required by the cluster authentication mode."
+        },
+        {
+          "id": "B",
+          "label": "Add another sts:AssumeRole statement to the source role."
+        },
+        {
+          "id": "C",
+          "label": "Create a NAT gateway for the cluster."
+        },
+        {
+          "id": "D",
+          "label": "Grant the deployment role permission to modify the KMS key used by the artifact bucket."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "STS succeeds",
+        "endpoint reachable",
+        "kubectl Forbidden"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "AssumeRole is part of the cross-account workflow.",
+          "failure": "The role session already exists; the remaining failure is Kubernetes access authorization."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Kubernetes API failures can be connectivity problems.",
+          "failure": "The endpoint is already reachable and returns an authorization response."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "KMS is often present in deployment pipelines.",
+          "failure": "Artifact decryption is unrelated to a Kubernetes Forbidden response after authentication."
+        }
+      ],
+      "explanation": {
+        "concise": "La sesión IAM ya fue autenticada. EKS todavía debe mapear o registrar el principal y autorizarlo dentro del clúster.",
+        "testedPattern": "Service-local authorization after IAM",
+        "correctChoiceWins": "A corrige exactamente la capa Kubernetes. Los access entries son el método recomendado; aws-auth aparece en escenarios heredados.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "elimination_failure",
+            "attraction": "AssumeRole is part of the cross-account workflow.",
+            "failure": "The role session already exists; the remaining failure is Kubernetes access authorization."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "Kubernetes API failures can be connectivity problems.",
+            "failure": "The endpoint is already reachable and returns an authorization response."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "KMS is often present in deployment pipelines.",
+            "failure": "Artifact decryption is unrelated to a Kubernetes Forbidden response after authentication."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "eks",
+        "access-entry",
+        "rbac"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cag-network-bank-23",
+      "version": "drill-definition-v1",
+      "topicId": "cross_account_network_identity",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: Lambda mounts cross-account EFS",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the verified bank question by writing one NETWORK requirement and one AUTHORIZATION requirement.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "D"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Lambda",
+        "EFS",
+        "cross-account",
+        "Select TWO"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Retorno al banco para comprobar que no se use AssumeRole como sustituto de conectividad.",
+        "testedPattern": "Network plus authorization bank return",
+        "correctChoiceWins": "La selección completa debe incluir alcance de red y permisos de montaje.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 23
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ],
+      "tags": [
+        "bank-return",
+        "efs",
+        "multi-select"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "capm-ssm-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "ssm_private_instance_management",
+      "domainId": "security_compliance",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "What actually runs where for Systems Manager",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the implementation chain and identify the responsibility of each component.",
+      "prompt": "SSM Agent runs inside the EC2 operating system. An IAM role grants Systems Manager API permissions. An instance profile attaches that role to EC2. The launch template applies the instance profile to every Auto Scaling replacement. The instance initiates outbound HTTPS to Systems Manager through NAT or interface VPC endpoints.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "SSM Agent",
+        "IAM role",
+        "instance profile",
+        "launch template",
+        "outbound HTTPS",
+        "interface VPC endpoints"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El agente corre dentro de EC2; el rol define permisos; el instance profile conecta el rol con EC2; y el launch template garantiza que cada reemplazo del ASG reciba la misma configuración.",
+        "testedPattern": "Systems Manager managed-node component ownership",
+        "correctChoiceWins": "Separar software, permisos, adjunto de identidad y conectividad evita suponer que una sola pieza resuelve todo.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "systems-manager",
+        "ssm-agent",
+        "instance-profile",
+        "launch-template"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "capm-ssm-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "ssm_private_instance_management",
+      "domainId": "security_compliance",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Does Session Manager require public internet?",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the statement that correctly describes private Systems Manager connectivity.",
+      "prompt": "An EC2 instance is in a private subnet with no public IP. The company prohibits internet access but requires Session Manager. Which statement is correct?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Session Manager always requires an internet gateway and a public IPv4 address."
+        },
+        {
+          "id": "B",
+          "label": "The instance can use Systems Manager interface VPC endpoints and initiate outbound HTTPS without inbound SSH."
+        },
+        {
+          "id": "C",
+          "label": "A bastion host is required because Session Manager uses SSH underneath."
+        },
+        {
+          "id": "D",
+          "label": "A bucket policy on the Systems Manager service replaces all network connectivity."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "private subnet",
+        "prohibits internet access",
+        "Session Manager"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "incorrect_assumption",
+          "attraction": "AWS service APIs are often reached through public endpoints.",
+          "failure": "Interface VPC endpoints provide private connectivity without a public IP, internet gateway, or NAT."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Bastion hosts are a traditional administrative-access pattern.",
+          "failure": "SSM Agent initiates the managed channel; inbound SSH is not required."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Resource policies can authorize access to some AWS services.",
+          "failure": "Authorization policy cannot replace the required network path to Systems Manager endpoints."
+        }
+      ],
+      "explanation": {
+        "concise": "Una instancia privada puede administrarse con Session Manager mediante PrivateLink. El agente inicia HTTPS hacia los endpoints; no necesita IP pública ni entrada SSH.",
+        "testedPattern": "Private Systems Manager connectivity",
+        "correctChoiceWins": "B satisface simultáneamente no internet, administración remota y ausencia de puertos administrativos entrantes.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "session-manager",
+        "private-subnet",
+        "privatelink"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "capm-ssm-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "ssm_private_instance_management",
+      "domainId": "security_compliance",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order the private managed-node bootstrap",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the implementation steps in the correct operational order.",
+      "prompt": "A private Auto Scaling group must register every replacement instance with Systems Manager without manual access.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "role",
+          "label": "Create an EC2 IAM role with Systems Manager permissions."
+        },
+        {
+          "id": "profile",
+          "label": "Create/use an instance profile containing the role."
+        },
+        {
+          "id": "template",
+          "label": "Reference the instance profile in the launch template and ensure SSM Agent is installed."
+        },
+        {
+          "id": "network",
+          "label": "Provide outbound HTTPS through NAT or the required interface VPC endpoints."
+        },
+        {
+          "id": "launch",
+          "label": "Launch or replace instances and verify they appear as managed nodes."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "role",
+          "profile",
+          "template",
+          "network",
+          "launch"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Auto Scaling group",
+        "every replacement instance",
+        "without manual access"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Primero se define la identidad, después se adjunta a EC2 mediante el instance profile, luego el launch template la replica, y finalmente la red permite que el agente se registre.",
+        "testedPattern": "Automatic Systems Manager registration for Auto Scaling",
+        "correctChoiceWins": "El orden garantiza que cada instancia nazca con software, identidad y conectividad suficientes antes de intentar registrarse.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "workflow",
+        "autoscaling",
+        "managed-node"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "capm-ssm-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "ssm_private_instance_management",
+      "domainId": "security_compliance",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map each private-management component to its responsibility",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component ID to the responsibility ID it owns.",
+      "prompt": "Match the implementation component to the problem it solves.",
+      "answerOptions": [
+        {
+          "id": "permissions",
+          "label": "Grants AWS API permissions to the EC2 workload"
+        },
+        {
+          "id": "attachment",
+          "label": "Attaches the IAM role to EC2"
+        },
+        {
+          "id": "software",
+          "label": "Runs commands and opens the managed channel from the operating system"
+        },
+        {
+          "id": "replication",
+          "label": "Applies the same configuration to each Auto Scaling replacement"
+        },
+        {
+          "id": "private-network",
+          "label": "Provides private HTTPS connectivity to AWS service APIs"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "iam-role",
+          "label": "IAM role"
+        },
+        {
+          "id": "instance-profile",
+          "label": "Instance profile"
+        },
+        {
+          "id": "ssm-agent",
+          "label": "SSM Agent"
+        },
+        {
+          "id": "launch-template",
+          "label": "Launch template"
+        },
+        {
+          "id": "interface-endpoints",
+          "label": "Interface VPC endpoints"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "iam-role": "permissions",
+          "instance-profile": "attachment",
+          "ssm-agent": "software",
+          "launch-template": "replication",
+          "interface-endpoints": "private-network"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "IAM role",
+        "instance profile",
+        "SSM Agent",
+        "launch template",
+        "interface VPC endpoints"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Cada componente resuelve una capa distinta. El error típico es tratar rol e instance profile como sinónimos o creer que IAM crea conectividad.",
+        "testedPattern": "Systems Manager architecture ownership",
+        "correctChoiceWins": "El mapeo correcto separa permisos, adjunto de identidad, software, replicación y red.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "architecture-mapping",
+        "instance-profile",
+        "vpc-endpoints"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "capm-ssm-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "ssm_private_instance_management",
+      "domainId": "security_compliance",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate the internet-first management design",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the complete solution with the least unnecessary exposure.",
+      "prompt": "A company runs an Auto Scaling group in private subnets. Instances have no public IP addresses and must not access the internet. Operators need shell access, Run Command, and centralized session logs. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Move the instances to public subnets, assign Elastic IP addresses, and allow SSH from the corporate CIDR."
+        },
+        {
+          "id": "B",
+          "label": "Install SSM Agent, attach an instance profile with Systems Manager permissions through the launch template, create the required interface VPC endpoints, and add private endpoints needed for the selected logging destination."
+        },
+        {
+          "id": "C",
+          "label": "Create a bastion host and copy one SSH private key to every Auto Scaling instance."
+        },
+        {
+          "id": "D",
+          "label": "Add AmazonSSMManagedInstanceCore to an IAM role but do not attach the role or provide a network path."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "private subnets",
+        "must not access the internet",
+        "Auto Scaling group",
+        "centralized session logs",
+        "BEST"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Public addressing makes remote administration straightforward.",
+          "failure": "It violates the explicit no-internet requirement and adds inbound administrative exposure."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "A bastion is a familiar private-subnet access pattern.",
+          "failure": "It adds key distribution and bastion operations when Session Manager can meet the requirement without inbound SSH."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "knowledge_gap",
+          "attraction": "The managed policy name sounds like the complete Systems Manager setup.",
+          "failure": "The role must reach EC2 through an instance profile, and SSM Agent still requires a network path to service endpoints."
+        }
+      ],
+      "explanation": {
+        "concise": "La solución completa incluye agente, permisos adjuntos mediante instance profile, replicación en el launch template y conectividad privada. Los logs pueden requerir endpoints adicionales según el destino.",
+        "testedPattern": "Complete private Systems Manager architecture",
+        "correctChoiceWins": "B satisface acceso operativo, escalado automático, no internet y registro centralizado sin introducir SSH ni claves permanentes.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "distractor-elimination",
+        "private-management",
+        "session-logging"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "capm-ssm-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "ssm_private_instance_management",
+      "domainId": "security_compliance",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "New Auto Scaling instances are not managed nodes",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST correction that fixes every future replacement instance.",
+      "prompt": "An Auto Scaling group uses a custom AMI with SSM Agent installed. Existing instances were manually attached to an IAM role and appear in Systems Manager. After an instance refresh, all replacement instances are missing from Fleet Manager. The private subnets already have working Systems Manager interface endpoints. What should the DevOps engineer do?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Attach the IAM role manually to each new instance after Auto Scaling launches it."
+        },
+        {
+          "id": "B",
+          "label": "Update the launch template to reference the EC2 instance profile that contains the Systems Manager role, and start a new instance refresh."
+        },
+        {
+          "id": "C",
+          "label": "Add an inbound security-group rule for TCP 22 from the Systems Manager public IP ranges."
+        },
+        {
+          "id": "D",
+          "label": "Create a new Systems Manager document for each replacement instance."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Auto Scaling group",
+        "custom AMI with SSM Agent",
+        "every replacement instance",
+        "launch template",
+        "interface endpoints already working"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "elimination_failure",
+          "attraction": "It repeats the manual action that made existing instances work.",
+          "failure": "It is not scalable and will fail again after every replacement."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Remote shell access is commonly associated with TCP 22.",
+          "failure": "Session Manager does not require inbound SSH; the stated network path is already working."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Systems Manager documents define commands and automation behavior.",
+          "failure": "A document does not attach an EC2 identity or register the instance as a managed node."
+        }
+      ],
+      "explanation": {
+        "concise": "El error está en la plantilla de lanzamiento. Las modificaciones manuales a instancias existentes no se heredan. El ASG debe crear cada reemplazo con el instance profile correcto.",
+        "testedPattern": "Launch template as the source of truth for managed-node identity",
+        "correctChoiceWins": "B corrige la configuración declarativa que usa Auto Scaling y reemplaza las instancias con una identidad repetible.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "exam-scenario",
+        "instance-refresh",
+        "launch-template"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "capm-ssm-bank-47",
+      "version": "drill-definition-v1",
+      "topicId": "ssm_private_instance_management",
+      "domainId": "security_compliance",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: Systems Manager hybrid activation",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the verified bank question, then contrast hybrid activation with the EC2 instance-profile model.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "on-premises",
+        "hybrid",
+        "activation code",
+        "activation ID",
+        "instance limit"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno distingue dos modelos: EC2 usa un instance profile; los nodos híbridos usan una activación y un rol de servicio para registrarse.",
+        "testedPattern": "EC2 managed-node identity versus hybrid activation",
+        "correctChoiceWins": "La respuesta debe justificar por qué una activación puede registrar varios servidores híbridos y por qué sus identificadores usan el prefijo mi-.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 47
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "systems-manager",
+        "hybrid-activation"
+      ],
+      "active": true
+    }
+  ],
+  "sourceQuestionRefs": [
+    {
+      "bank": "verified",
+      "questionId": 20
+    },
+    {
+      "bank": "verified",
+      "questionId": 23
+    },
+    {
+      "bank": "verified",
+      "questionId": 30
+    },
+    {
+      "bank": "verified",
+      "questionId": 39
+    },
+    {
+      "bank": "verified",
+      "questionId": 43
+    },
+    {
+      "bank": "verified",
+      "questionId": 47
+    },
+    {
+      "bank": "verified",
+      "questionId": 82
+    },
+    {
+      "bank": "verified",
+      "questionId": 92
+    }
+  ],
+  "prerequisiteRelationships": [
+    {
+      "topicId": "cross_account_role_flow",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "cross_account_s3_kms",
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ]
+    },
+    {
+      "topicId": "cross_account_codepipeline",
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow",
+        "cross_account_s3_kms"
+      ]
+    },
+    {
+      "topicId": "cross_account_network_identity",
+      "prerequisiteTopicIds": [
+        "cross_account_role_flow"
+      ]
+    },
+    {
+      "topicId": "ssm_private_instance_management",
+      "prerequisiteTopicIds": []
+    }
+  ],
+  "tags": [
+    "dop-c02",
+    "cross-account",
+    "iam",
+    "sts",
+    "s3",
+    "kms",
+    "codepipeline",
+    "systems-manager",
+    "private-subnet",
+    "instance-profile",
+    "vpc-endpoints",
+    "personalized"
+  ]
+}

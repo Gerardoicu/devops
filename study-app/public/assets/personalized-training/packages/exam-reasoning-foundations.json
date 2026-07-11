@@ -1,0 +1,2980 @@
+{
+  "schemaVersion": "1.0",
+  "packageId": "exam-reasoning-foundations",
+  "version": "1.0.0",
+  "title": "Exam Reasoning Foundations",
+  "description": "Personalized DOP-C02 training for decisive English keywords, requirement extraction, BEST-answer elimination, exact multi-select construction, and account/resource scope reasoning.",
+  "topicDescriptors": [
+    {
+      "topicId": "exam_reasoning_keywords",
+      "title": "Decisive Keywords and Requirement Extraction",
+      "domainId": "sdlc_automation",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "developing",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "decisive_keywords",
+        "requirement_before_service",
+        "unsupported_assumption",
+        "no_public_internet_assumption"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 30
+        },
+        {
+          "bank": "verified",
+          "questionId": 88
+        }
+      ]
+    },
+    {
+      "topicId": "exam_reasoning_elimination",
+      "title": "Distractor Elimination and the BEST Answer",
+      "domainId": "incident_event_response",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "relatedPatternIds": [
+        "best_vs_possible",
+        "minimum_operational_overhead",
+        "same_artifact_promotion",
+        "direct_root_cause"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        },
+        {
+          "bank": "verified",
+          "questionId": 5
+        },
+        {
+          "bank": "verified",
+          "questionId": 6
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        }
+      ]
+    },
+    {
+      "topicId": "exam_reasoning_multi_select",
+      "title": "Multi-select Completeness",
+      "domainId": "security_compliance",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "relatedPatternIds": [
+        "select_exact_count",
+        "independent_requirements",
+        "partial_solution",
+        "conflicting_options"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 7
+        },
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 94
+        },
+        {
+          "bank": "verified",
+          "questionId": 98
+        },
+        {
+          "bank": "verified",
+          "questionId": 102
+        },
+        {
+          "bank": "verified",
+          "questionId": 104
+        }
+      ]
+    },
+    {
+      "topicId": "exam_reasoning_scope",
+      "title": "Account, Region, Resource, and Policy Scope",
+      "domainId": "configuration_management_iac",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "relatedPatternIds": [
+        "source_vs_target_account",
+        "role_trust_location",
+        "resource_policy_owner",
+        "kms_key_policy_owner"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 2
+        },
+        {
+          "bank": "verified",
+          "questionId": 34
+        },
+        {
+          "bank": "verified",
+          "questionId": 35
+        },
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 94
+        }
+      ]
+    }
+  ],
+  "conceptMaps": [
+    {
+      "id": "map-requirement-first-ladder",
+      "schemaVersion": "1.0",
+      "topicId": "exam_reasoning_keywords",
+      "title": "Read the scenario before naming a service",
+      "steps": [
+        {
+          "id": "outcome",
+          "label": "1. Outcome",
+          "detail": "Write one sentence describing what must be true after the solution is implemented. Do not name a service yet.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 4
+            },
+            {
+              "bank": "verified",
+              "questionId": 30
+            }
+          ]
+        },
+        {
+          "id": "constraints",
+          "label": "2. Constraints",
+          "detail": "Mark decisive words such as AUTOMATICALLY, CENTRALIZED, CROSS-ACCOUNT, IMMEDIATELY, LEAST OPERATIONAL OVERHEAD, and NO INTERNET.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 25
+            },
+            {
+              "bank": "verified",
+              "questionId": 88
+            }
+          ]
+        },
+        {
+          "id": "scope",
+          "label": "3. Scope",
+          "detail": "Identify the account, Region, resource owner, execution identity, and whether the requirement applies to existing or future resources.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            },
+            {
+              "bank": "verified",
+              "questionId": 98
+            }
+          ]
+        },
+        {
+          "id": "mechanism",
+          "label": "4. Mechanism",
+          "detail": "Only now select the AWS workflow that directly satisfies the outcome, constraints, and scope.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 5
+            },
+            {
+              "bank": "verified",
+              "questionId": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-best-answer-filter",
+      "schemaVersion": "1.0",
+      "topicId": "exam_reasoning_elimination",
+      "title": "Four filters for the BEST answer",
+      "steps": [
+        {
+          "id": "complete",
+          "label": "Complete",
+          "detail": "Does the option satisfy every explicit requirement, not just the main service name?",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 25
+            }
+          ]
+        },
+        {
+          "id": "direct",
+          "label": "Direct",
+          "detail": "Does the option use the native mechanism that solves the stated problem instead of building a parallel workaround?",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 5
+            },
+            {
+              "bank": "verified",
+              "questionId": 6
+            }
+          ]
+        },
+        {
+          "id": "few-assumptions",
+          "label": "Few assumptions",
+          "detail": "Reject options that require unstated network access, custom schedulers, manual steps, or a second artifact build.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 4
+            },
+            {
+              "bank": "verified",
+              "questionId": 30
+            }
+          ]
+        },
+        {
+          "id": "operational-fit",
+          "label": "Operational fit",
+          "detail": "Among complete options, prefer the one with the required automation, resilience, and lower operational overhead.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 7
+            },
+            {
+              "bank": "verified",
+              "questionId": 25
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-multiselect-set-check",
+      "schemaVersion": "1.0",
+      "topicId": "exam_reasoning_multi_select",
+      "title": "Build the complete answer set",
+      "steps": [
+        {
+          "id": "count",
+          "label": "1. Lock the count",
+          "detail": "Write the required number: Select TWO or Select THREE. Do not stop after finding one correct statement.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 7
+            },
+            {
+              "bank": "verified",
+              "questionId": 94
+            }
+          ]
+        },
+        {
+          "id": "requirements",
+          "label": "2. Split requirements",
+          "detail": "Turn the scenario into independent obligations such as detect + remediate, scale + retain, or assume role + decrypt artifact.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            },
+            {
+              "bank": "verified",
+              "questionId": 102
+            }
+          ]
+        },
+        {
+          "id": "map",
+          "label": "3. Map one option to each obligation",
+          "detail": "Each selected option must contribute a necessary capability. Avoid selecting two variations that solve the same subproblem.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 98
+            },
+            {
+              "bank": "verified",
+              "questionId": 104
+            }
+          ]
+        },
+        {
+          "id": "set-validation",
+          "label": "4. Validate the set",
+          "detail": "Check the exact count, reject contradictions, and verify that the combined set satisfies the whole workflow.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 94
+            },
+            {
+              "bank": "verified",
+              "questionId": 102
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-scope-ownership",
+      "schemaVersion": "1.0",
+      "topicId": "exam_reasoning_scope",
+      "title": "Who calls, who trusts, who owns",
+      "steps": [
+        {
+          "id": "caller",
+          "label": "Caller",
+          "detail": "Identify the principal that initiates the action and the identity policy that allows sts:AssumeRole.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "target-role",
+          "label": "Target role",
+          "detail": "The assumable role normally lives in the account that owns the target deployment or resource. Its trust policy names the caller.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "resource-owner",
+          "label": "Resource owner",
+          "detail": "Bucket policies and other resource policies are controlled in the account that owns the resource.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            },
+            {
+              "bank": "verified",
+              "questionId": 94
+            }
+          ]
+        },
+        {
+          "id": "kms-owner",
+          "label": "KMS owner",
+          "detail": "The KMS key policy is controlled where the key exists and must allow the principal that needs decrypt or encrypt access.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "comparison-requirement-vs-service",
+      "topicId": "exam_reasoning_keywords",
+      "leftService": "Requirement statement",
+      "rightService": "Service-shaped assumption",
+      "dimensions": [
+        {
+          "id": "starts-with",
+          "label": "Starts with",
+          "leftValue": "The required outcome and constraint",
+          "rightValue": "A familiar AWS product name"
+        },
+        {
+          "id": "network-example",
+          "label": "Private management example",
+          "leftValue": "Manage instances without public access",
+          "rightValue": "Assume internet access is required"
+        },
+        {
+          "id": "exam-effect",
+          "label": "Exam effect",
+          "leftValue": "Keeps all valid architectures open",
+          "rightValue": "Eliminates the correct private-service path too early"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 88
+        }
+      ]
+    },
+    {
+      "id": "comparison-possible-vs-best",
+      "topicId": "exam_reasoning_elimination",
+      "leftService": "Technically possible",
+      "rightService": "BEST fit",
+      "dimensions": [
+        {
+          "id": "requirements",
+          "label": "Requirements",
+          "leftValue": "Solves part of the scenario",
+          "rightValue": "Satisfies every explicit requirement"
+        },
+        {
+          "id": "assumptions",
+          "label": "Assumptions",
+          "leftValue": "Needs unstated custom steps",
+          "rightValue": "Uses the stated architecture and native workflow"
+        },
+        {
+          "id": "operations",
+          "label": "Operations",
+          "leftValue": "Adds maintenance or rebuilds",
+          "rightValue": "Minimizes operational overhead while preserving control"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        }
+      ]
+    },
+    {
+      "id": "comparison-single-vs-multi",
+      "topicId": "exam_reasoning_multi_select",
+      "leftService": "Single-choice reasoning",
+      "rightService": "Multi-select reasoning",
+      "dimensions": [
+        {
+          "id": "goal",
+          "label": "Goal",
+          "leftValue": "Find the one option that best satisfies the scenario",
+          "rightValue": "Build the exact complete set"
+        },
+        {
+          "id": "stop-rule",
+          "label": "Stop rule",
+          "leftValue": "Stop after one complete winner",
+          "rightValue": "Continue until the required count and every obligation are covered"
+        },
+        {
+          "id": "common-trap",
+          "label": "Common trap",
+          "leftValue": "Choosing a plausible but incomplete answer",
+          "rightValue": "Choosing one correct component and one redundant or conflicting component"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 7
+        },
+        {
+          "bank": "verified",
+          "questionId": 94
+        },
+        {
+          "bank": "verified",
+          "questionId": 102
+        }
+      ]
+    },
+    {
+      "id": "comparison-caller-vs-target",
+      "topicId": "exam_reasoning_scope",
+      "leftService": "Caller side",
+      "rightService": "Target/resource-owner side",
+      "dimensions": [
+        {
+          "id": "identity",
+          "label": "Identity control",
+          "leftValue": "Permission to call sts:AssumeRole",
+          "rightValue": "Role trust policy accepts the caller"
+        },
+        {
+          "id": "resource",
+          "label": "Resource control",
+          "leftValue": "Uses temporary role credentials",
+          "rightValue": "Bucket/resource policy permits the role"
+        },
+        {
+          "id": "encryption",
+          "label": "Encryption control",
+          "leftValue": "Requests decrypt through the assumed role",
+          "rightValue": "KMS key policy/grants allow that role"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ]
+    }
+  ],
+  "drillDefinitions": [
+    {
+      "drillId": "erf-req-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_keywords",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Requirement-first reading method",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the method. Do not choose an AWS service.",
+      "prompt": "For every scenario, write four lines in this order: OUTCOME, CONSTRAINTS, SCOPE, MECHANISM. The service name belongs only on the fourth line.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "OUTCOME",
+        "CONSTRAINTS",
+        "SCOPE",
+        "MECHANISM"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El objetivo es impedir que un servicio conocido reemplace la lectura del requisito. Primero se fija qué debe ocurrir, bajo qué restricciones y en qué alcance.",
+        "testedPattern": "Pattern → Workflow → Service",
+        "correctChoiceWins": "La secuencia reduce suposiciones no escritas y conserva abiertas las arquitecturas válidas hasta entender el problema.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 30
+        },
+        {
+          "bank": "verified",
+          "questionId": 88
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "exam-reading",
+        "mechanism",
+        "keywords"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-req-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_keywords",
+      "domainId": "sdlc_automation",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Requirement or assumption?",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the note that states the actual requirement.",
+      "prompt": "A company must administer EC2 instances in private subnets. The instances cannot have public IP addresses, and no inbound administration port may be opened. Which note correctly captures the requirement before a service is selected?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Provide internet access so administrators can reach the instances."
+        },
+        {
+          "id": "B",
+          "label": "Provide a private management path that requires no inbound administration port."
+        },
+        {
+          "id": "C",
+          "label": "Record administrator API activity for later audit."
+        },
+        {
+          "id": "D",
+          "label": "Scan the instances for software vulnerabilities."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "private subnets",
+        "no public IP",
+        "no inbound"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Internet access sounds like the normal way to reach AWS services.",
+          "failure": "The requirement is private administration, not public egress. Private service endpoints can satisfy it."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "CloudTrail is associated with AWS account activity.",
+          "failure": "Audit logging does not provide an interactive management channel to the instances."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "Inspector uses an agent and evaluates EC2 workloads.",
+          "failure": "Vulnerability assessment is not the requested remote management mechanism."
+        }
+      ],
+      "explanation": {
+        "concise": "La frase correcta conserva el requisito sin inventar Internet. El acceso privado y sin puertos entrantes es el resultado que la arquitectura debe cumplir.",
+        "testedPattern": "Requirement before service",
+        "correctChoiceWins": "B transforma las restricciones en una condición verificable sin introducir una solución ni una dependencia no solicitada.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Internet access sounds like the normal way to reach AWS services.",
+            "failure": "The requirement is private administration, not public egress. Private service endpoints can satisfy it."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "CloudTrail is associated with AWS account activity.",
+            "failure": "Audit logging does not provide an interactive management channel to the instances."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "Inspector uses an agent and evaluates EC2 workloads.",
+            "failure": "Vulnerability assessment is not the requested remote management mechanism."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 88
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "exam-reading",
+        "private-management",
+        "unsupported-assumption"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-req-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_keywords",
+      "domainId": "sdlc_automation",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order the reading workflow",
+      "difficulty": "intro",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the analysis steps in the order that should be used before selecting an answer.",
+      "prompt": "Order the exam-reading workflow.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "outcome",
+          "label": "State the required end state."
+        },
+        {
+          "id": "constraints",
+          "label": "Mark decisive operational constraints."
+        },
+        {
+          "id": "scope",
+          "label": "Locate the account, Region, resource, and owner."
+        },
+        {
+          "id": "mechanism",
+          "label": "Choose the AWS mechanism that satisfies the first three steps."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "outcome",
+          "constraints",
+          "scope",
+          "mechanism"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "required",
+        "constraints",
+        "scope",
+        "mechanism"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El orden correcto evita elegir por reconocimiento de servicio. La arquitectura se evalúa después de fijar resultado, restricciones y alcance.",
+        "testedPattern": "Structured scenario interpretation",
+        "correctChoiceWins": "La secuencia convierte un escenario largo en un contrato operativo corto antes de comparar opciones.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 30
+        },
+        {
+          "bank": "verified",
+          "questionId": 88
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "workflow",
+        "exam-reading"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-req-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_keywords",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Translate AUTOMATICALLY into a workflow",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the option that directly satisfies detection and automatic remediation with the least custom code.",
+      "prompt": "An organization must detect S3 buckets that allow public read access and AUTOMATICALLY remediate noncompliant buckets across member accounts. Which solution is the BEST fit?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Deploy an AWS Config rule and associate automatic remediation backed by an AWS Systems Manager Automation document across the accounts."
+        },
+        {
+          "id": "B",
+          "label": "Run a scheduled Lambda function that lists every bucket and changes any public bucket policy."
+        },
+        {
+          "id": "C",
+          "label": "Deliver CloudTrail logs to S3 and query them with Athena each day."
+        },
+        {
+          "id": "D",
+          "label": "Enable Security Hub and review the findings manually."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "AUTOMATICALLY",
+        "noncompliant",
+        "across member accounts",
+        "least custom code"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "A scheduled custom scanner appears flexible and automatic.",
+          "failure": "It adds custom code and does not use the direct compliance-remediation workflow requested."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "CloudTrail and Athena are useful for audit analysis.",
+          "failure": "They do not evaluate current resource compliance and automatically remediate the resource."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "Security Hub centralizes findings.",
+          "failure": "A finding alone does not perform the requested configuration remediation."
+        }
+      ],
+      "explanation": {
+        "concise": "La pregunta exige detectar y remediar automáticamente. AWS Config evalúa el cumplimiento y la remediación puede ejecutar un documento de Systems Manager Automation.",
+        "testedPattern": "Detect + remediate, not report only",
+        "correctChoiceWins": "A cubre las dos obligaciones con mecanismos administrados y evita construir un escáner periódico personalizado.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "elimination_failure",
+            "attraction": "A scheduled custom scanner appears flexible and automatic.",
+            "failure": "It adds custom code and does not use the direct compliance-remediation workflow requested."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "CloudTrail and Athena are useful for audit analysis.",
+            "failure": "They do not evaluate current resource compliance and automatically remediate the resource."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "Security Hub centralizes findings.",
+            "failure": "A finding alone does not perform the requested configuration remediation."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 7
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "aws-config",
+        "automatic-remediation",
+        "keyword"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-req-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_keywords",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Private instance management without internet",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST architecture. Do not assume public internet is required.",
+      "prompt": "An Auto Scaling group launches EC2 instances in private subnets with no internet gateway. Security policy prohibits inbound SSH. Operations must collect software inventory and run administrative commands on every instance. Which solution meets the requirements?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Add a NAT gateway, install SSH keys, and allow inbound SSH from the corporate CIDR."
+        },
+        {
+          "id": "B",
+          "label": "Install and configure SSM Agent in the image, attach an instance profile with AmazonSSMManagedInstanceCore permissions, and create the required Systems Manager VPC interface endpoints."
+        },
+        {
+          "id": "C",
+          "label": "Enable CloudTrail data events and deliver the logs to an S3 bucket."
+        },
+        {
+          "id": "D",
+          "label": "Install Amazon Inspector and schedule recurring scans."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "private subnets",
+        "no internet gateway",
+        "prohibits inbound SSH",
+        "inventory",
+        "run commands"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "incorrect_assumption",
+          "attraction": "A NAT gateway is a familiar way to reach AWS public endpoints.",
+          "failure": "The requirement explicitly avoids internet access; Systems Manager interface endpoints provide private connectivity."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "CloudTrail and S3 provide audit records.",
+          "failure": "They do not make an EC2 instance a managed node or execute commands on it."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "Inspector can assess EC2 vulnerabilities.",
+          "failure": "It does not provide the requested inventory and command-execution workflow."
+        }
+      ],
+      "explanation": {
+        "concise": "Una instancia puede administrarse como managed node sin IP pública ni SSH. Requiere agente, permisos mediante instance profile y conectividad privada hacia los endpoints de Systems Manager.",
+        "testedPattern": "Private AWS service access",
+        "correctChoiceWins": "B satisface administración, inventario y ejecución de comandos sin contradecir las restricciones de red.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "incorrect_assumption",
+            "attraction": "A NAT gateway is a familiar way to reach AWS public endpoints.",
+            "failure": "The requirement explicitly avoids internet access; Systems Manager interface endpoints provide private connectivity."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "CloudTrail and S3 provide audit records.",
+            "failure": "They do not make an EC2 instance a managed node or execute commands on it."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "Inspector can assess EC2 vulnerabilities.",
+            "failure": "It does not provide the requested inventory and command-execution workflow."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 88
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "systems-manager",
+        "instance-profile",
+        "vpc-endpoints",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-req-spaced-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_keywords",
+      "domainId": "sdlc_automation",
+      "activityType": "spaced_review",
+      "drillForm": "spaced_review",
+      "title": "Thirty-second requirement reset",
+      "difficulty": "intro",
+      "estimatedMinutes": 2,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Complete the mental reset before the next scenario.",
+      "prompt": "Say the four labels aloud: outcome, constraints, scope, mechanism. Then name one assumption you must not add unless the scenario states it.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "outcome",
+        "constraints",
+        "scope",
+        "mechanism"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Este repaso refuerza el orden de lectura. No evalúa una respuesta de examen.",
+        "testedPattern": "Spaced review",
+        "correctChoiceWins": "La rutina corta reduce decisiones impulsivas basadas en una palabra familiar.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 30
+        },
+        {
+          "bank": "verified",
+          "questionId": 88
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "spaced-review",
+        "exam-reading"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-req-bank-30",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_keywords",
+      "domainId": "sdlc_automation",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: automation requirement",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the verified bank question loaded by reference. Identify the automation requirement before selecting an option.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "automated",
+        "latest",
+        "pipeline"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Retorno al banco para comprobar que el método de lectura se transfiere a un escenario completo.",
+        "testedPattern": "Requirement-first bank return",
+        "correctChoiceWins": "El objetivo es justificar la opción por el flujo operativo solicitado, no por memoria de la letra.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 30
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "automation"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-best-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_elimination",
+      "domainId": "incident_event_response",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "The BEST answer filter",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the four filters before solving another scenario.",
+      "prompt": "A BEST answer is complete, direct, low-assumption, and operationally aligned. A merely possible answer normally fails at least one of those filters.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "BEST",
+        "MOST",
+        "LEAST OPERATIONAL OVERHEAD",
+        "MUST"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Las preguntas profesionales suelen incluir varias opciones posibles. La ganadora cumple todo el contrato operativo con menos suposiciones y sobrecarga.",
+        "testedPattern": "BEST versus possible",
+        "correctChoiceWins": "Los cuatro filtros convierten una comparación subjetiva en una eliminación defendible.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        },
+        {
+          "bank": "verified",
+          "questionId": 5
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "best-answer",
+        "elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-best-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_elimination",
+      "domainId": "incident_event_response",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Promote or rebuild?",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the option that preserves the tested artifact with the least operational overhead.",
+      "prompt": "A release must use the exact artifact that passed integration tests and must require approval before production. Which approach is the BEST fit?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Rebuild the source in a separate production job after approval."
+        },
+        {
+          "id": "B",
+          "label": "Promote the same pipeline artifact through a manual approval stage and then deploy it to production."
+        },
+        {
+          "id": "C",
+          "label": "Copy the artifact manually to the production bucket after approval."
+        },
+        {
+          "id": "D",
+          "label": "Create a second independent pipeline that polls the source repository and rebuilds the release."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "exact artifact",
+        "passed integration tests",
+        "approval",
+        "least operational overhead"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "elimination_failure",
+          "attraction": "Rebuilding in production feels safer because it is a separate controlled step.",
+          "failure": "It creates a different artifact from the one that passed testing, weakening promotion integrity and adding overhead."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Manual copying appears simple for infrequent releases.",
+          "failure": "It is not an automated promotion path and creates drift and audit risk."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "A second pipeline can isolate production.",
+          "failure": "Separate pipelines often duplicate logic and may rebuild or select a different artifact instead of promoting the tested revision."
+        }
+      ],
+      "explanation": {
+        "concise": "Promover el mismo artefacto preserva lo probado. Reconstruir o copiar manualmente introduce diferencias, pasos extras y menor trazabilidad.",
+        "testedPattern": "Artifact promotion integrity",
+        "correctChoiceWins": "B cubre aprobación y promoción sin crear una segunda cadena de build.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "elimination_failure",
+            "attraction": "Rebuilding in production feels safer because it is a separate controlled step.",
+            "failure": "It creates a different artifact from the one that passed testing, weakening promotion integrity and adding overhead."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Manual copying appears simple for infrequent releases.",
+            "failure": "It is not an automated promotion path and creates drift and audit risk."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "A second pipeline can isolate production.",
+            "failure": "Separate pipelines often duplicate logic and may rebuild or select a different artifact instead of promoting the tested revision."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 30
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "cicd",
+        "same-artifact",
+        "best-answer"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-best-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_elimination",
+      "domainId": "incident_event_response",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Choose the direct query plane",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Eliminate options that split the required data or add an unrequested custom pipeline.",
+      "prompt": "Operations must query EC2 application logs and AWS API activity from one managed query experience with minimal custom infrastructure. Which solution is the BEST fit?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Send application logs to CloudWatch Logs, keep CloudTrail logs only in S3, and query both with Athena."
+        },
+        {
+          "id": "B",
+          "label": "Send application logs to CloudWatch Logs, deliver CloudTrail events to CloudWatch Logs, and query both with CloudWatch Logs Insights."
+        },
+        {
+          "id": "C",
+          "label": "Stream both datasets through Kinesis Data Streams and build a custom consumer and index."
+        },
+        {
+          "id": "D",
+          "label": "Use CloudTrail Lake for both datasets without changing application log delivery."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "both",
+        "one managed query experience",
+        "minimal custom infrastructure"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "elimination_failure",
+          "attraction": "S3 and Athena are strong log analytics tools.",
+          "failure": "The two datasets are not placed in the same query system by this option, so it does not directly satisfy one query experience."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "A custom streaming pipeline can be built for near-real-time analysis.",
+          "failure": "The scenario does not require custom stream processing, so this adds unnecessary operational overhead."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "CloudTrail Lake can query API activity.",
+          "failure": "It does not by itself ingest the EC2 application logs required by the scenario."
+        }
+      ],
+      "explanation": {
+        "concise": "La opción ganadora coloca ambos conjuntos en CloudWatch Logs y usa una herramienta de consulta nativa para ese mismo plano.",
+        "testedPattern": "Direct integration beats split analytics",
+        "correctChoiceWins": "B satisface la consulta conjunta sin inventar un consumidor, índice o flujo paralelo.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "elimination_failure",
+            "attraction": "S3 and Athena are strong log analytics tools.",
+            "failure": "The two datasets are not placed in the same query system by this option, so it does not directly satisfy one query experience."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "incorrect_assumption",
+            "attraction": "A custom streaming pipeline can be built for near-real-time analysis.",
+            "failure": "The scenario does not require custom stream processing, so this adds unnecessary operational overhead."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "CloudTrail Lake can query API activity.",
+            "failure": "It does not by itself ingest the EC2 application logs required by the scenario."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "cloudwatch-logs-insights",
+        "cloudtrail",
+        "best-answer"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-best-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_elimination",
+      "domainId": "incident_event_response",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Match the deployment mechanism to every requirement",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST option after checking replacement capacity, traffic shift, validation, and rollback.",
+      "prompt": "A production web application runs in an EC2 Auto Scaling group behind an Application Load Balancer. A critical release must create a full replacement fleet, validate it before production traffic, shift traffic in a controlled way, and preserve rapid rollback. Which approach is the BEST fit?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use an Elastic Beanstalk rolling deployment on the existing instances."
+        },
+        {
+          "id": "B",
+          "label": "Use an in-place CodeDeploy rolling deployment on half of the instances at a time."
+        },
+        {
+          "id": "C",
+          "label": "Use a CodeDeploy EC2 blue/green deployment with a replacement Auto Scaling environment and load balancer target groups."
+        },
+        {
+          "id": "D",
+          "label": "Update the launch template and manually terminate the existing instances in batches."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "full replacement fleet",
+        "validate before production traffic",
+        "shift traffic",
+        "rapid rollback"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "service_confusion",
+          "attraction": "Elastic Beanstalk supports deployment policies.",
+          "failure": "The requirement explicitly needs a separate replacement fleet and traffic shift controlled by CodeDeploy for the existing Auto Scaling architecture."
+        },
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Rolling deployment uses existing capacity and is familiar.",
+          "failure": "It does not create a full replacement fleet and can mix old and new versions during deployment."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Changing the launch template and replacing instances can deploy a new version.",
+          "failure": "It omits the required controlled traffic shift and rollback workflow."
+        }
+      ],
+      "explanation": {
+        "concise": "El requisito describe blue/green: entorno de reemplazo, validación antes del tráfico y cambio controlado mediante el balanceador.",
+        "testedPattern": "Deployment strategy from operational constraints",
+        "correctChoiceWins": "C es la única opción que satisface simultáneamente reemplazo completo, validación, traffic shifting y rollback.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "service_confusion",
+            "attraction": "Elastic Beanstalk supports deployment policies.",
+            "failure": "The requirement explicitly needs a separate replacement fleet and traffic shift controlled by CodeDeploy for the existing Auto Scaling architecture."
+          },
+          {
+            "optionId": "B",
+            "errorCause": "elimination_failure",
+            "attraction": "Rolling deployment uses existing capacity and is familiar.",
+            "failure": "It does not create a full replacement fleet and can mix old and new versions during deployment."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Changing the launch template and replacing instances can deploy a new version.",
+            "failure": "It omits the required controlled traffic shift and rollback workflow."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 25
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "codedeploy",
+        "blue-green",
+        "deployment-strategy"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-best-spaced-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_elimination",
+      "domainId": "incident_event_response",
+      "activityType": "spaced_review",
+      "drillForm": "spaced_review",
+      "title": "BEST-answer elimination reset",
+      "difficulty": "intro",
+      "estimatedMinutes": 2,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Review the filter and state which one eliminated the last distractor you chose.",
+      "prompt": "Complete, direct, low-assumption, operationally aligned. Use these four words before accepting a plausible answer.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "BEST",
+        "complete",
+        "direct",
+        "operationally aligned"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Este repaso mantiene activo el filtro de eliminación sin convertir una respuesta aislada en dominio del tema.",
+        "testedPattern": "Spaced review",
+        "correctChoiceWins": "La repetición breve ayuda a defender por qué una opción gana, no solo a reconocerla.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        },
+        {
+          "bank": "verified",
+          "questionId": 5
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "spaced-review",
+        "elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-best-bank-25",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_elimination",
+      "domainId": "incident_event_response",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: deployment strategy",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the verified bank question by mapping every deployment requirement before selecting an option.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "replacement fleet",
+        "traffic shift",
+        "rollback"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Retorno al banco para validar la selección de estrategia por restricciones, no por nombre de servicio.",
+        "testedPattern": "BEST deployment strategy bank return",
+        "correctChoiceWins": "La revisión debe explicar por qué las alternativas plausibles fallan una restricción concreta.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 25
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "bank-return",
+        "codedeploy"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-multi-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_multi_select",
+      "domainId": "security_compliance",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Multi-select set construction",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the method and lock the required answer count.",
+      "prompt": "For Select TWO or Select THREE: write the count, split the scenario into independent obligations, map one necessary option to each obligation, and validate the final set for conflicts or redundancy.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Select TWO",
+        "Select THREE",
+        "independent obligations",
+        "exact set"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Una respuesta correcta parcial sigue siendo incorrecta en el examen. El objetivo es construir el conjunto exacto, no encontrar una sola opción verdadera.",
+        "testedPattern": "Exact-set reasoning",
+        "correctChoiceWins": "El método obliga a cubrir cada requisito y evita completar el conteo con una variante redundante.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 7
+        },
+        {
+          "bank": "verified",
+          "questionId": 94
+        },
+        {
+          "bank": "verified",
+          "questionId": 102
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "multi-select",
+        "set-construction"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-multi-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_multi_select",
+      "domainId": "security_compliance",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order the multi-select method",
+      "difficulty": "intro",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Order the steps used to build an exact answer set.",
+      "prompt": "Order the multi-select decision workflow.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "lock-count",
+          "label": "Write the exact number of required selections."
+        },
+        {
+          "id": "split-requirements",
+          "label": "Split the scenario into independent obligations."
+        },
+        {
+          "id": "map-options",
+          "label": "Map one necessary option to each obligation."
+        },
+        {
+          "id": "validate-set",
+          "label": "Check count, contradictions, redundancy, and complete coverage."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "lock-count",
+          "split-requirements",
+          "map-options",
+          "validate-set"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "exact number",
+        "independent obligations",
+        "complete coverage"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El orden evita detenerse después de la primera opción correcta y reduce la selección de dos respuestas para el mismo subproblema.",
+        "testedPattern": "Multi-select workflow",
+        "correctChoiceWins": "Primero se fija el contrato del conjunto; después se eligen y validan sus componentes.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 7
+        },
+        {
+          "bank": "verified",
+          "questionId": 94
+        },
+        {
+          "bank": "verified",
+          "questionId": 102
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "workflow",
+        "multi-select"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-multi-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_multi_select",
+      "domainId": "security_compliance",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Select TWO: detector and remediator",
+      "difficulty": "practice",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select TWO. One answer must provide compliance evaluation and the other must provide automatic remediation.",
+      "prompt": "A company must continuously detect S3 buckets that violate an approved encryption configuration and automatically correct noncompliant buckets. Which TWO components form the required managed workflow?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "An AWS Config rule that evaluates the bucket configuration."
+        },
+        {
+          "id": "B",
+          "label": "A CloudTrail trail that records S3 configuration API calls."
+        },
+        {
+          "id": "C",
+          "label": "An AWS Config remediation configuration that invokes an AWS Systems Manager Automation document."
+        },
+        {
+          "id": "D",
+          "label": "An SNS notification that asks an administrator to update the bucket."
+        },
+        {
+          "id": "E",
+          "label": "A Security Hub standard that aggregates security findings."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "continuously detect",
+        "automatically correct",
+        "TWO"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "service_confusion",
+          "attraction": "CloudTrail records configuration API calls and supports audit.",
+          "failure": "Audit history does not continuously evaluate the current bucket configuration against a compliance rule."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "SNS can notify the security team about noncompliance.",
+          "failure": "Notification does not perform the required automatic remediation."
+        },
+        {
+          "optionId": "E",
+          "errorCause": "service_confusion",
+          "attraction": "Security Hub aggregates security findings.",
+          "failure": "The requested pair is the compliance detector and the automatic remediation action, not finding aggregation."
+        }
+      ],
+      "explanation": {
+        "concise": "El conjunto correcto necesita dos funciones distintas: evaluar cumplimiento y ejecutar remediación. A detecta; C remedia.",
+        "testedPattern": "Detector + remediator",
+        "correctChoiceWins": "A y C cubren obligaciones independientes sin depender de una acción manual.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "service_confusion",
+            "attraction": "CloudTrail records configuration API calls and supports audit.",
+            "failure": "Audit history does not continuously evaluate the current bucket configuration against a compliance rule."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "elimination_failure",
+            "attraction": "SNS can notify the security team about noncompliance.",
+            "failure": "Notification does not perform the required automatic remediation."
+          },
+          {
+            "optionId": "E",
+            "errorCause": "service_confusion",
+            "attraction": "Security Hub aggregates security findings.",
+            "failure": "The requested pair is the compliance detector and the automatic remediation action, not finding aggregation."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 7
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "aws-config",
+        "multi-select",
+        "automatic-remediation"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-multi-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_multi_select",
+      "domainId": "security_compliance",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Select TWO: process faster and preserve data",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select TWO. Map one choice to consumer capacity and one choice to data-loss protection.",
+      "prompt": "A KCL consumer running on EC2 is falling behind a multi-shard Kinesis data stream during heavy load. Records may expire before processing. The company wants the minimum-change reliability improvement. Which TWO actions should be taken?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Increase the stream shard count without changing the consumer fleet."
+        },
+        {
+          "id": "B",
+          "label": "Run the consumer in an Auto Scaling group and scale on MillisBehindLatest."
+        },
+        {
+          "id": "C",
+          "label": "Reduce the shard count to simplify processing."
+        },
+        {
+          "id": "D",
+          "label": "Increase the data retention period of the stream."
+        },
+        {
+          "id": "E",
+          "label": "Rewrite the consumer as a Lambda function immediately."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B",
+          "D"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "consumer falling behind",
+        "records may expire",
+        "minimum-change",
+        "TWO"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "elimination_failure",
+          "attraction": "Adding shards can increase stream throughput.",
+          "failure": "The stated bottleneck is the consumer application falling behind; scaling consumers directly addresses processing capacity."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Reducing shards seems like it could simplify consumer coordination.",
+          "failure": "It reduces parallelism and throughput, worsening the backlog."
+        },
+        {
+          "optionId": "E",
+          "errorCause": "service_confusion",
+          "attraction": "Lambda can consume Kinesis records.",
+          "failure": "A migration is not the minimum-change reliability improvement requested and does not replace the need to manage retention risk."
+        }
+      ],
+      "explanation": {
+        "concise": "B ataca la capacidad de procesamiento del consumidor; D amplía la ventana antes de que los registros expiren. Son controles complementarios.",
+        "testedPattern": "Capacity + retention",
+        "correctChoiceWins": "El conjunto cubre la causa operativa y el riesgo de pérdida sin exigir una migración completa.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "elimination_failure",
+            "attraction": "Adding shards can increase stream throughput.",
+            "failure": "The stated bottleneck is the consumer application falling behind; scaling consumers directly addresses processing capacity."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Reducing shards seems like it could simplify consumer coordination.",
+            "failure": "It reduces parallelism and throughput, worsening the backlog."
+          },
+          {
+            "optionId": "E",
+            "errorCause": "service_confusion",
+            "attraction": "Lambda can consume Kinesis records.",
+            "failure": "A migration is not the minimum-change reliability improvement requested and does not replace the need to manage retention risk."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 102
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "kinesis",
+        "kcl",
+        "multi-select",
+        "reliability"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-multi-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_multi_select",
+      "domainId": "security_compliance",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Redundant pair or complete pair?",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the rule that produces a complete multi-select set.",
+      "prompt": "Which rule is most reliable when two answer choices are both technically correct?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Select both if they describe different implementations of the same subproblem."
+        },
+        {
+          "id": "B",
+          "label": "Select both only if each satisfies a different required obligation and the final set matches the requested count."
+        },
+        {
+          "id": "C",
+          "label": "Select the two options with the most implementation detail."
+        },
+        {
+          "id": "D",
+          "label": "Select the first certain answer and guess the remaining choice."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "different required obligation",
+        "final set",
+        "requested count"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "elimination_failure",
+          "attraction": "Two implementation variants can both be true.",
+          "failure": "If both solve the same obligation, another explicit requirement remains uncovered."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Selecting the most detailed statements can feel safer.",
+          "failure": "Detail does not prove that the combined set covers every independent requirement."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "rushed_reading",
+          "attraction": "Stopping after the first certain answer reduces uncertainty.",
+          "failure": "The exact-count instruction requires completing and validating the whole set."
+        }
+      ],
+      "explanation": {
+        "concise": "La verdad individual de una opción no basta. Cada selección debe aportar una capacidad necesaria al conjunto completo.",
+        "testedPattern": "Independent obligation coverage",
+        "correctChoiceWins": "B valida necesidad, cobertura y conteo; no usa detalle o familiaridad como sustituto del razonamiento.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "elimination_failure",
+            "attraction": "Two implementation variants can both be true.",
+            "failure": "If both solve the same obligation, another explicit requirement remains uncovered."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Selecting the most detailed statements can feel safer.",
+            "failure": "Detail does not prove that the combined set covers every independent requirement."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "rushed_reading",
+            "attraction": "Stopping after the first certain answer reduces uncertainty.",
+            "failure": "The exact-count instruction requires completing and validating the whole set."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 94
+        },
+        {
+          "bank": "verified",
+          "questionId": 102
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "multi-select",
+        "elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-multi-spaced-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_multi_select",
+      "domainId": "security_compliance",
+      "activityType": "spaced_review",
+      "drillForm": "spaced_review",
+      "title": "Exact-set reset",
+      "difficulty": "intro",
+      "estimatedMinutes": 2,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "State the required count and the independent obligations before the next multi-select question.",
+      "prompt": "A correct option is not yet a correct multi-select answer. Build and verify the complete set.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "exact count",
+        "complete set",
+        "independent obligations"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Este repaso refuerza que una respuesta parcial no equivale a un conjunto correcto.",
+        "testedPattern": "Spaced review",
+        "correctChoiceWins": "La frase reduce el patrón de detenerse tras reconocer un componente válido.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 7
+        },
+        {
+          "bank": "verified",
+          "questionId": 94
+        },
+        {
+          "bank": "verified",
+          "questionId": 102
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "spaced-review",
+        "multi-select"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-multi-bank-94",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_multi_select",
+      "domainId": "security_compliance",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: Select THREE",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the verified bank question. Write the three independent ways the template can observe a changed Lambda artifact reference.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "D",
+          "F"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Select THREE",
+        "changed reference",
+        "S3 object version"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Retorno al banco para comprobar construcción de un conjunto de tres respuestas sin completar por intuición.",
+        "testedPattern": "Exact three-answer bank return",
+        "correctChoiceWins": "La justificación debe demostrar qué aporta cada opción seleccionada al mismo requisito técnico sin introducir distractores.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 94
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "bank-return",
+        "multi-select",
+        "cloudformation"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-scope-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_scope",
+      "domainId": "configuration_management_iac",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Cross-account ownership method",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the ownership questions before solving a cross-account scenario.",
+      "prompt": "Ask four questions: Who starts the call? Which account owns the target? Where does the assumable role live? Which account owns the bucket or KMS key policy?",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "caller",
+        "target account",
+        "trust policy",
+        "resource policy",
+        "KMS key policy"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El error frecuente no es reconocer IAM, S3 o KMS, sino colocar cada permiso en la cuenta equivocada.",
+        "testedPattern": "Caller → trust → temporary credentials → target resource",
+        "correctChoiceWins": "Separar identidad, confianza y propiedad del recurso convierte un escenario cross-account en un flujo verificable.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "cross-account",
+        "ownership",
+        "iam"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-scope-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_scope",
+      "domainId": "configuration_management_iac",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order the AssumeRole path",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Order the cross-account authorization flow.",
+      "prompt": "Order the steps used by a principal in one account to access a protected resource in another account.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "caller-permission",
+          "label": "The caller identity policy allows sts:AssumeRole on the target role."
+        },
+        {
+          "id": "target-trust",
+          "label": "The target role trust policy allows the caller principal."
+        },
+        {
+          "id": "temporary-credentials",
+          "label": "AWS STS returns temporary credentials for the target role."
+        },
+        {
+          "id": "resource-access",
+          "label": "The assumed role accesses the target resource and, when applicable, the resource and KMS policies allow the operation."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "caller-permission",
+          "target-trust",
+          "temporary-credentials",
+          "resource-access"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "sts:AssumeRole",
+        "trust policy",
+        "temporary credentials",
+        "resource policy"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La autorización cross-account requiere permiso del llamador y confianza del rol. Después, las credenciales temporales operan contra el recurso objetivo.",
+        "testedPattern": "Cross-account authorization flow",
+        "correctChoiceWins": "El orden distingue quién solicita, quién confía y qué políticas controlan finalmente el recurso.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "workflow",
+        "sts",
+        "cross-account"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-scope-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_scope",
+      "domainId": "configuration_management_iac",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map each policy to its owning account",
+      "difficulty": "practice",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each control to the account where it is configured for a deployment from a tooling account into a production account.",
+      "prompt": "The tooling account runs the pipeline. The production account owns the deploy role, artifact destination bucket, and customer managed KMS key.",
+      "answerOptions": [
+        {
+          "id": "source-account",
+          "label": "Tooling/source account"
+        },
+        {
+          "id": "target-account",
+          "label": "Production/target account"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "caller-identity-policy",
+          "label": "Identity policy that permits the pipeline principal to call sts:AssumeRole."
+        },
+        {
+          "id": "target-role-trust-policy",
+          "label": "Trust policy of the production deployment role."
+        },
+        {
+          "id": "destination-bucket-policy",
+          "label": "Policy of the production S3 destination bucket."
+        },
+        {
+          "id": "artifact-key-policy",
+          "label": "Policy of the production customer managed KMS key."
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "caller-identity-policy": "source-account",
+          "target-role-trust-policy": "target-account",
+          "destination-bucket-policy": "target-account",
+          "artifact-key-policy": "target-account"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "tooling account",
+        "production account",
+        "owns",
+        "trust policy",
+        "key policy"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El permiso para iniciar AssumeRole pertenece al llamador. El rol, su confianza y las políticas de los recursos objetivo se administran donde viven esos recursos.",
+        "testedPattern": "Policy ownership mapping",
+        "correctChoiceWins": "El mapeo evita intentar resolver todo con una sola política IAM en la cuenta de origen.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "architecture-mapping",
+        "cross-account",
+        "kms"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-scope-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_scope",
+      "domainId": "configuration_management_iac",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Where does the deploy role live?",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the correct role placement.",
+      "prompt": "A pipeline in a tooling account must deploy resources into a production account. Where should the role that grants production deployment permissions normally be created?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "In the tooling account, with the production account listed in its permissions policy."
+        },
+        {
+          "id": "B",
+          "label": "In the production account, with a trust policy that allows the tooling pipeline principal to assume it."
+        },
+        {
+          "id": "C",
+          "label": "No role is needed if the artifact bucket policy allows the tooling account."
+        },
+        {
+          "id": "D",
+          "label": "In both accounts with the same long-lived access keys."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "pipeline in tooling account",
+        "deploy into production account",
+        "role that grants production permissions"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Creating the role in the caller account feels natural because the pipeline runs there.",
+          "failure": "The role that grants production permissions must live in the production account and trust the pipeline principal."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "A bucket policy is part of artifact access.",
+          "failure": "A bucket policy does not replace the assumable production role or its trust relationship."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Copying credentials appears to bypass role complexity.",
+          "failure": "Long-lived shared credentials violate the intended cross-account role model and increase risk."
+        }
+      ],
+      "explanation": {
+        "concise": "El rol que entrega permisos sobre producción vive en producción. La cuenta de tooling obtiene credenciales temporales al asumirlo.",
+        "testedPattern": "Target-account role placement",
+        "correctChoiceWins": "B alinea la autoridad con la propiedad del entorno y usa una trust policy explícita.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "Creating the role in the caller account feels natural because the pipeline runs there.",
+            "failure": "The role that grants production permissions must live in the production account and trust the pipeline principal."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "A bucket policy is part of artifact access.",
+            "failure": "A bucket policy does not replace the assumable production role or its trust relationship."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Copying credentials appears to bypass role complexity.",
+            "failure": "Long-lived shared credentials violate the intended cross-account role model and increase risk."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "iam-role",
+        "cross-account",
+        "scope"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-scope-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_scope",
+      "domainId": "configuration_management_iac",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Find the complete cross-account permission set",
+      "difficulty": "practice",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the option that covers role assumption, resource access, and encryption access.",
+      "prompt": "A pipeline in Account A deploys an encrypted artifact to an S3 bucket in Account B. Account B owns the deployment role, bucket, and customer managed KMS key. Which configuration is the BEST fit?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Allow the pipeline principal to assume the Account B role; configure the role trust policy, S3 permissions or bucket policy, and KMS key policy for the required operations."
+        },
+        {
+          "id": "B",
+          "label": "Attach AdministratorAccess to the pipeline role in Account A only."
+        },
+        {
+          "id": "C",
+          "label": "Make the Account B bucket publicly writable and leave the KMS policy unchanged."
+        },
+        {
+          "id": "D",
+          "label": "Replace the customer managed key with the default S3 encryption key and remove the deployment role."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Account B owns",
+        "deployment role",
+        "bucket",
+        "customer managed KMS key"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Granting broad permissions to the source pipeline role seems sufficient.",
+          "failure": "Identity permissions in the source account cannot replace the target role trust and resource-owner controls."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Making the bucket public removes permission errors.",
+          "failure": "It violates security requirements and does not solve KMS authorization."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "An AWS managed S3 key can encrypt artifacts.",
+          "failure": "The proposed change does not establish the required cross-account role and resource permissions for the deployment workflow."
+        }
+      ],
+      "explanation": {
+        "concise": "El flujo completo necesita confianza para asumir el rol y permisos efectivos sobre S3 y KMS en la cuenta propietaria.",
+        "testedPattern": "Identity + trust + resource + encryption",
+        "correctChoiceWins": "A es la única opción que cubre todos los planos de autorización sin debilitar el recurso.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "Granting broad permissions to the source pipeline role seems sufficient.",
+            "failure": "Identity permissions in the source account cannot replace the target role trust and resource-owner controls."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Making the bucket public removes permission errors.",
+            "failure": "It violates security requirements and does not solve KMS authorization."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "An AWS managed S3 key can encrypt artifacts.",
+            "failure": "The proposed change does not establish the required cross-account role and resource permissions for the deployment workflow."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "cross-account",
+        "s3",
+        "kms",
+        "elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-scope-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_scope",
+      "domainId": "configuration_management_iac",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Central access to member-owned encrypted logs",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST architecture. Identify who owns the logs, role, bucket policy, and KMS key.",
+      "prompt": "A central security account must investigate log objects stored in S3 buckets owned by multiple member accounts. Each bucket uses a customer managed KMS key in the same member account. The solution must use temporary credentials and preserve member-account ownership. Which approach is the BEST fit?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create one role only in the central account and attach AdministratorAccess."
+        },
+        {
+          "id": "B",
+          "label": "Create a read role in each member account that trusts the central investigator role; allow the member role in the bucket and KMS key policies; have the central account assume the member role."
+        },
+        {
+          "id": "C",
+          "label": "Continuously copy every log object into a new unencrypted central bucket."
+        },
+        {
+          "id": "D",
+          "label": "Use an Organizations SCP to grant the central account read and decrypt access."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "member accounts own",
+        "customer managed KMS key",
+        "temporary credentials",
+        "preserve ownership"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "A central role with broad IAM permissions sounds centralized.",
+          "failure": "It cannot unilaterally grant itself access to member-owned resources and KMS keys without trust and resource-owner permissions."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Copying all logs to the central account seems to simplify access.",
+          "failure": "The requirement is to read existing member-owned encrypted logs with least operational overhead; duplicating every object adds a new data pipeline."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "Organizations SCPs control maximum permissions.",
+          "failure": "SCPs do not grant resource access or KMS decrypt permissions."
+        }
+      ],
+      "explanation": {
+        "concise": "La cuenta miembro conserva el control: crea un rol local, confía en el principal central y permite al rol acceder al bucket y descifrar con la clave local.",
+        "testedPattern": "Cross-account resource ownership",
+        "correctChoiceWins": "B respeta propiedad, usa credenciales temporales y cubre S3 más KMS.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "A central role with broad IAM permissions sounds centralized.",
+            "failure": "It cannot unilaterally grant itself access to member-owned resources and KMS keys without trust and resource-owner permissions."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Copying all logs to the central account seems to simplify access.",
+            "failure": "The requirement is to read existing member-owned encrypted logs with least operational overhead; duplicating every object adds a new data pipeline."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "Organizations SCPs control maximum permissions.",
+            "failure": "SCPs do not grant resource access or KMS decrypt permissions."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "cross-account",
+        "central-security",
+        "s3",
+        "kms"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-scope-spaced-01",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_scope",
+      "domainId": "configuration_management_iac",
+      "activityType": "spaced_review",
+      "drillForm": "spaced_review",
+      "title": "Ownership reset",
+      "difficulty": "intro",
+      "estimatedMinutes": 2,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "State the owner of each control before the next cross-account question.",
+      "prompt": "Caller permission is not trust. Trust is not resource access. Resource access is not KMS decrypt. Place each control where its owner can configure it.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "caller permission",
+        "trust policy",
+        "resource policy",
+        "KMS key policy"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Este repaso previene la idea de que una política amplia en la cuenta de origen resuelve todo el flujo cross-account.",
+        "testedPattern": "Spaced review",
+        "correctChoiceWins": "La separación de controles facilita eliminar respuestas con el servicio correcto en la cuenta equivocada.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "spaced-review",
+        "cross-account"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "erf-scope-bank-39",
+      "version": "drill-definition-v1",
+      "topicId": "exam_reasoning_scope",
+      "domainId": "configuration_management_iac",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: cross-account CodePipeline",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the verified bank question. Draw Account A and Account B, then place each required policy before selecting TWO.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "E"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "cross-account",
+        "artifact bucket",
+        "KMS",
+        "Select TWO"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Retorno al banco para verificar que rol, bucket y cifrado se ubiquen en la cuenta correcta.",
+        "testedPattern": "Cross-account policy placement bank return",
+        "correctChoiceWins": "La respuesta debe defender cada selección por el control que habilita y por la cuenta que lo posee.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ],
+      "tags": [
+        "bank-return",
+        "cross-account",
+        "codepipeline"
+      ],
+      "active": true
+    }
+  ],
+  "sourceQuestionRefs": [
+    {
+      "bank": "verified",
+      "questionId": 2
+    },
+    {
+      "bank": "verified",
+      "questionId": 4
+    },
+    {
+      "bank": "verified",
+      "questionId": 5
+    },
+    {
+      "bank": "verified",
+      "questionId": 6
+    },
+    {
+      "bank": "verified",
+      "questionId": 7
+    },
+    {
+      "bank": "verified",
+      "questionId": 25
+    },
+    {
+      "bank": "verified",
+      "questionId": 30
+    },
+    {
+      "bank": "verified",
+      "questionId": 34
+    },
+    {
+      "bank": "verified",
+      "questionId": 35
+    },
+    {
+      "bank": "verified",
+      "questionId": 39
+    },
+    {
+      "bank": "verified",
+      "questionId": 88
+    },
+    {
+      "bank": "verified",
+      "questionId": 94
+    },
+    {
+      "bank": "verified",
+      "questionId": 98
+    },
+    {
+      "bank": "verified",
+      "questionId": 102
+    },
+    {
+      "bank": "verified",
+      "questionId": 104
+    }
+  ],
+  "prerequisiteRelationships": [
+    {
+      "topicId": "exam_reasoning_keywords",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "exam_reasoning_elimination",
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ]
+    },
+    {
+      "topicId": "exam_reasoning_multi_select",
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ]
+    },
+    {
+      "topicId": "exam_reasoning_scope",
+      "prerequisiteTopicIds": [
+        "exam_reasoning_keywords"
+      ]
+    }
+  ],
+  "tags": [
+    "dop-c02",
+    "exam-reasoning",
+    "keywords",
+    "distractor-elimination",
+    "multi-select",
+    "scope",
+    "personalized"
+  ]
+}

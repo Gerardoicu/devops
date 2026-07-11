@@ -1,0 +1,3343 @@
+{
+  "schemaVersion": "1.0",
+  "packageId": "cloudformation-autoscaling-config",
+  "version": "1.0.0",
+  "title": "CloudFormation, Auto Scaling, and AWS Config",
+  "description": "Personalized DOP-C02 training for CloudFormation change control, rollback recovery, resource-retention behavior, Auto Scaling replacement and lifecycle control, AWS Config detection and remediation, and organization-wide governance using conformance packs and configuration aggregators.",
+  "topicDescriptors": [
+    {
+      "topicId": "cloudformation_update_recovery",
+      "title": "CloudFormation Change Control, Rollback Recovery, and Resource Lifecycle",
+      "domainId": "configuration_management_iac",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "change_set_vs_drift",
+        "update_rollback_failed",
+        "service_role_passrole",
+        "resource_replacement",
+        "retain_import_cleanup",
+        "capability_iam"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 9
+        },
+        {
+          "bank": "verified",
+          "questionId": 22
+        },
+        {
+          "bank": "verified",
+          "questionId": 34
+        },
+        {
+          "bank": "verified",
+          "questionId": 40
+        },
+        {
+          "bank": "verified",
+          "questionId": 80
+        },
+        {
+          "bank": "verified",
+          "questionId": 83
+        },
+        {
+          "bank": "verified",
+          "questionId": 94
+        },
+        {
+          "bank": "verified",
+          "questionId": 109
+        }
+      ]
+    },
+    {
+      "topicId": "autoscaling_replacement_lifecycle",
+      "title": "Auto Scaling Replacement, Instance Refresh, and Lifecycle Hooks",
+      "domainId": "configuration_management_iac",
+      "blueprintRelevance": 0.95,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [
+        "cloudformation_update_recovery"
+      ],
+      "relatedPatternIds": [
+        "launch_template_does_not_replace_instances",
+        "updatepolicy_rolling",
+        "instance_refresh",
+        "minimum_healthy_capacity",
+        "default_instance_warmup",
+        "terminating_wait",
+        "complete_lifecycle_action"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 13
+        },
+        {
+          "bank": "verified",
+          "questionId": 42
+        },
+        {
+          "bank": "verified",
+          "questionId": 53
+        },
+        {
+          "bank": "verified",
+          "questionId": 66
+        },
+        {
+          "bank": "verified",
+          "questionId": 73
+        },
+        {
+          "bank": "verified",
+          "questionId": 104
+        },
+        {
+          "bank": "verified",
+          "questionId": 105
+        }
+      ]
+    },
+    {
+      "topicId": "aws_config_remediation",
+      "title": "AWS Config Detection, Notification, and Automated Remediation",
+      "domainId": "security_compliance",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "resource_scope",
+        "managed_rule",
+        "custom_rule",
+        "non_compliant_event",
+        "eventbridge_notification",
+        "ssm_automation_remediation",
+        "compliance_history"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 7
+        },
+        {
+          "bank": "verified",
+          "questionId": 15
+        },
+        {
+          "bank": "verified",
+          "questionId": 18
+        },
+        {
+          "bank": "verified",
+          "questionId": 70
+        },
+        {
+          "bank": "verified",
+          "questionId": 119
+        }
+      ]
+    },
+    {
+      "topicId": "conformance_packs_aggregators",
+      "title": "Organization Conformance Packs and Configuration Aggregators",
+      "domainId": "security_compliance",
+      "blueprintRelevance": 0.95,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [
+        "aws_config_remediation"
+      ],
+      "relatedPatternIds": [
+        "configuration_aggregator",
+        "organization_conformance_pack",
+        "rules_and_remediation_bundle",
+        "central_view_not_enforcement",
+        "stacksets_bootstrap",
+        "multi_account_multi_region"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 21
+        },
+        {
+          "bank": "verified",
+          "questionId": 65
+        },
+        {
+          "bank": "verified",
+          "questionId": 103
+        }
+      ]
+    }
+  ],
+  "conceptMaps": [
+    {
+      "id": "map-cfn-change-safety",
+      "schemaVersion": "1.0",
+      "topicId": "cloudformation_update_recovery",
+      "title": "CloudFormation change safety workflow",
+      "steps": [
+        {
+          "id": "preview",
+          "label": "1. Preview",
+          "detail": "Use a change set to inspect additions, modifications, replacements, and deletions before execution. A preview reduces surprise but does not guarantee success.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 34
+            },
+            {
+              "bank": "verified",
+              "questionId": 80
+            },
+            {
+              "bank": "verified",
+              "questionId": 94
+            }
+          ]
+        },
+        {
+          "id": "permissions",
+          "label": "2. Authorize execution",
+          "detail": "Use a least-privilege CloudFormation service role and allow the operator or pipeline to pass that role. Acknowledging IAM capabilities is separate from role permissions.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 40
+            },
+            {
+              "bank": "verified",
+              "questionId": 80
+            }
+          ]
+        },
+        {
+          "id": "execute",
+          "label": "3. Execute and observe",
+          "detail": "CloudFormation applies the template and reports resource events. Rollback triggers can connect application alarms to stack rollback.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 34
+            },
+            {
+              "bank": "verified",
+              "questionId": 96
+            }
+          ]
+        },
+        {
+          "id": "recover",
+          "label": "4. Recover failed rollback",
+          "detail": "When a stack reaches UPDATE_ROLLBACK_FAILED, repair or reconcile the blocking resource, then continue the update rollback. Drift detection alone does not finish the rollback.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 34
+            }
+          ]
+        },
+        {
+          "id": "lifecycle",
+          "label": "5. Protect stateful resources",
+          "detail": "Use DeletionPolicy and UpdateReplacePolicy deliberately. Retained resources can later be imported when the template and live resource are reconciled.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 83
+            },
+            {
+              "bank": "verified",
+              "questionId": 96
+            },
+            {
+              "bank": "verified",
+              "questionId": 109
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-cfn-resource-lifecycle",
+      "schemaVersion": "1.0",
+      "topicId": "cloudformation_update_recovery",
+      "title": "Resource update and deletion decision map",
+      "steps": [
+        {
+          "id": "update-behavior",
+          "label": "Check update behavior",
+          "detail": "Determine whether the property change is no-interruption, some-interruption, or replacement. Replacement creates a new physical resource before the old one is removed when possible.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 94
+            },
+            {
+              "bank": "verified",
+              "questionId": 96
+            }
+          ]
+        },
+        {
+          "id": "data-risk",
+          "label": "Identify persistent data",
+          "detail": "For databases, buckets, and other stateful resources, decide whether replacement or deletion must retain or snapshot data.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 83
+            },
+            {
+              "bank": "verified",
+              "questionId": 96
+            }
+          ]
+        },
+        {
+          "id": "cleanup",
+          "label": "Plan application cleanup",
+          "detail": "CloudFormation cannot delete a non-empty S3 bucket. Use an explicit cleanup step or custom resource for test stacks rather than assuming force deletion exists.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 83
+            }
+          ]
+        },
+        {
+          "id": "external-change",
+          "label": "Detect out-of-band change",
+          "detail": "Use drift detection for changes made outside CloudFormation, not for previewing a pending template update.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 9
+            },
+            {
+              "bank": "verified",
+              "questionId": 34
+            }
+          ]
+        },
+        {
+          "id": "adopt",
+          "label": "Adopt existing resource",
+          "detail": "Use resource import when an existing supported resource must become managed by the stack without recreation.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 9
+            },
+            {
+              "bank": "verified",
+              "questionId": 109
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-asg-update-flow",
+      "schemaVersion": "1.0",
+      "topicId": "autoscaling_replacement_lifecycle",
+      "title": "Launch template change to healthy fleet",
+      "steps": [
+        {
+          "id": "new-config",
+          "label": "1. Publish desired configuration",
+          "detail": "Create a new launch template version or update the launch template reference used by the Auto Scaling group.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 53
+            },
+            {
+              "bank": "verified",
+              "questionId": 69
+            }
+          ]
+        },
+        {
+          "id": "replacement-mechanism",
+          "label": "2. Choose replacement mechanism",
+          "detail": "Use CloudFormation AutoScalingRollingUpdate during stack updates or start an EC2 Auto Scaling instance refresh. Merely changing the reference does not refresh existing instances by itself.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 53
+            }
+          ]
+        },
+        {
+          "id": "availability",
+          "label": "3. Protect healthy capacity",
+          "detail": "Set batch or minimum healthy capacity so enough instances remain available while replacements occur.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 53
+            },
+            {
+              "bank": "verified",
+              "questionId": 73
+            }
+          ]
+        },
+        {
+          "id": "warmup",
+          "label": "4. Wait for real readiness",
+          "detail": "Use default instance warmup and load balancer health so new instances are not treated as stable before initialization completes.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 53
+            },
+            {
+              "bank": "verified",
+              "questionId": 74
+            }
+          ]
+        },
+        {
+          "id": "observe",
+          "label": "5. Monitor and stop safely",
+          "detail": "Use health signals and rollback controls appropriate to the selected replacement mechanism.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 53
+            },
+            {
+              "bank": "verified",
+              "questionId": 73
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-asg-termination-hook",
+      "schemaVersion": "1.0",
+      "topicId": "autoscaling_replacement_lifecycle",
+      "title": "Auto Scaling termination lifecycle hook flow",
+      "steps": [
+        {
+          "id": "scale-in",
+          "label": "1. Scale-in selects an instance",
+          "detail": "The termination policy chooses which instance is selected. It does not provide time for custom cleanup.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 42
+            },
+            {
+              "bank": "verified",
+              "questionId": 66
+            },
+            {
+              "bank": "verified",
+              "questionId": 104
+            }
+          ]
+        },
+        {
+          "id": "wait",
+          "label": "2. Lifecycle hook pauses termination",
+          "detail": "A termination lifecycle hook moves the selected instance to Terminating:Wait.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 42
+            },
+            {
+              "bank": "verified",
+              "questionId": 66
+            },
+            {
+              "bank": "verified",
+              "questionId": 104
+            }
+          ]
+        },
+        {
+          "id": "event",
+          "label": "3. Event starts automation",
+          "detail": "EventBridge or the configured notification target invokes cleanup automation such as SSM Automation or Lambda.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 42
+            },
+            {
+              "bank": "verified",
+              "questionId": 66
+            },
+            {
+              "bank": "verified",
+              "questionId": 104
+            }
+          ]
+        },
+        {
+          "id": "cleanup",
+          "label": "4. Preserve or detach state",
+          "detail": "Upload logs, create an AMI, deregister from a domain, or update cluster membership while the heartbeat timeout is active.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 42
+            },
+            {
+              "bank": "verified",
+              "questionId": 66
+            },
+            {
+              "bank": "verified",
+              "questionId": 104
+            },
+            {
+              "bank": "verified",
+              "questionId": 105
+            }
+          ]
+        },
+        {
+          "id": "complete",
+          "label": "5. Complete lifecycle action",
+          "detail": "Call CompleteLifecycleAction with CONTINUE or ABANDON so the instance can leave the wait state intentionally.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 42
+            },
+            {
+              "bank": "verified",
+              "questionId": 66
+            },
+            {
+              "bank": "verified",
+              "questionId": 104
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-config-governance-layers",
+      "schemaVersion": "1.0",
+      "topicId": "conformance_packs_aggregators",
+      "title": "AWS Config governance layers",
+      "steps": [
+        {
+          "id": "record",
+          "label": "1. Record",
+          "detail": "Enable AWS Config recorders and delivery channels in required accounts and Regions so resource configuration history exists.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 65
+            },
+            {
+              "bank": "verified",
+              "questionId": 103
+            },
+            {
+              "bank": "verified",
+              "questionId": 119
+            }
+          ]
+        },
+        {
+          "id": "evaluate",
+          "label": "2. Evaluate",
+          "detail": "Config rules evaluate the correct resource type and scope. A rule for EC2 instances does not substitute for a rule scoped to EBS volumes.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 15
+            },
+            {
+              "bank": "verified",
+              "questionId": 70
+            }
+          ]
+        },
+        {
+          "id": "respond",
+          "label": "3. Respond",
+          "detail": "Use compliance-change events for notifications and remediation configurations with SSM Automation for corrective action.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 18
+            },
+            {
+              "bank": "verified",
+              "questionId": 119
+            }
+          ]
+        },
+        {
+          "id": "standardize",
+          "label": "4. Standardize",
+          "detail": "Use conformance packs to deploy a bundle of Config rules and remediation actions to an account, Region, or organization.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 21
+            },
+            {
+              "bank": "verified",
+              "questionId": 65
+            }
+          ]
+        },
+        {
+          "id": "aggregate",
+          "label": "5. Aggregate",
+          "detail": "Use a configuration aggregator for a central multi-account, multi-Region view. Aggregation provides visibility; it does not deploy or enforce rules.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 65
+            },
+            {
+              "bank": "verified",
+              "questionId": 103
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "cmp-change-set-vs-drift",
+      "topicId": "cloudformation_update_recovery",
+      "leftService": "CloudFormation Change Set",
+      "rightService": "CloudFormation Drift Detection",
+      "dimensions": [
+        {
+          "id": "question",
+          "label": "Primary question",
+          "leftValue": "What will the proposed stack update change?",
+          "rightValue": "What changed outside CloudFormation?"
+        },
+        {
+          "id": "timing",
+          "label": "When used",
+          "leftValue": "Before executing a template update",
+          "rightValue": "After resources may have diverged from the template"
+        },
+        {
+          "id": "output",
+          "label": "Output",
+          "leftValue": "Planned adds, modifies, replacements, and deletes",
+          "rightValue": "Actual vs expected resource configuration differences"
+        },
+        {
+          "id": "limitation",
+          "label": "Does not do",
+          "leftValue": "Does not guarantee update success",
+          "rightValue": "Does not repair drift or finish rollback by itself"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 9
+        },
+        {
+          "bank": "verified",
+          "questionId": 34
+        },
+        {
+          "bank": "verified",
+          "questionId": 94
+        }
+      ]
+    },
+    {
+      "id": "cmp-updatepolicy-vs-instance-refresh",
+      "topicId": "autoscaling_replacement_lifecycle",
+      "leftService": "CloudFormation AutoScalingRollingUpdate",
+      "rightService": "EC2 Auto Scaling Instance Refresh",
+      "dimensions": [
+        {
+          "id": "owner",
+          "label": "Execution owner",
+          "leftValue": "CloudFormation stack update",
+          "rightValue": "EC2 Auto Scaling operation"
+        },
+        {
+          "id": "trigger",
+          "label": "Typical trigger",
+          "leftValue": "Template update changes ASG configuration",
+          "rightValue": "Explicitly roll out a new AMI, launch template, or instance type"
+        },
+        {
+          "id": "control",
+          "label": "Availability control",
+          "leftValue": "Batch size, minimum in service, pause time",
+          "rightValue": "Minimum/maximum healthy percentage, warmup, checkpoints"
+        },
+        {
+          "id": "scope",
+          "label": "Exam clue",
+          "leftValue": "The question asks for a CloudFormation template setting",
+          "rightValue": "The question asks to refresh existing fleet independently of stack logic"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 53
+        },
+        {
+          "bank": "verified",
+          "questionId": 69
+        }
+      ]
+    },
+    {
+      "id": "cmp-lifecycle-hook-vs-termination-policy",
+      "topicId": "autoscaling_replacement_lifecycle",
+      "leftService": "Auto Scaling Lifecycle Hook",
+      "rightService": "Auto Scaling Termination Policy",
+      "dimensions": [
+        {
+          "id": "purpose",
+          "label": "Purpose",
+          "leftValue": "Pause launch or termination for custom work",
+          "rightValue": "Choose which instance is terminated first"
+        },
+        {
+          "id": "state",
+          "label": "Lifecycle state",
+          "leftValue": "Pending:Wait or Terminating:Wait",
+          "rightValue": "No custom wait state"
+        },
+        {
+          "id": "action",
+          "label": "Typical action",
+          "leftValue": "Log upload, AMI creation, domain deregistration",
+          "rightValue": "Prefer oldest launch template, AZ balancing, allocation strategy"
+        },
+        {
+          "id": "completion",
+          "label": "Completion",
+          "leftValue": "CompleteLifecycleAction or timeout",
+          "rightValue": "Auto Scaling proceeds with selected termination"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 42
+        },
+        {
+          "bank": "verified",
+          "questionId": 66
+        },
+        {
+          "bank": "verified",
+          "questionId": 73
+        },
+        {
+          "bank": "verified",
+          "questionId": 104
+        }
+      ]
+    },
+    {
+      "id": "cmp-config-rule-vs-eventbridge",
+      "topicId": "aws_config_remediation",
+      "leftService": "AWS Config Rule",
+      "rightService": "Amazon EventBridge Rule",
+      "dimensions": [
+        {
+          "id": "purpose",
+          "label": "Purpose",
+          "leftValue": "Evaluate resource compliance",
+          "rightValue": "Route matching events to targets"
+        },
+        {
+          "id": "history",
+          "label": "Historical evidence",
+          "leftValue": "Maintains compliance evaluation history",
+          "rightValue": "Does not provide Config compliance history by itself"
+        },
+        {
+          "id": "trigger",
+          "label": "Input",
+          "leftValue": "Configuration changes or periodic evaluation",
+          "rightValue": "Events such as Config compliance changes or API activity"
+        },
+        {
+          "id": "best-use",
+          "label": "Best use",
+          "leftValue": "Audit requirement and resource-state policy",
+          "rightValue": "Notification, fan-out, or workflow initiation"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 15
+        },
+        {
+          "bank": "verified",
+          "questionId": 18
+        },
+        {
+          "bank": "verified",
+          "questionId": 70
+        },
+        {
+          "bank": "verified",
+          "questionId": 119
+        }
+      ]
+    },
+    {
+      "id": "cmp-conformance-pack-vs-aggregator",
+      "topicId": "conformance_packs_aggregators",
+      "leftService": "AWS Config Conformance Pack",
+      "rightService": "AWS Config Configuration Aggregator",
+      "dimensions": [
+        {
+          "id": "purpose",
+          "label": "Purpose",
+          "leftValue": "Deploy a bundle of rules and remediation actions",
+          "rightValue": "Collect configuration and compliance data centrally"
+        },
+        {
+          "id": "effect",
+          "label": "Member-account effect",
+          "leftValue": "Creates governance controls",
+          "rightValue": "Provides read-only central visibility"
+        },
+        {
+          "id": "scope",
+          "label": "Scope",
+          "leftValue": "Account/Region or organization deployment",
+          "rightValue": "Multiple accounts and Regions"
+        },
+        {
+          "id": "trap",
+          "label": "Common trap",
+          "leftValue": "Not a dashboard by itself",
+          "rightValue": "Does not enforce or remediate by itself"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 21
+        },
+        {
+          "bank": "verified",
+          "questionId": 65
+        },
+        {
+          "bank": "verified",
+          "questionId": 103
+        }
+      ]
+    }
+  ],
+  "drillDefinitions": [
+    {
+      "drillId": "cfn-control-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "cloudformation_update_recovery",
+      "domainId": "configuration_management_iac",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "CloudFormation control-plane sentence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the mechanism before choosing a command or feature.",
+      "prompt": "CloudFormation safety separates four questions: preview a proposed change, detect out-of-band drift, authorize stack execution, and recover a failed rollback.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "change set",
+        "drift",
+        "service role",
+        "UPDATE_ROLLBACK_FAILED"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Change set, drift, execution permissions y rollback recovery resuelven etapas distintas.",
+        "testedPattern": "CloudFormation control separation",
+        "correctChoiceWins": "Separar la etapa evita usar drift detection para un rollback o un service role para un problema de plantilla.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 9
+        },
+        {
+          "bank": "verified",
+          "questionId": 34
+        },
+        {
+          "bank": "verified",
+          "questionId": 40
+        },
+        {
+          "bank": "verified",
+          "questionId": 80
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "cloudformation",
+        "mechanism"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cfn-control-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "cloudformation_update_recovery",
+      "domainId": "configuration_management_iac",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Pending change or existing drift?",
+      "difficulty": "practice",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the mechanism that answers the stated question.",
+      "prompt": "You need to see whether a proposed template update will replace a database before executing it.",
+      "answerOptions": [
+        {
+          "id": "change-set",
+          "label": "Create and inspect a change set"
+        },
+        {
+          "id": "drift",
+          "label": "Run stack drift detection"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "change-set"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "proposed template update",
+        "before executing",
+        "replace"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "drift",
+          "errorCause": "service_confusion",
+          "attraction": "Drift is a CloudFormation safety feature.",
+          "failure": "Drift compares live resources with the current template; it does not preview the pending update."
+        }
+      ],
+      "explanation": {
+        "concise": "Un change set muestra el impacto de la actualización propuesta antes de ejecutarla.",
+        "testedPattern": "Change set vs drift detection",
+        "correctChoiceWins": "La palabra decisiva es proposed: todavía no se busca una modificación fuera de CloudFormation.",
+        "distractorReview": [
+          {
+            "optionId": "drift",
+            "errorCause": "service_confusion",
+            "attraction": "Drift suena como una revisión de cambios.",
+            "failure": "Revisa divergencia existente, no el cambio pendiente."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 9
+        },
+        {
+          "bank": "verified",
+          "questionId": 94
+        },
+        {
+          "bank": "verified",
+          "questionId": 96
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "change-set",
+        "drift"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cfn-control-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "cloudformation_update_recovery",
+      "domainId": "configuration_management_iac",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Recover UPDATE_ROLLBACK_FAILED",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Order the recovery steps. Use each item once.",
+      "prompt": "A stack update rollback is blocked by a resource that cannot return to its previous state.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "inspect-events",
+          "label": "Inspect stack events and identify the blocking resource"
+        },
+        {
+          "id": "repair-resource",
+          "label": "Repair or reconcile the resource outside the failed rollback"
+        },
+        {
+          "id": "continue-rollback",
+          "label": "Run ContinueUpdateRollback"
+        },
+        {
+          "id": "verify-stable",
+          "label": "Verify the stack reaches UPDATE_ROLLBACK_COMPLETE"
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "inspect-events",
+          "repair-resource",
+          "continue-rollback",
+          "verify-stable"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "UPDATE_ROLLBACK_FAILED",
+        "blocking resource",
+        "ContinueUpdateRollback"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Primero se elimina el bloqueo; después se continúa el rollback.",
+        "testedPattern": "CloudFormation rollback recovery",
+        "correctChoiceWins": "ContinueUpdateRollback no corrige por sí mismo la causa que bloqueó el retorno.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 34
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "rollback",
+        "workflow"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cfn-control-component-01",
+      "version": "drill-definition-v1",
+      "topicId": "cloudformation_update_recovery",
+      "domainId": "configuration_management_iac",
+      "activityType": "component_identification",
+      "drillForm": "component_identification",
+      "title": "Least-privilege stack execution",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the architecture that separates user permission from CloudFormation execution permission.",
+      "prompt": "A developer must deploy a stack without receiving direct permission to create every resource in the template.",
+      "answerOptions": [
+        {
+          "id": "service-role",
+          "label": "Create a least-privilege CloudFormation service role, allow iam:PassRole for that role, and deploy using it"
+        },
+        {
+          "id": "admin-user",
+          "label": "Attach AdministratorAccess to the developer for the deployment window"
+        },
+        {
+          "id": "stack-policy",
+          "label": "Use a stack policy instead of an execution role"
+        },
+        {
+          "id": "source-ip",
+          "label": "Restrict the developer by source IP and omit iam:PassRole"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "service-role"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "without direct permission",
+        "least privilege",
+        "deploy stack"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "admin-user",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "AdministratorAccess guarantees provisioning succeeds.",
+          "failure": "It grants the caller far more permissions than required."
+        },
+        {
+          "optionId": "stack-policy",
+          "errorCause": "service_confusion",
+          "attraction": "A stack policy sounds like stack security.",
+          "failure": "It protects resources from updates; it does not grant provisioning permissions."
+        },
+        {
+          "optionId": "source-ip",
+          "errorCause": "incorrect_assumption",
+          "attraction": "A network condition appears restrictive.",
+          "failure": "It does not authorize CloudFormation to assume the service role."
+        }
+      ],
+      "explanation": {
+        "concise": "El usuario pasa un rol limitado y CloudFormation usa ese rol para aprovisionar.",
+        "testedPattern": "CloudFormation service role and iam:PassRole",
+        "correctChoiceWins": "Esta opción mantiene privilegios de creación fuera de la identidad humana.",
+        "distractorReview": [
+          {
+            "optionId": "admin-user",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "Es operativamente fácil.",
+            "failure": "Rompe mínimo privilegio."
+          },
+          {
+            "optionId": "stack-policy",
+            "errorCause": "service_confusion",
+            "attraction": "Está asociado al stack.",
+            "failure": "No es un rol de ejecución."
+          },
+          {
+            "optionId": "source-ip",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Reduce desde dónde se llama.",
+            "failure": "No reemplaza iam:PassRole."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 40
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "service-role",
+        "passrole"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cfn-control-elimination-01",
+      "version": "drill-definition-v1",
+      "topicId": "cloudformation_update_recovery",
+      "domainId": "configuration_management_iac",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Delete a test stack with a populated bucket",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the BEST operational fix.",
+      "prompt": "A disposable test stack cannot be deleted because its S3 bucket contains test objects. The cleanup must be automatic for every pipeline run.",
+      "answerOptions": [
+        {
+          "id": "custom-resource",
+          "label": "Add a cleanup custom resource or equivalent pipeline cleanup that empties the bucket before deletion"
+        },
+        {
+          "id": "force-property",
+          "label": "Set a fictitious ForceDelete property on the bucket"
+        },
+        {
+          "id": "drift",
+          "label": "Run drift detection and retry DeleteStack"
+        },
+        {
+          "id": "stack-policy",
+          "label": "Remove the stack policy and retry"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "custom-resource"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "bucket contains objects",
+        "automatic cleanup",
+        "every pipeline run"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "force-property",
+          "errorCause": "knowledge_gap",
+          "attraction": "A force-delete flag would be convenient.",
+          "failure": "CloudFormation S3 bucket deletion does not gain object cleanup from such a property."
+        },
+        {
+          "optionId": "drift",
+          "errorCause": "service_confusion",
+          "attraction": "Drift is related to stack/resource mismatch.",
+          "failure": "It does not empty the bucket."
+        },
+        {
+          "optionId": "stack-policy",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Policies can block updates.",
+          "failure": "The failure is the non-empty bucket, not update protection."
+        }
+      ],
+      "explanation": {
+        "concise": "El proceso debe vaciar el bucket antes de que CloudFormation elimine el recurso.",
+        "testedPattern": "Stateful cleanup during stack deletion",
+        "correctChoiceWins": "El custom resource hace explícita una operación que CloudFormation no realiza automáticamente.",
+        "distractorReview": [
+          {
+            "optionId": "force-property",
+            "errorCause": "knowledge_gap",
+            "attraction": "Parece una propiedad natural.",
+            "failure": "No existe para este comportamiento."
+          },
+          {
+            "optionId": "drift",
+            "errorCause": "service_confusion",
+            "attraction": "Analiza recursos del stack.",
+            "failure": "No borra objetos."
+          },
+          {
+            "optionId": "stack-policy",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Puede bloquear cambios.",
+            "failure": "No explica el error descrito."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 83
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "s3",
+        "custom-resource",
+        "cleanup"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cfn-control-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "cloudformation_update_recovery",
+      "domainId": "configuration_management_iac",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Preserve a stateful resource during replacement",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer and defend why the other controls solve different problems.",
+      "prompt": "A CloudFormation update will replace a stateful resource. The old physical resource must remain available after replacement for a controlled migration, while the new resource becomes part of the updated stack.",
+      "answerOptions": [
+        {
+          "id": "update-replace-retain",
+          "label": "Configure UpdateReplacePolicy: Retain on the resource"
+        },
+        {
+          "id": "deletion-retain",
+          "label": "Configure only DeletionPolicy: Retain"
+        },
+        {
+          "id": "change-set-only",
+          "label": "Create a change set and execute it without a lifecycle policy"
+        },
+        {
+          "id": "drift-only",
+          "label": "Run drift detection after the update"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "update-replace-retain"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "update will replace",
+        "old physical resource must remain",
+        "after replacement"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "deletion-retain",
+          "errorCause": "missed_keyword",
+          "attraction": "DeletionPolicy: Retain is a well-known protection.",
+          "failure": "The decisive event is replacement during update, not stack deletion."
+        },
+        {
+          "optionId": "change-set-only",
+          "errorCause": "incorrect_assumption",
+          "attraction": "The change set can reveal replacement.",
+          "failure": "Previewing does not preserve the old physical resource."
+        },
+        {
+          "optionId": "drift-only",
+          "errorCause": "service_confusion",
+          "attraction": "Drift checks actual state.",
+          "failure": "It is not a replacement lifecycle policy."
+        }
+      ],
+      "explanation": {
+        "concise": "UpdateReplacePolicy controla qué pasa con el recurso anterior cuando una actualización lo reemplaza.",
+        "testedPattern": "CloudFormation replacement lifecycle",
+        "correctChoiceWins": "La opción coincide exactamente con el evento replacement; DeletionPolicy protege otro evento.",
+        "distractorReview": [
+          {
+            "optionId": "deletion-retain",
+            "errorCause": "missed_keyword",
+            "attraction": "Retain es correcto en otro contexto.",
+            "failure": "La pregunta dice replacement."
+          },
+          {
+            "optionId": "change-set-only",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Permite anticipar el reemplazo.",
+            "failure": "No cambia el tratamiento del recurso viejo."
+          },
+          {
+            "optionId": "drift-only",
+            "errorCause": "service_confusion",
+            "attraction": "Detecta diferencia.",
+            "failure": "No preserva nada."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 83
+        },
+        {
+          "bank": "verified",
+          "questionId": 94
+        },
+        {
+          "bank": "verified",
+          "questionId": 96
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "update-replace-policy",
+        "retain"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cfn-control-bank-34",
+      "version": "drill-definition-v1",
+      "topicId": "cloudformation_update_recovery",
+      "domainId": "configuration_management_iac",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: failed rollback recovery",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the original verified-bank question in English. Identify decisive keywords, eliminate distractors, and submit confidence explicitly.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B",
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La revisión completa se resuelve desde la referencia del banco sin copiar el contenido al paquete.",
+        "testedPattern": "Verified-bank return",
+        "correctChoiceWins": "El objetivo es comprobar si el flujo de recuperación se transfiere al escenario original.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 34
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "cloudformation",
+        "rollback"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "asg-update-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "autoscaling_replacement_lifecycle",
+      "domainId": "configuration_management_iac",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Desired configuration is not fleet replacement",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the operational model.",
+      "prompt": "Changing an Auto Scaling group's launch template or launch configuration defines what future instances use. Existing instances need an explicit rolling replacement mechanism.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "future instances",
+        "existing instances",
+        "rolling replacement"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Cambiar la configuración deseada no reemplaza por sí solo toda la flota existente.",
+        "testedPattern": "Auto Scaling configuration vs fleet rollout",
+        "correctChoiceWins": "El examen suele separar el objeto de configuración del mecanismo que actualiza las instancias.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 53
+        },
+        {
+          "bank": "verified",
+          "questionId": 69
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cloudformation_update_recovery"
+      ],
+      "tags": [
+        "asg",
+        "launch-template"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "asg-update-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "autoscaling_replacement_lifecycle",
+      "domainId": "configuration_management_iac",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Template-controlled or independent rollout?",
+      "difficulty": "practice",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the mechanism that matches the ownership clue.",
+      "prompt": "The requirement says: configure the CloudFormation template so a six-instance group replaces instances in batches while at least four remain available.",
+      "answerOptions": [
+        {
+          "id": "update-policy",
+          "label": "Use AutoScalingRollingUpdate in the CloudFormation UpdatePolicy"
+        },
+        {
+          "id": "instance-refresh",
+          "label": "Start an instance refresh outside the stack"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "update-policy"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "configure the CloudFormation template",
+        "batches",
+        "at least four"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "instance-refresh",
+          "errorCause": "missed_keyword",
+          "attraction": "Instance refresh can also replace a fleet safely.",
+          "failure": "The question explicitly asks for the CloudFormation template configuration."
+        }
+      ],
+      "explanation": {
+        "concise": "La propiedad pedida vive en la plantilla: UpdatePolicy con AutoScalingRollingUpdate.",
+        "testedPattern": "UpdatePolicy vs instance refresh",
+        "correctChoiceWins": "Ambas tecnologías son plausibles; la frase configure the template decide.",
+        "distractorReview": [
+          {
+            "optionId": "instance-refresh",
+            "errorCause": "missed_keyword",
+            "attraction": "Es una alternativa operativa válida.",
+            "failure": "No responde al alcance pedido."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 53
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cloudformation_update_recovery"
+      ],
+      "tags": [
+        "update-policy",
+        "instance-refresh"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "asg-update-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "autoscaling_replacement_lifecycle",
+      "domainId": "configuration_management_iac",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Roll out a new AMI with instance refresh",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Order the operational steps.",
+      "prompt": "A team wants every existing instance to adopt a new AMI while preserving availability.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "publish-version",
+          "label": "Create a launch template version that references the new AMI"
+        },
+        {
+          "id": "set-desired",
+          "label": "Point the Auto Scaling group or refresh desired configuration to the new version"
+        },
+        {
+          "id": "start-refresh",
+          "label": "Start the instance refresh with healthy-percentage and warmup settings"
+        },
+        {
+          "id": "validate-batches",
+          "label": "Monitor health as batches are replaced"
+        },
+        {
+          "id": "complete",
+          "label": "Confirm the refresh completes or roll back according to failure controls"
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "publish-version",
+          "set-desired",
+          "start-refresh",
+          "validate-batches",
+          "complete"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "new AMI",
+        "existing instances",
+        "preserving availability"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Primero existe la configuración nueva; después se inicia y observa el reemplazo.",
+        "testedPattern": "Instance refresh operational flow",
+        "correctChoiceWins": "La secuencia evita creer que publicar la AMI o la launch template actualiza instancias existentes.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 53
+        },
+        {
+          "bank": "verified",
+          "questionId": 69
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cloudformation_update_recovery"
+      ],
+      "tags": [
+        "instance-refresh",
+        "workflow"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "asg-update-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "autoscaling_replacement_lifecycle",
+      "domainId": "configuration_management_iac",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map Auto Scaling controls to their job",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each control ID to its operational purpose.",
+      "prompt": "Match each Auto Scaling control to the job it performs.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "launch-template",
+          "label": "Launch template version"
+        },
+        {
+          "id": "instance-refresh",
+          "label": "Instance refresh"
+        },
+        {
+          "id": "warmup",
+          "label": "Default instance warmup"
+        },
+        {
+          "id": "lifecycle-hook",
+          "label": "Termination lifecycle hook"
+        },
+        {
+          "id": "termination-policy",
+          "label": "Termination policy"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "launch-template": "desired-instance-configuration",
+          "instance-refresh": "replace-existing-fleet",
+          "warmup": "delay-readiness-accounting",
+          "lifecycle-hook": "pause-for-custom-action",
+          "termination-policy": "choose-termination-candidate"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "desired configuration",
+        "replace fleet",
+        "warmup",
+        "pause",
+        "choose instance"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Cada control actúa en una etapa distinta del ciclo de vida.",
+        "testedPattern": "Auto Scaling mechanism mapping",
+        "correctChoiceWins": "El mapa elimina la confusión entre elegir la instancia, pausarla y reemplazar toda la flota.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 42
+        },
+        {
+          "bank": "verified",
+          "questionId": 53
+        },
+        {
+          "bank": "verified",
+          "questionId": 66
+        },
+        {
+          "bank": "verified",
+          "questionId": 73
+        },
+        {
+          "bank": "verified",
+          "questionId": 104
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cloudformation_update_recovery"
+      ],
+      "tags": [
+        "mapping",
+        "lifecycle"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "asg-update-elimination-01",
+      "version": "drill-definition-v1",
+      "topicId": "autoscaling_replacement_lifecycle",
+      "domainId": "configuration_management_iac",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Collect logs before scale-in termination",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the mechanism that creates a reliable cleanup window.",
+      "prompt": "Instances can terminate during scale-in. Application logs must be uploaded before termination, without disabling Auto Scaling.",
+      "answerOptions": [
+        {
+          "id": "hook-event-automation",
+          "label": "Use a termination lifecycle hook, route the event to automation, upload logs, then complete the lifecycle action"
+        },
+        {
+          "id": "termination-policy",
+          "label": "Use a termination policy that chooses the oldest instance"
+        },
+        {
+          "id": "cooldown",
+          "label": "Increase the scaling cooldown"
+        },
+        {
+          "id": "scheduled-job",
+          "label": "Run a daily cron job on each instance"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "hook-event-automation"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "before termination",
+        "scale-in",
+        "reliable cleanup window"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "termination-policy",
+          "errorCause": "service_confusion",
+          "attraction": "Termination policies participate in scale-in.",
+          "failure": "They select the candidate but do not pause termination for cleanup."
+        },
+        {
+          "optionId": "cooldown",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Cooldown slows scaling activity.",
+          "failure": "It does not create a per-instance termination wait state."
+        },
+        {
+          "optionId": "scheduled-job",
+          "errorCause": "elimination_failure",
+          "attraction": "A job can upload logs periodically.",
+          "failure": "It cannot guarantee final logs are captured immediately before unpredictable termination."
+        }
+      ],
+      "explanation": {
+        "concise": "El lifecycle hook crea Terminating:Wait; la automatización hace la limpieza y completa la acción.",
+        "testedPattern": "Scale-in cleanup",
+        "correctChoiceWins": "Es la única opción que sincroniza el trabajo con el evento real de terminación.",
+        "distractorReview": [
+          {
+            "optionId": "termination-policy",
+            "errorCause": "service_confusion",
+            "attraction": "Está relacionada con termination.",
+            "failure": "Solo elige candidato."
+          },
+          {
+            "optionId": "cooldown",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Parece dar tiempo.",
+            "failure": "No pausa la instancia seleccionada."
+          },
+          {
+            "optionId": "scheduled-job",
+            "errorCause": "elimination_failure",
+            "attraction": "Reduce pérdida en promedio.",
+            "failure": "No garantiza el cierre."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 42
+        },
+        {
+          "bank": "verified",
+          "questionId": 66
+        },
+        {
+          "bank": "verified",
+          "questionId": 104
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cloudformation_update_recovery"
+      ],
+      "tags": [
+        "lifecycle-hook",
+        "logs"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "asg-update-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "autoscaling_replacement_lifecycle",
+      "domainId": "configuration_management_iac",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Protect capacity during a slow bootstrap",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST combination.",
+      "prompt": "A new application version takes 8 minutes after entering InService before it can sustain traffic. An instance refresh must replace the fleet without terminating too many healthy instances early.",
+      "answerOptions": [
+        {
+          "id": "warmup-health",
+          "label": "Configure default instance warmup near the real bootstrap time and set a minimum healthy percentage for the refresh"
+        },
+        {
+          "id": "cooldown-only",
+          "label": "Increase the default scaling cooldown only"
+        },
+        {
+          "id": "termination-policy",
+          "label": "Choose a different termination policy"
+        },
+        {
+          "id": "desired-zero",
+          "label": "Set desired capacity to zero and restore it after the update"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "warmup-health"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "after entering InService",
+        "8 minutes",
+        "minimum healthy"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "cooldown-only",
+          "errorCause": "service_confusion",
+          "attraction": "Cooldown is associated with waiting after scaling.",
+          "failure": "Instance refresh readiness and healthy-capacity protection require warmup and healthy-percentage controls."
+        },
+        {
+          "optionId": "termination-policy",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Termination selection affects which instance leaves.",
+          "failure": "It does not tell the refresh when a new instance is truly ready."
+        },
+        {
+          "optionId": "desired-zero",
+          "errorCause": "elimination_failure",
+          "attraction": "It guarantees all instances restart.",
+          "failure": "It violates availability."
+        }
+      ],
+      "explanation": {
+        "concise": "Warmup evita contar capacidad nueva antes de estar lista; el porcentaje saludable protege disponibilidad.",
+        "testedPattern": "Instance refresh readiness",
+        "correctChoiceWins": "La combinación responde tanto al tiempo de arranque como a la cantidad mínima saludable.",
+        "distractorReview": [
+          {
+            "optionId": "cooldown-only",
+            "errorCause": "service_confusion",
+            "attraction": "Es una espera de Auto Scaling.",
+            "failure": "No es la señal principal del refresh."
+          },
+          {
+            "optionId": "termination-policy",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "Controla scale-in.",
+            "failure": "No controla readiness."
+          },
+          {
+            "optionId": "desired-zero",
+            "errorCause": "elimination_failure",
+            "attraction": "Fuerza renovación.",
+            "failure": "Causa downtime."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 53
+        },
+        {
+          "bank": "verified",
+          "questionId": 73
+        },
+        {
+          "bank": "verified",
+          "questionId": 74
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cloudformation_update_recovery"
+      ],
+      "tags": [
+        "warmup",
+        "healthy-percentage"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "asg-update-bank-53",
+      "version": "drill-definition-v1",
+      "topicId": "autoscaling_replacement_lifecycle",
+      "domainId": "configuration_management_iac",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: CloudFormation rolling ASG update",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the original verified-bank question in English. Identify decisive keywords, eliminate distractors, and submit confidence explicitly.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La revisión completa se resuelve desde la referencia del banco sin copiar el contenido al paquete.",
+        "testedPattern": "Verified-bank return",
+        "correctChoiceWins": "El objetivo es transferir el modelo de UpdatePolicy al escenario original.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 53
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "cloudformation_update_recovery"
+      ],
+      "tags": [
+        "bank-return",
+        "asg",
+        "update-policy"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-remediate-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "aws_config_remediation",
+      "domainId": "security_compliance",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Detect, notify, remediate, retain evidence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the four-stage compliance model.",
+      "prompt": "AWS Config records configuration, evaluates a resource with a rule, emits compliance-change events for workflows, and can invoke remediation through Systems Manager Automation.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "record",
+        "evaluate",
+        "compliance change",
+        "remediation"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Config conserva evidencia y evalúa estado; EventBridge y SSM Automation ejecutan la respuesta.",
+        "testedPattern": "AWS Config compliance workflow",
+        "correctChoiceWins": "Separar detectar, notificar y remediar evita pedirle a una sola herramienta que haga todo.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 15
+        },
+        {
+          "bank": "verified",
+          "questionId": 18
+        },
+        {
+          "bank": "verified",
+          "questionId": 70
+        },
+        {
+          "bank": "verified",
+          "questionId": 119
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aws-config",
+        "remediation"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-remediate-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "aws_config_remediation",
+      "domainId": "security_compliance",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Compliance state or API event?",
+      "difficulty": "practice",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the primary detector.",
+      "prompt": "The requirement is to audit over time whether every EBS volume is encrypted, including resources created before the solution.",
+      "answerOptions": [
+        {
+          "id": "config",
+          "label": "Use an AWS Config managed rule scoped to EBS volumes"
+        },
+        {
+          "id": "eventbridge-api",
+          "label": "Use only an EventBridge rule for CreateVolume API calls"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "config"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "audit over time",
+        "every EBS volume",
+        "created before"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "eventbridge-api",
+          "errorCause": "missed_keyword",
+          "attraction": "CreateVolume events can catch new resources.",
+          "failure": "They do not evaluate the current fleet or provide Config compliance history."
+        }
+      ],
+      "explanation": {
+        "concise": "La necesidad es estado y auditoría histórica, no solo reaccionar al evento de creación.",
+        "testedPattern": "State compliance vs event detection",
+        "correctChoiceWins": "AWS Config evalúa recursos existentes y cambios futuros.",
+        "distractorReview": [
+          {
+            "optionId": "eventbridge-api",
+            "errorCause": "missed_keyword",
+            "attraction": "Es casi tiempo real para nuevos eventos.",
+            "failure": "No cubre el inventario previo ni el historial de cumplimiento."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 70
+        },
+        {
+          "bank": "verified",
+          "questionId": 119
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "config-rule",
+        "eventbridge"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-remediate-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "aws_config_remediation",
+      "domainId": "security_compliance",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Automatic Config remediation flow",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Order the stages.",
+      "prompt": "A required backup tag must be added automatically to noncompliant EBS volumes.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "record",
+          "label": "AWS Config records the EBS volume configuration"
+        },
+        {
+          "id": "evaluate",
+          "label": "A rule scoped to AWS::EC2::Volume evaluates the required tag"
+        },
+        {
+          "id": "noncompliant",
+          "label": "The volume is marked NON_COMPLIANT"
+        },
+        {
+          "id": "remediate",
+          "label": "A remediation configuration invokes an SSM Automation runbook"
+        },
+        {
+          "id": "reevaluate",
+          "label": "AWS Config reevaluates the resource and retains compliance history"
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "record",
+          "evaluate",
+          "noncompliant",
+          "remediate",
+          "reevaluate"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "EBS volume",
+        "required tag",
+        "automatic remediation"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La remediación ocurre después de una evaluación de incumplimiento y debe volver a verificarse.",
+        "testedPattern": "Config automatic remediation workflow",
+        "correctChoiceWins": "El flujo preserva la trazabilidad entre estado detectado, acción y estado final.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 15
+        },
+        {
+          "bank": "verified",
+          "questionId": 119
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "ssm-automation",
+        "workflow"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-remediate-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "aws_config_remediation",
+      "domainId": "security_compliance",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map compliance components",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to its role.",
+      "prompt": "Match each component to the compliance job it performs.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "recorder",
+          "label": "Configuration recorder"
+        },
+        {
+          "id": "rule",
+          "label": "AWS Config rule"
+        },
+        {
+          "id": "eventbridge",
+          "label": "EventBridge rule"
+        },
+        {
+          "id": "automation",
+          "label": "SSM Automation runbook"
+        },
+        {
+          "id": "sns",
+          "label": "SNS topic"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "recorder": "capture-resource-configuration",
+          "rule": "evaluate-compliance",
+          "eventbridge": "route-compliance-change",
+          "automation": "perform-remediation",
+          "sns": "deliver-notification"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "record",
+        "evaluate",
+        "route",
+        "remediate",
+        "notify"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El diseño correcto asigna una responsabilidad por componente.",
+        "testedPattern": "Compliance architecture mapping",
+        "correctChoiceWins": "Esto evita confundir una regla de Config con una regla de EventBridge o con el runbook.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 15
+        },
+        {
+          "bank": "verified",
+          "questionId": 18
+        },
+        {
+          "bank": "verified",
+          "questionId": 70
+        },
+        {
+          "bank": "verified",
+          "questionId": 119
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "mapping",
+        "compliance"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-remediate-elimination-01",
+      "version": "drill-definition-v1",
+      "topicId": "aws_config_remediation",
+      "domainId": "security_compliance",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Notify only for one rule's NON_COMPLIANT result",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the BEST event pattern and delivery path.",
+      "prompt": "The security team wants a customized SNS message only when the restricted-SSH Config rule reports NON_COMPLIANT.",
+      "answerOptions": [
+        {
+          "id": "specific-event",
+          "label": "Match the AWS Config compliance-change event for the specific rule and NON_COMPLIANT state, transform the input, and target SNS"
+        },
+        {
+          "id": "all-results",
+          "label": "Match all evaluation results from every Config rule and publish unchanged events"
+        },
+        {
+          "id": "error-state",
+          "label": "Match only ERROR evaluations"
+        },
+        {
+          "id": "config-direct",
+          "label": "Connect the Config rule directly to SNS with no event routing"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "specific-event"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "only",
+        "specific rule",
+        "NON_COMPLIANT",
+        "customized"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "all-results",
+          "errorCause": "elimination_failure",
+          "attraction": "It guarantees events are received.",
+          "failure": "It violates the scope and creates noise."
+        },
+        {
+          "optionId": "error-state",
+          "errorCause": "service_confusion",
+          "attraction": "ERROR sounds like failure.",
+          "failure": "NON_COMPLIANT is the required compliance result."
+        },
+        {
+          "optionId": "config-direct",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Direct integration sounds simpler.",
+          "failure": "The customized event filtering and transformation belong in EventBridge."
+        }
+      ],
+      "explanation": {
+        "concise": "EventBridge filtra la regla exacta y NON_COMPLIANT, transforma el mensaje y entrega a SNS.",
+        "testedPattern": "Config compliance event routing",
+        "correctChoiceWins": "La opción satisface simultáneamente only, specific rule y customized message.",
+        "distractorReview": [
+          {
+            "optionId": "all-results",
+            "errorCause": "elimination_failure",
+            "attraction": "Es amplia y funcional.",
+            "failure": "No cumple only."
+          },
+          {
+            "optionId": "error-state",
+            "errorCause": "service_confusion",
+            "attraction": "Parece severo.",
+            "failure": "No es el estado pedido."
+          },
+          {
+            "optionId": "config-direct",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Parece menos componentes.",
+            "failure": "No ofrece el flujo de filtrado/transformación descrito."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 18
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "eventbridge",
+        "sns",
+        "non-compliant"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-remediate-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "aws_config_remediation",
+      "domainId": "security_compliance",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Choose the correct resource scope",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer and identify the scope trap.",
+      "prompt": "Every EBS volume must carry a backup-frequency tag. The solution must continuously identify and automatically fix missing tags.",
+      "answerOptions": [
+        {
+          "id": "volume-rule-remediation",
+          "label": "Use a Config rule scoped to AWS::EC2::Volume and attach automatic SSM Automation remediation"
+        },
+        {
+          "id": "instance-rule",
+          "label": "Use a rule scoped to AWS::EC2::Instance because volumes are attached to instances"
+        },
+        {
+          "id": "trusted-advisor",
+          "label": "Use Trusted Advisor as the source of a volume-backup compliance event"
+        },
+        {
+          "id": "cloudtrail-create",
+          "label": "Handle only CreateVolume API events with no periodic evaluation"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "volume-rule-remediation"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "every EBS volume",
+        "continuously",
+        "automatically fix"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "instance-rule",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Volumes are commonly reached through instances.",
+          "failure": "The policy applies to the volume resource, including unattached volumes."
+        },
+        {
+          "optionId": "trusted-advisor",
+          "errorCause": "service_confusion",
+          "attraction": "Trusted Advisor provides recommendations.",
+          "failure": "It is not the rule/remediation mechanism for this custom tag requirement."
+        },
+        {
+          "optionId": "cloudtrail-create",
+          "errorCause": "missed_keyword",
+          "attraction": "It catches new volumes.",
+          "failure": "It misses existing resources and ongoing compliance evaluation."
+        }
+      ],
+      "explanation": {
+        "concise": "La regla debe evaluar EC2::Volume y la remediación debe aplicar la etiqueta.",
+        "testedPattern": "AWS Config scope and remediation",
+        "correctChoiceWins": "La opción cubre el recurso correcto, el inventario completo y la corrección automática.",
+        "distractorReview": [
+          {
+            "optionId": "instance-rule",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "La relación instancia-volumen distrae.",
+            "failure": "El alcance es el volumen."
+          },
+          {
+            "optionId": "trusted-advisor",
+            "errorCause": "service_confusion",
+            "attraction": "Es un servicio de revisión.",
+            "failure": "No implementa esta política personalizada."
+          },
+          {
+            "optionId": "cloudtrail-create",
+            "errorCause": "missed_keyword",
+            "attraction": "Es reactivo.",
+            "failure": "No cumple every ni continuously."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 15
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "resource-scope",
+        "automatic-remediation"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-remediate-bank-119",
+      "version": "drill-definition-v1",
+      "topicId": "aws_config_remediation",
+      "domainId": "security_compliance",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: Config audit and automatic correction",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the original verified-bank question in English. Identify decisive keywords, eliminate distractors, and submit confidence explicitly.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La revisión completa se resuelve desde la referencia del banco sin copiar el contenido al paquete.",
+        "testedPattern": "Verified-bank return",
+        "correctChoiceWins": "El objetivo es transferir detect, audit y remediate al escenario original.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 119
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "aws-config",
+        "remediation"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-org-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "conformance_packs_aggregators",
+      "domainId": "security_compliance",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Deploy controls, then aggregate evidence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the governance layers.",
+      "prompt": "Organization conformance packs distribute Config rules and remediation actions. Configuration aggregators collect configuration and compliance data for a central view. Deployment and aggregation are complementary, not interchangeable.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "deploy controls",
+        "aggregate evidence",
+        "complementary"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Conformance pack estandariza controles; aggregator centraliza visibilidad.",
+        "testedPattern": "Multi-account AWS Config governance",
+        "correctChoiceWins": "La separación responde a la trampa frecuente de usar el dashboard como si fuera enforcement.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 21
+        },
+        {
+          "bank": "verified",
+          "questionId": 65
+        },
+        {
+          "bank": "verified",
+          "questionId": 103
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "aws_config_remediation"
+      ],
+      "tags": [
+        "organization",
+        "governance"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-org-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "conformance_packs_aggregators",
+      "domainId": "security_compliance",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Enforce or view?",
+      "difficulty": "practice",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the mechanism matching the verb.",
+      "prompt": "A security team must centrally deploy the same set of Config rules and remediation actions to member accounts.",
+      "answerOptions": [
+        {
+          "id": "conformance-pack",
+          "label": "Deploy an organization conformance pack"
+        },
+        {
+          "id": "aggregator",
+          "label": "Create a configuration aggregator"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "conformance-pack"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "deploy",
+        "same set",
+        "rules and remediation actions",
+        "member accounts"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "aggregator",
+          "errorCause": "service_confusion",
+          "attraction": "An aggregator is central and organization-aware.",
+          "failure": "It collects compliance data; it does not deploy rules or remediation."
+        }
+      ],
+      "explanation": {
+        "concise": "El verbo deploy dirige a organization conformance pack.",
+        "testedPattern": "Conformance pack vs aggregator",
+        "correctChoiceWins": "Aggregator responde a view/aggregate; no a crear controles en miembros.",
+        "distractorReview": [
+          {
+            "optionId": "aggregator",
+            "errorCause": "service_confusion",
+            "attraction": "Es correcto para una vista central.",
+            "failure": "No implementa enforcement."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 21
+        },
+        {
+          "bank": "verified",
+          "questionId": 65
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "aws_config_remediation"
+      ],
+      "tags": [
+        "conformance-pack",
+        "aggregator"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-org-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "conformance_packs_aggregators",
+      "domainId": "security_compliance",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Build organization-wide compliance",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Order the architecture rollout.",
+      "prompt": "The organization wants standard rules, automatic remediation, and a central multi-Region compliance view.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "enable-config",
+          "label": "Enable AWS Config recorder and delivery in required accounts and Regions"
+        },
+        {
+          "id": "deploy-pack",
+          "label": "Deploy the organization conformance pack with rules and remediation"
+        },
+        {
+          "id": "create-aggregator",
+          "label": "Create a configuration aggregator in the delegated central account"
+        },
+        {
+          "id": "authorize-sources",
+          "label": "Authorize or configure organization aggregation sources"
+        },
+        {
+          "id": "monitor",
+          "label": "Use aggregated compliance data and events for central operations"
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "enable-config",
+          "deploy-pack",
+          "create-aggregator",
+          "authorize-sources",
+          "monitor"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "standard rules",
+        "automatic remediation",
+        "central view"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Primero existe la telemetría y los controles; después se centraliza su evidencia.",
+        "testedPattern": "Organization Config rollout",
+        "correctChoiceWins": "El orden evita esperar que un aggregator funcione como grabador o que despliegue reglas.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 21
+        },
+        {
+          "bank": "verified",
+          "questionId": 65
+        },
+        {
+          "bank": "verified",
+          "questionId": 103
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "aws_config_remediation"
+      ],
+      "tags": [
+        "organization",
+        "workflow"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-org-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "conformance_packs_aggregators",
+      "domainId": "security_compliance",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map organization governance tools",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each tool to its role.",
+      "prompt": "Match each governance mechanism to what it actually does.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "stacksets",
+          "label": "CloudFormation StackSets"
+        },
+        {
+          "id": "org-pack",
+          "label": "Organization conformance pack"
+        },
+        {
+          "id": "aggregator",
+          "label": "Configuration aggregator"
+        },
+        {
+          "id": "eventbridge",
+          "label": "EventBridge"
+        },
+        {
+          "id": "quick-sight",
+          "label": "QuickSight or another reporting layer"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "stacksets": "bootstrap-shared-infrastructure",
+          "org-pack": "deploy-rules-and-remediation",
+          "aggregator": "centralize-config-compliance-data",
+          "eventbridge": "route-operational-events",
+          "quick-sight": "visualize-exported-or-transformed-data"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "bootstrap",
+        "deploy controls",
+        "aggregate",
+        "route",
+        "visualize"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La gobernanza multi-cuenta combina despliegue, control, agregación y visualización.",
+        "testedPattern": "Governance component mapping",
+        "correctChoiceWins": "El mapa evita asignar enforcement al aggregator o inventario a EventBridge.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 21
+        },
+        {
+          "bank": "verified",
+          "questionId": 65
+        },
+        {
+          "bank": "verified",
+          "questionId": 103
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "aws_config_remediation"
+      ],
+      "tags": [
+        "mapping",
+        "multi-account"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-org-elimination-01",
+      "version": "drill-definition-v1",
+      "topicId": "conformance_packs_aggregators",
+      "domainId": "security_compliance",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Central view without changing member resources",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the BEST mechanism.",
+      "prompt": "A central security account needs read-only visibility of Config resource configuration and compliance from all organization accounts and Regions. Existing member rules must remain unchanged.",
+      "answerOptions": [
+        {
+          "id": "aggregator",
+          "label": "Create an organization-backed configuration aggregator in the central account"
+        },
+        {
+          "id": "org-pack",
+          "label": "Deploy an organization conformance pack"
+        },
+        {
+          "id": "stacksets",
+          "label": "Use StackSets to copy all Config data into the central account"
+        },
+        {
+          "id": "cloudtrail",
+          "label": "Use only an organization CloudTrail"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "aggregator"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "read-only visibility",
+        "all accounts and Regions",
+        "rules remain unchanged"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "org-pack",
+          "errorCause": "missed_keyword",
+          "attraction": "It is organization-wide and Config-native.",
+          "failure": "It deploys controls, which is not requested."
+        },
+        {
+          "optionId": "stacksets",
+          "errorCause": "service_confusion",
+          "attraction": "StackSets can deploy Config infrastructure.",
+          "failure": "They do not aggregate Config compliance data."
+        },
+        {
+          "optionId": "cloudtrail",
+          "errorCause": "service_confusion",
+          "attraction": "CloudTrail centralizes API audit events.",
+          "failure": "It is not the Config compliance aggregation feature."
+        }
+      ],
+      "explanation": {
+        "concise": "El aggregator reúne datos de configuración y cumplimiento sin desplegar reglas nuevas.",
+        "testedPattern": "Central Config visibility",
+        "correctChoiceWins": "Read-only visibility y remain unchanged eliminan las opciones de enforcement.",
+        "distractorReview": [
+          {
+            "optionId": "org-pack",
+            "errorCause": "missed_keyword",
+            "attraction": "Es centralizado.",
+            "failure": "Cambia controles en miembros."
+          },
+          {
+            "optionId": "stacksets",
+            "errorCause": "service_confusion",
+            "attraction": "Despliega recursos.",
+            "failure": "No agrega datos."
+          },
+          {
+            "optionId": "cloudtrail",
+            "errorCause": "service_confusion",
+            "attraction": "Audita llamadas API.",
+            "failure": "No reemplaza Config compliance."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 65
+        },
+        {
+          "bank": "verified",
+          "questionId": 103
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "aws_config_remediation"
+      ],
+      "tags": [
+        "aggregator",
+        "central-view"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-org-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "conformance_packs_aggregators",
+      "domainId": "security_compliance",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Standardize and observe compliance at scale",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select TWO components that satisfy both enforcement and visibility.",
+      "prompt": "A company must deploy a common compliance baseline with remediation across AWS Organizations and provide a central multi-account, multi-Region compliance view.",
+      "answerOptions": [
+        {
+          "id": "org-pack",
+          "label": "Organization conformance pack"
+        },
+        {
+          "id": "aggregator",
+          "label": "AWS Config configuration aggregator"
+        },
+        {
+          "id": "cloudtrail-lake",
+          "label": "CloudTrail Lake event data store"
+        },
+        {
+          "id": "security-group",
+          "label": "A security group in the management account"
+        },
+        {
+          "id": "manual-rules",
+          "label": "Manually create rules in each member account"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "org-pack",
+          "aggregator"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "deploy baseline",
+        "remediation",
+        "central view",
+        "multi-account",
+        "multi-Region"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "cloudtrail-lake",
+          "errorCause": "service_confusion",
+          "attraction": "It provides centralized query of audit events.",
+          "failure": "It does not deploy or aggregate Config compliance controls."
+        },
+        {
+          "optionId": "security-group",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "It is a security control.",
+          "failure": "It has no organization governance scope."
+        },
+        {
+          "optionId": "manual-rules",
+          "errorCause": "elimination_failure",
+          "attraction": "It can eventually create the same rules.",
+          "failure": "It has high operational overhead and no central deployment mechanism."
+        }
+      ],
+      "explanation": {
+        "concise": "Conformance pack implementa el baseline; aggregator centraliza los resultados.",
+        "testedPattern": "Organization compliance architecture",
+        "correctChoiceWins": "La pregunta contiene dos verbos distintos: deploy/remediate y provide central view.",
+        "distractorReview": [
+          {
+            "optionId": "cloudtrail-lake",
+            "errorCause": "service_confusion",
+            "attraction": "Es central y auditable.",
+            "failure": "Trabaja con eventos CloudTrail."
+          },
+          {
+            "optionId": "security-group",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "Es un recurso de seguridad.",
+            "failure": "No es governance de organización."
+          },
+          {
+            "optionId": "manual-rules",
+            "errorCause": "elimination_failure",
+            "attraction": "Es posible técnicamente.",
+            "failure": "No es la solución escalable ni centralizada."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 21
+        },
+        {
+          "bank": "verified",
+          "questionId": 65
+        },
+        {
+          "bank": "verified",
+          "questionId": 103
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "aws_config_remediation"
+      ],
+      "tags": [
+        "multi-select",
+        "organization",
+        "config"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "config-org-bank-65",
+      "version": "drill-definition-v1",
+      "topicId": "conformance_packs_aggregators",
+      "domainId": "security_compliance",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: organization-wide CloudTrail compliance",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the original verified-bank question in English. Identify decisive keywords, eliminate distractors, and submit confidence explicitly.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La revisión completa se resuelve desde la referencia del banco sin copiar el contenido al paquete.",
+        "testedPattern": "Verified-bank return",
+        "correctChoiceWins": "El objetivo es transferir despliegue multi-cuenta, Config y vista central al escenario original.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 65
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "aws_config_remediation"
+      ],
+      "tags": [
+        "bank-return",
+        "organizations",
+        "config"
+      ],
+      "active": true
+    }
+  ],
+  "sourceQuestionRefs": [
+    {
+      "bank": "verified",
+      "questionId": 7
+    },
+    {
+      "bank": "verified",
+      "questionId": 9
+    },
+    {
+      "bank": "verified",
+      "questionId": 13
+    },
+    {
+      "bank": "verified",
+      "questionId": 15
+    },
+    {
+      "bank": "verified",
+      "questionId": 18
+    },
+    {
+      "bank": "verified",
+      "questionId": 21
+    },
+    {
+      "bank": "verified",
+      "questionId": 22
+    },
+    {
+      "bank": "verified",
+      "questionId": 34
+    },
+    {
+      "bank": "verified",
+      "questionId": 40
+    },
+    {
+      "bank": "verified",
+      "questionId": 42
+    },
+    {
+      "bank": "verified",
+      "questionId": 53
+    },
+    {
+      "bank": "verified",
+      "questionId": 65
+    },
+    {
+      "bank": "verified",
+      "questionId": 66
+    },
+    {
+      "bank": "verified",
+      "questionId": 69
+    },
+    {
+      "bank": "verified",
+      "questionId": 70
+    },
+    {
+      "bank": "verified",
+      "questionId": 73
+    },
+    {
+      "bank": "verified",
+      "questionId": 80
+    },
+    {
+      "bank": "verified",
+      "questionId": 83
+    },
+    {
+      "bank": "verified",
+      "questionId": 94
+    },
+    {
+      "bank": "verified",
+      "questionId": 96
+    },
+    {
+      "bank": "verified",
+      "questionId": 103
+    },
+    {
+      "bank": "verified",
+      "questionId": 104
+    },
+    {
+      "bank": "verified",
+      "questionId": 105
+    },
+    {
+      "bank": "verified",
+      "questionId": 109
+    },
+    {
+      "bank": "verified",
+      "questionId": 119
+    }
+  ],
+  "prerequisiteRelationships": [
+    {
+      "topicId": "cloudformation_update_recovery",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "autoscaling_replacement_lifecycle",
+      "prerequisiteTopicIds": [
+        "cloudformation_update_recovery"
+      ]
+    },
+    {
+      "topicId": "aws_config_remediation",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "conformance_packs_aggregators",
+      "prerequisiteTopicIds": [
+        "aws_config_remediation"
+      ]
+    }
+  ],
+  "tags": [
+    "dop-c02",
+    "cloudformation",
+    "change-sets",
+    "drift-detection",
+    "rollback",
+    "autoscaling",
+    "instance-refresh",
+    "lifecycle-hooks",
+    "aws-config",
+    "remediation",
+    "conformance-packs",
+    "aggregators",
+    "personalized"
+  ]
+}

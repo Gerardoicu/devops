@@ -1,0 +1,2807 @@
+{
+  "schemaVersion": "1.0",
+  "packageId": "cicd-artifacts-advanced-pipelines",
+  "version": "1.0.0",
+  "title": "CI/CD Artifacts and Advanced Pipeline Patterns",
+  "description": "Personalized DOP-C02 training for CodeArtifact package events and promotion, CodePipeline cross-account and cross-Region artifact flow, CodeBuild dynamic artifacts and parallel tests, and immutable build-once release promotion.",
+  "topicDescriptors": [
+    {
+      "topicId": "codeartifact_pipeline_events",
+      "title": "CodeArtifact Package Events and Dependency Promotion",
+      "domainId": "sdlc_automation",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "codeartifact_domain",
+        "repository",
+        "upstream_repository",
+        "external_connection",
+        "package_version_state",
+        "eventbridge",
+        "published_package",
+        "promotion_pipeline",
+        "sequence_number",
+        "idempotency"
+      ],
+      "sourceQuestions": []
+    },
+    {
+      "topicId": "advanced_codepipeline_cross_account",
+      "title": "CodePipeline Cross-Account and Cross-Region Artifact Flow",
+      "domainId": "sdlc_automation",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "pipeline_account",
+        "target_account_role",
+        "role_arn",
+        "artifact_bucket",
+        "customer_managed_kms_key",
+        "bucket_policy",
+        "key_policy",
+        "artifact_stores",
+        "cross_region_action",
+        "source_action_region"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 92
+        }
+      ]
+    },
+    {
+      "topicId": "codebuild_artifacts_parallel_testing",
+      "title": "CodeBuild Buildspec, Dynamic Artifacts, and Parallel Test Execution",
+      "domainId": "sdlc_automation",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "developing",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "buildspec",
+        "phases",
+        "artifacts",
+        "secondary_artifacts",
+        "environment_variables",
+        "codebuild_source_version",
+        "run_order",
+        "parallel_actions",
+        "network_bound_tests",
+        "long_running_tests"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 64
+        },
+        {
+          "bank": "verified",
+          "questionId": 68
+        },
+        {
+          "bank": "verified",
+          "questionId": 81
+        },
+        {
+          "bank": "verified",
+          "questionId": 113
+        }
+      ]
+    },
+    {
+      "topicId": "immutable_artifact_promotion",
+      "title": "Immutable Artifacts, Release Promotion, and Artifact Identity",
+      "domainId": "sdlc_automation",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "build_once_promote",
+        "immutable_artifact",
+        "content_digest",
+        "ecr_digest",
+        "versioned_s3_object",
+        "manual_approval",
+        "artifact_metadata",
+        "cloudfront_invalidation",
+        "same_artifact_across_environments"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 30
+        },
+        {
+          "bank": "verified",
+          "questionId": 72
+        },
+        {
+          "bank": "verified",
+          "questionId": 107
+        }
+      ]
+    }
+  ],
+  "conceptMaps": [
+    {
+      "id": "map-codeartifact-event-promotion",
+      "schemaVersion": "1.0",
+      "topicId": "codeartifact_pipeline_events",
+      "title": "CodeArtifact package publication to pipeline flow",
+      "steps": [
+        {
+          "id": "publish",
+          "label": "1. Publish or copy a package version",
+          "detail": "A build publishes a new package version or copies an approved version into another repository.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "event",
+          "label": "2. CodeArtifact emits an EventBridge event",
+          "detail": "The event identifies the domain, repository, package, version, state, operation type, and sequence number.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "filter",
+          "label": "3. EventBridge filters the exact package event",
+          "detail": "The rule should match the intended repository, package name, version state, and operation instead of every CodeArtifact event.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "target",
+          "label": "4. Start the validation or release workflow",
+          "detail": "EventBridge can start CodePipeline directly or invoke Lambda or Step Functions when enrichment or orchestration is required.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "dedupe",
+          "label": "5. Make processing idempotent",
+          "detail": "Use package identity, packageVersionRevision, or sequenceNumber to tolerate duplicates and out-of-order delivery.",
+          "sourceQuestions": []
+        }
+      ]
+    },
+    {
+      "id": "map-codepipeline-cross-account-flow",
+      "schemaVersion": "1.0",
+      "topicId": "advanced_codepipeline_cross_account",
+      "title": "Cross-account action authorization and artifact flow",
+      "steps": [
+        {
+          "id": "pipeline",
+          "label": "1. Pipeline account owns the pipeline and artifact store",
+          "detail": "The pipeline service role orchestrates actions and assumes a role in the target account.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "target-role",
+          "label": "2. Target account owns the action role",
+          "detail": "The role trust policy allows the pipeline service role to assume it, and its permissions policy authorizes the deployment resources.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "bucket",
+          "label": "3. Artifact bucket policy permits target-account access",
+          "detail": "The cross-account action and deployment resources must read the pipeline artifacts.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "kms",
+          "label": "4. Customer-managed KMS key authorizes both sides",
+          "detail": "Cross-account artifact encryption requires key-policy and IAM permissions for the pipeline and target-account roles.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 39
+            }
+          ]
+        },
+        {
+          "id": "action",
+          "label": "5. The action references roleArn and consumes allowed artifacts",
+          "detail": "Artifact flow must remain within CodePipeline cross-account limitations; arbitrary account-to-account passing outside the pipeline account is not supported.",
+          "sourceQuestions": []
+        }
+      ]
+    },
+    {
+      "id": "map-codepipeline-cross-region-flow",
+      "schemaVersion": "1.0",
+      "topicId": "advanced_codepipeline_cross_account",
+      "title": "Cross-Region action flow",
+      "steps": [
+        {
+          "id": "pipeline-region",
+          "label": "1. Keep the pipeline in one home Region",
+          "detail": "The pipeline remains hosted in its original Region.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "artifact-stores",
+          "label": "2. Define one artifact store per action Region",
+          "detail": "Each cross-Region action Region needs an S3 artifact bucket and optional KMS key in the pipeline account.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "region-field",
+          "label": "3. Set the Region on the action",
+          "detail": "The action references deployment or build resources that exist in that Region.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "copy",
+          "label": "4. CodePipeline copies input artifacts",
+          "detail": "CodePipeline replicates the input artifact to the action Region automatically.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "limits",
+          "label": "5. Respect unsupported action categories",
+          "detail": "Source, third-party, and custom actions cannot be configured as cross-Region actions.",
+          "sourceQuestions": []
+        }
+      ]
+    },
+    {
+      "id": "map-codebuild-test-flow",
+      "schemaVersion": "1.0",
+      "topicId": "codebuild_artifacts_parallel_testing",
+      "title": "Fast and traceable CodeBuild test stage",
+      "steps": [
+        {
+          "id": "buildspec",
+          "label": "1. Define commands and outputs in buildspec",
+          "detail": "The buildspec controls phases, environment variables, reports, caching, and artifacts.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 81
+            }
+          ]
+        },
+        {
+          "id": "identity",
+          "label": "2. Derive artifact identity from pipeline or source metadata",
+          "detail": "Branch, commit, build number, or release version can become artifact names and metadata.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 81
+            }
+          ]
+        },
+        {
+          "id": "parallel",
+          "label": "3. Run independent actions in parallel",
+          "detail": "CodePipeline actions in the same stage with the same runOrder execute in parallel.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 64
+            }
+          ]
+        },
+        {
+          "id": "reports",
+          "label": "4. Publish test reports and artifacts",
+          "detail": "CodeBuild report groups and output artifacts make failures and evidence visible.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "gate",
+          "label": "5. Gate promotion on successful completion",
+          "detail": "The next stage starts only after the required parallel actions succeed.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 113
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-immutable-promotion-flow",
+      "schemaVersion": "1.0",
+      "topicId": "immutable_artifact_promotion",
+      "title": "Build once, verify, and promote the same artifact",
+      "steps": [
+        {
+          "id": "build",
+          "label": "1. Build one release artifact",
+          "detail": "Create the binary, package, image, SDK, or infrastructure bundle once.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 30
+            },
+            {
+              "bank": "verified",
+              "questionId": 107
+            }
+          ]
+        },
+        {
+          "id": "identify",
+          "label": "2. Assign immutable identity",
+          "detail": "Use a package version, S3 version, object checksum, or container digest rather than a mutable label alone.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 107
+            }
+          ]
+        },
+        {
+          "id": "test",
+          "label": "3. Deploy the exact artifact to staging",
+          "detail": "Functional and security tests validate the same bytes that can later reach production.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 113
+            }
+          ]
+        },
+        {
+          "id": "approve",
+          "label": "4. Apply automated and manual gates",
+          "detail": "Metrics, tests, and required approval determine whether the release advances.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 72
+            }
+          ]
+        },
+        {
+          "id": "promote",
+          "label": "5. Promote without rebuilding",
+          "detail": "Production receives the already-verified artifact identity, avoiding environment-specific rebuild drift.",
+          "sourceQuestions": []
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "cmp-codeartifact-event-vs-schedule",
+      "topicId": "codeartifact_pipeline_events",
+      "leftService": "CodeArtifact EventBridge event",
+      "rightService": "Scheduled polling",
+      "dimensions": [
+        {
+          "id": "trigger",
+          "label": "Trigger",
+          "leftValue": "Package version is created, changed, copied, or deleted",
+          "rightValue": "Time interval expires"
+        },
+        {
+          "id": "latency",
+          "label": "Reaction latency",
+          "leftValue": "Near real time",
+          "rightValue": "Bounded by polling interval"
+        },
+        {
+          "id": "cost",
+          "label": "Unnecessary executions",
+          "leftValue": "Only matching package events",
+          "rightValue": "Runs even when no package changed"
+        },
+        {
+          "id": "trap",
+          "label": "Exam trap",
+          "leftValue": "Must filter state and package identity precisely",
+          "rightValue": "Often chosen even when an event source already exists"
+        }
+      ],
+      "sourceQuestions": []
+    },
+    {
+      "id": "cmp-cross-account-vs-cross-region",
+      "topicId": "advanced_codepipeline_cross_account",
+      "leftService": "Cross-account action",
+      "rightService": "Cross-Region action",
+      "dimensions": [
+        {
+          "id": "boundary",
+          "label": "Boundary crossed",
+          "leftValue": "AWS account",
+          "rightValue": "AWS Region"
+        },
+        {
+          "id": "core",
+          "label": "Primary requirement",
+          "leftValue": "Target role trust, permissions, bucket policy, and KMS authorization",
+          "rightValue": "Action Region plus an artifact store in each action Region"
+        },
+        {
+          "id": "artifact",
+          "label": "Artifact behavior",
+          "leftValue": "Target role consumes pipeline-account artifacts under cross-account rules",
+          "rightValue": "CodePipeline copies input artifacts to the action Region"
+        },
+        {
+          "id": "trap",
+          "label": "Exam trap",
+          "leftValue": "A Region field does not solve account authorization",
+          "rightValue": "An AssumeRole trust path does not create regional artifact stores"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 92
+        }
+      ]
+    },
+    {
+      "id": "cmp-runorder-parallel-vs-sequential",
+      "topicId": "codebuild_artifacts_parallel_testing",
+      "leftService": "Same runOrder",
+      "rightService": "Increasing runOrder",
+      "dimensions": [
+        {
+          "id": "execution",
+          "label": "Execution",
+          "leftValue": "Actions in the stage can run in parallel",
+          "rightValue": "Lower order completes before the next order starts"
+        },
+        {
+          "id": "use",
+          "label": "Use when",
+          "leftValue": "Tests are independent and consume the same prior artifact",
+          "rightValue": "One action depends on output or effects from another"
+        },
+        {
+          "id": "speed",
+          "label": "Pipeline duration",
+          "leftValue": "Approaches the slowest parallel action",
+          "rightValue": "Adds action durations serially"
+        },
+        {
+          "id": "trap",
+          "label": "Exam trap",
+          "leftValue": "More CPU does not fix unnecessary serialization",
+          "rightValue": "Do not parallelize actions with real dependencies"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 64
+        }
+      ]
+    },
+    {
+      "id": "cmp-codebuild-vs-lambda-tests",
+      "topicId": "codebuild_artifacts_parallel_testing",
+      "leftService": "CodeBuild test action",
+      "rightService": "Lambda custom test action",
+      "dimensions": [
+        {
+          "id": "duration",
+          "label": "Execution duration",
+          "leftValue": "Suitable for long-running test suites",
+          "rightValue": "Bound by Lambda execution limits"
+        },
+        {
+          "id": "environment",
+          "label": "Environment",
+          "leftValue": "Managed build container with custom images and tools",
+          "rightValue": "Function runtime and deployment package or container image"
+        },
+        {
+          "id": "pipeline",
+          "label": "Pipeline integration",
+          "leftValue": "Native build/test action with reports and artifacts",
+          "rightValue": "Useful for short custom control logic"
+        },
+        {
+          "id": "keyword",
+          "label": "Decisive clue",
+          "leftValue": "two-hour tests, containers, full build environment",
+          "rightValue": "short transformation or API call"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 113
+        }
+      ]
+    },
+    {
+      "id": "cmp-image-tag-vs-digest",
+      "topicId": "immutable_artifact_promotion",
+      "leftService": "Mutable container tag",
+      "rightService": "Container image digest",
+      "dimensions": [
+        {
+          "id": "identity",
+          "label": "Identity",
+          "leftValue": "Label can be moved to a different image",
+          "rightValue": "Content-addressed immutable image identity"
+        },
+        {
+          "id": "trace",
+          "label": "Traceability",
+          "leftValue": "Requires external history to know which bytes were used",
+          "rightValue": "Directly identifies the exact image content"
+        },
+        {
+          "id": "cache",
+          "label": "Cache risk",
+          "leftValue": "Old local image can remain associated with reused tag behavior",
+          "rightValue": "Task definition requests the exact immutable image"
+        },
+        {
+          "id": "use",
+          "label": "Best production use",
+          "leftValue": "Human-friendly alias may supplement metadata",
+          "rightValue": "Deployment and audit source of truth"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 107
+        }
+      ]
+    }
+  ],
+  "drillDefinitions": [
+    {
+      "drillId": "cap-codeartifact-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "codeartifact_pipeline_events",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Package event before polling",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the event-driven package-release mechanism.",
+      "prompt": "CodeArtifact emits EventBridge events when package versions are created, modified, copied, retained, or deleted. A release rule can match the repository, package, version state, and operation, then start CodePipeline directly. Consumers must tolerate duplicate or out-of-order events.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "package version",
+        "EventBridge",
+        "state",
+        "sequenceNumber",
+        "idempotent"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "CodeArtifact ya produce el evento; no se necesita un cron que pregunte continuamente si apareció una versión.",
+        "testedPattern": "Event-driven package release",
+        "correctChoiceWins": "Filtrar el evento correcto reduce latencia y ejecuciones inútiles.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codeartifact",
+        "eventbridge",
+        "mechanism"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codeartifact-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "codeartifact_pipeline_events",
+      "domainId": "sdlc_automation",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Event-driven package pipeline",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A shared Java library is published to CodeArtifact several times per week. A validation pipeline must start only when a new version of package com.example:pricing reaches the Published state. Which solution is MOST efficient?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create an EventBridge rule that matches CodeArtifact package-version events for the repository, package, and Published state, and target CodePipeline."
+        },
+        {
+          "id": "B",
+          "label": "Run a Lambda function every minute to list every package version in every repository."
+        },
+        {
+          "id": "C",
+          "label": "Configure an S3 event on the CodePipeline artifact bucket."
+        },
+        {
+          "id": "D",
+          "label": "Create a CloudWatch alarm on repository storage size."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "only when",
+        "new version",
+        "Published",
+        "MOST efficient"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Polling can discover new versions.",
+          "failure": "It adds repeated list calls and state tracking when CodeArtifact already emits the event."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "S3 can trigger events for new objects.",
+          "failure": "The authoritative event is package publication in CodeArtifact, not a pipeline artifact-bucket write."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "CloudWatch alarms automate responses to metrics.",
+          "failure": "Repository size does not identify a specific published package version."
+        }
+      ],
+      "explanation": {
+        "concise": "Package + Published + only when apunta a un EventBridge pattern sobre CodeArtifact.",
+        "testedPattern": "CodeArtifact package publication trigger",
+        "correctChoiceWins": "A inicia exactamente el flujo requerido sin polling.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codeartifact",
+        "eventbridge",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codeartifact-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "codeartifact_pipeline_events",
+      "domainId": "sdlc_automation",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a package promotion workflow",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A company promotes validated packages from a development repository to a production repository.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "publish",
+          "label": "Publish the version to the development repository with immutable version metadata."
+        },
+        {
+          "id": "event",
+          "label": "Match the publication event and start validation."
+        },
+        {
+          "id": "validate",
+          "label": "Run dependency, license, security, and compatibility tests."
+        },
+        {
+          "id": "copy",
+          "label": "Copy the approved package version to the production repository without rebuilding it."
+        },
+        {
+          "id": "consume",
+          "label": "Allow production builds to resolve dependencies from the production repository."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "publish",
+          "event",
+          "validate",
+          "copy",
+          "consume"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "publish",
+        "validate",
+        "copy package version",
+        "without rebuilding"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Promover significa mover la misma versión validada, no compilar otra vez con el mismo nombre.",
+        "testedPattern": "Package build-once promotion",
+        "correctChoiceWins": "El orden conserva identidad y separa repositorio de desarrollo de repositorio aprobado.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codeartifact",
+        "workflow",
+        "promotion"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codeartifact-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "codeartifact_pipeline_events",
+      "domainId": "sdlc_automation",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map CodeArtifact event fields",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each event field to the operational decision it supports.",
+      "answerOptions": [
+        {
+          "id": "repo-scope",
+          "label": "Limits automation to the intended repository"
+        },
+        {
+          "id": "state-gate",
+          "label": "Distinguishes Published from Unfinished, Unlisted, Archived, or Disposed"
+        },
+        {
+          "id": "content-revision",
+          "label": "Identifies a changed set of package assets or metadata"
+        },
+        {
+          "id": "event-order",
+          "label": "Helps order package events that arrive out of sequence"
+        },
+        {
+          "id": "change-kind",
+          "label": "Distinguishes Created, Updated, and Deleted changes"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "repositoryName",
+          "label": "repositoryName"
+        },
+        {
+          "id": "packageVersionState",
+          "label": "packageVersionState"
+        },
+        {
+          "id": "packageVersionRevision",
+          "label": "packageVersionRevision"
+        },
+        {
+          "id": "sequenceNumber",
+          "label": "sequenceNumber"
+        },
+        {
+          "id": "operationType",
+          "label": "operationType"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "repositoryName": "repo-scope",
+          "packageVersionState": "state-gate",
+          "packageVersionRevision": "content-revision",
+          "sequenceNumber": "event-order",
+          "operationType": "change-kind"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "repository",
+        "state",
+        "revision",
+        "sequence",
+        "operation"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El evento contiene suficiente identidad para filtrar, ordenar y deduplicar sin volver a escanear todo el repositorio.",
+        "testedPattern": "CodeArtifact event-field ownership",
+        "correctChoiceWins": "El mapeo evita usar solo packageName y reaccionar a estados o repositorios incorrectos.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codeartifact",
+        "architecture-mapping",
+        "events"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codeartifact-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "codeartifact_pipeline_events",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate duplicate package processing",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A CodeArtifact-triggered pipeline occasionally processes the same package version twice because EventBridge retries delivery. Which design BEST prevents duplicate promotion?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use package identity plus packageVersionRevision or sequenceNumber as an idempotency key and record completed processing before promotion."
+        },
+        {
+          "id": "B",
+          "label": "Disable all EventBridge retries."
+        },
+        {
+          "id": "C",
+          "label": "Change the package version to latest for every build."
+        },
+        {
+          "id": "D",
+          "label": "Increase CodeBuild compute size."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "same package version twice",
+        "retries",
+        "BEST prevents duplicate"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Fewer retries reduce duplicate delivery.",
+          "failure": "They also reduce reliability and do not eliminate all duplicate-event possibilities."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "A common tag simplifies consumer configuration.",
+          "failure": "A mutable alias makes identity and deduplication worse."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Larger compute can finish faster.",
+          "failure": "It does not change event semantics."
+        }
+      ],
+      "explanation": {
+        "concise": "Los flujos event-driven deben asumir at-least-once y hacer la promoción idempotente.",
+        "testedPattern": "Idempotent package-event processing",
+        "correctChoiceWins": "A identifica de forma estable la revisión ya procesada y evita repetir la acción destructiva.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codeartifact",
+        "idempotency",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codeartifact-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "codeartifact_pipeline_events",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Release only approved package versions",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "Development teams publish npm packages to a shared CodeArtifact development repository. Production builds must consume only versions that passed security and compatibility tests. The company wants near-real-time automation with minimal custom infrastructure. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use EventBridge package-version events to start a validation pipeline, then copy the exact approved package version to a production repository that production builds use as their dependency source."
+        },
+        {
+          "id": "B",
+          "label": "Allow production builds to use the development repository and trust semantic-version ranges."
+        },
+        {
+          "id": "C",
+          "label": "Poll the public npm registry every hour and rebuild every package."
+        },
+        {
+          "id": "D",
+          "label": "Copy source code to S3 and let each production build generate a new package version."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "only versions that passed",
+        "near-real-time",
+        "minimal custom infrastructure",
+        "exact approved version"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "Semantic versioning controls compatible version ranges.",
+          "failure": "It does not prove security or compatibility approval."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "External repositories provide public dependencies.",
+          "failure": "The authoritative packages are in CodeArtifact and the requirement is event-driven internal promotion."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Rebuilding can reproduce a package.",
+          "failure": "It violates build-once promotion and can create byte drift."
+        }
+      ],
+      "explanation": {
+        "concise": "El repositorio de producción funciona como frontera de aprobación y recibe la misma versión validada.",
+        "testedPattern": "Approved dependency promotion",
+        "correctChoiceWins": "A separa publicación, validación y consumo sin polling ni reconstrucción.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codeartifact",
+        "promotion",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codeartifact-review-01",
+      "version": "drill-definition-v1",
+      "topicId": "codeartifact_pipeline_events",
+      "domainId": "sdlc_automation",
+      "activityType": "spaced_review",
+      "drillForm": "spaced_review",
+      "title": "Spaced review: package release signal",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "Which pairing is correct?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "New approved package version → CodeArtifact event through EventBridge; duplicate delivery → idempotency key"
+        },
+        {
+          "id": "B",
+          "label": "New approved package version → Route 53 health check; duplicate delivery → larger CodeBuild instance"
+        },
+        {
+          "id": "C",
+          "label": "New approved package version → S3 lifecycle rule; duplicate delivery → CloudFormation drift detection"
+        },
+        {
+          "id": "D",
+          "label": "New approved package version → scheduled manual review only; duplicate delivery → mutable latest tag"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "package version",
+        "EventBridge",
+        "duplicate",
+        "idempotency"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "service_confusion",
+          "attraction": "Both Route 53 and CodeBuild are operational services.",
+          "failure": "Neither owns CodeArtifact package events or event deduplication."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Lifecycle and drift controls automate other domains.",
+          "failure": "They do not provide the package-release signal."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Manual review can add governance.",
+          "failure": "A mutable tag and no event identity make repeat processing harder."
+        }
+      ],
+      "explanation": {
+        "concise": "Evento de paquete e idempotencia forman el patrón completo.",
+        "testedPattern": "Package event recall",
+        "correctChoiceWins": "A conserva señal y protección contra entrega repetida.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "spaced-review",
+        "codeartifact",
+        "eventbridge"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-pipeline-cross-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "advanced_codepipeline_cross_account",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Account boundary and Region boundary",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the two independent pipeline dimensions.",
+      "prompt": "Cross-account actions require a target-account role, trust, deployment permissions, artifact-bucket access, and KMS authorization. Cross-Region actions require the action Region plus an artifact store in each Region; CodePipeline copies input artifacts for the action.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "target-account role",
+        "bucket policy",
+        "KMS",
+        "artifactStores",
+        "Region"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Cuenta y región son dos problemas distintos que pueden coexistir.",
+        "testedPattern": "Cross-account versus cross-Region pipeline design",
+        "correctChoiceWins": "Separarlos evita creer que roleArn resuelve replicación regional o que artifactStores resuelve trust cross-account.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codepipeline",
+        "cross-account",
+        "cross-region"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-pipeline-cross-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "advanced_codepipeline_cross_account",
+      "domainId": "sdlc_automation",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Which account owns the deploy role",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A pipeline in a tools account deploys a CloudFormation stack in a production account. Where should the role used by the cross-account deploy action live?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "In the production account, trusting the pipeline service role from the tools account"
+        },
+        {
+          "id": "B",
+          "label": "Only in the tools account, trusting itself"
+        },
+        {
+          "id": "C",
+          "label": "In an unrelated logging account"
+        },
+        {
+          "id": "D",
+          "label": "No role is required if both accounts are in AWS Organizations"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "pipeline in tools",
+        "deploys in production",
+        "where should role live"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "The pipeline service role originates in the tools account.",
+          "failure": "The action role must exist where the deployment resources and permissions are owned."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Central accounts often host shared roles.",
+          "failure": "An unrelated account cannot authorize production resources."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "knowledge_gap",
+          "attraction": "Organizations establishes account governance.",
+          "failure": "It does not automatically grant workload deployment access."
+        }
+      ],
+      "explanation": {
+        "concise": "El rol vive en la cuenta destino porque allí se autorizan los recursos de despliegue.",
+        "testedPattern": "Cross-account role ownership",
+        "correctChoiceWins": "A establece trust desde production hacia el service role del pipeline.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codepipeline",
+        "assume-role",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-pipeline-cross-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "advanced_codepipeline_cross_account",
+      "domainId": "sdlc_automation",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a cross-account pipeline setup",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A central pipeline must deploy an application into another AWS account.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "kms",
+          "label": "Create or select a customer-managed KMS key for pipeline artifacts and authorize required principals."
+        },
+        {
+          "id": "bucket",
+          "label": "Configure the artifact bucket policy for target-account access."
+        },
+        {
+          "id": "target-role",
+          "label": "Create the target-account action role with trust for the pipeline service role and deployment permissions."
+        },
+        {
+          "id": "pipeline-role",
+          "label": "Allow the pipeline service role to assume the target-account role."
+        },
+        {
+          "id": "action",
+          "label": "Configure the action with the target roleArn and validate artifact access."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "kms",
+          "bucket",
+          "target-role",
+          "pipeline-role",
+          "action"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "KMS",
+        "bucket policy",
+        "target role",
+        "sts:AssumeRole",
+        "roleArn"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El action no funciona hasta que la identidad y el artefacto tienen autorización de ambos lados.",
+        "testedPattern": "Cross-account pipeline authorization workflow",
+        "correctChoiceWins": "El orden configura primero datos y confianza antes de ejecutar la acción.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codepipeline",
+        "cross-account",
+        "workflow"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-pipeline-cross-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "advanced_codepipeline_cross_account",
+      "domainId": "sdlc_automation",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map cross-boundary pipeline components",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each component to the responsibility it owns.",
+      "answerOptions": [
+        {
+          "id": "orchestrate-assume",
+          "label": "Orchestrates the pipeline and assumes the target role"
+        },
+        {
+          "id": "deploy-target",
+          "label": "Authorizes deployment actions in the target account"
+        },
+        {
+          "id": "read-artifact",
+          "label": "Allows the target side to access pipeline artifacts"
+        },
+        {
+          "id": "decrypt-artifact",
+          "label": "Allows approved principals to use the artifact-encryption key"
+        },
+        {
+          "id": "regional-copy",
+          "label": "Provides an artifact bucket for each Region containing actions"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "pipeline-role",
+          "label": "Pipeline service role"
+        },
+        {
+          "id": "target-role",
+          "label": "Target-account action role"
+        },
+        {
+          "id": "bucket-policy",
+          "label": "Artifact bucket policy"
+        },
+        {
+          "id": "kms-key-policy",
+          "label": "KMS key policy and IAM permissions"
+        },
+        {
+          "id": "artifact-stores",
+          "label": "Regional artifactStores map"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "pipeline-role": "orchestrate-assume",
+          "target-role": "deploy-target",
+          "bucket-policy": "read-artifact",
+          "kms-key-policy": "decrypt-artifact",
+          "artifact-stores": "regional-copy"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "service role",
+        "target role",
+        "bucket policy",
+        "KMS",
+        "artifactStores"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Cada fallo de autorización deja un síntoma distinto, pero todos son gates obligatorios.",
+        "testedPattern": "Cross-boundary artifact and identity ownership",
+        "correctChoiceWins": "El mapeo permite localizar si el error está en STS, S3, KMS o configuración regional.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codepipeline",
+        "architecture-mapping",
+        "kms"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-pipeline-cross-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "advanced_codepipeline_cross_account",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate the alias-only KMS design",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A cross-account CodePipeline action can assume the target role but cannot decrypt its input artifact. The artifact store uses a customer-managed KMS key in the pipeline account. Which correction is MOST likely required?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Authorize the target-account role in the KMS key policy and its IAM permissions, and reference the key by key ID or ARN for cross-account use."
+        },
+        {
+          "id": "B",
+          "label": "Add more CPU to the deployment target."
+        },
+        {
+          "id": "C",
+          "label": "Create an SCP that allows kms:* and remove all key policies."
+        },
+        {
+          "id": "D",
+          "label": "Use only the KMS alias name from the target account."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "can assume",
+        "cannot decrypt",
+        "customer-managed KMS key",
+        "cross-account"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Compute capacity can affect deployment duration.",
+          "failure": "The stated failure is cryptographic authorization."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "knowledge_gap",
+          "attraction": "An SCP can limit or permit the possibility of actions.",
+          "failure": "It does not replace KMS key-policy authorization."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Aliases are convenient key identifiers.",
+          "failure": "Cross-account actions require a key ID or ARN and authorization to the actual key."
+        }
+      ],
+      "explanation": {
+        "concise": "AssumeRole exitoso no implica decrypt exitoso; KMS es un gate separado.",
+        "testedPattern": "Cross-account artifact decryption",
+        "correctChoiceWins": "A corrige key policy, IAM permissions e identidad de clave.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codepipeline",
+        "kms",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-pipeline-cross-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "advanced_codepipeline_cross_account",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "One pipeline with a cross-Region deploy action",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A pipeline is hosted in eu-west-1 and must add a native CodeDeploy action in us-east-2. The company wants CodePipeline to manage artifact transfer and does not want a second polling pipeline. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Add a cross-Region CodeDeploy action, configure an artifact store in each action Region in the pipeline account, and let CodePipeline copy the input artifact."
+        },
+        {
+          "id": "B",
+          "label": "Create a cross-Region source action in us-east-2."
+        },
+        {
+          "id": "C",
+          "label": "Copy the artifact manually and invoke a scheduled second pipeline."
+        },
+        {
+          "id": "D",
+          "label": "Create only a target-account role; no regional artifact store is needed."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "native CodeDeploy action",
+        "us-east-2",
+        "manage artifact transfer",
+        "no second polling pipeline"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "service_confusion",
+          "attraction": "Source actions start pipelines from repositories.",
+          "failure": "Source actions cannot be configured as cross-Region actions."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "A second pipeline can deploy regional artifacts.",
+          "failure": "It adds polling and coordination when one pipeline supports cross-Region native actions."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "missed_keyword",
+          "attraction": "Target roles solve account boundaries.",
+          "failure": "The requirement is regional artifact transfer and needs per-Region artifact stores."
+        }
+      ],
+      "explanation": {
+        "concise": "Cross-Region action + artifactStores permite que CodePipeline copie el input al Region destino.",
+        "testedPattern": "Native cross-Region pipeline action",
+        "correctChoiceWins": "A satisface una sola orquestación sin inventar un segundo pipeline.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codepipeline",
+        "cross-region",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-pipeline-cross-bank-39",
+      "version": "drill-definition-v1",
+      "topicId": "advanced_codepipeline_cross_account",
+      "domainId": "sdlc_automation",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: cross-account S3 deployment",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive CI/CD pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "E"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "cross-account role",
+        "pipeline service role",
+        "KMS",
+        "versioning"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno obliga a construir la ruta completa entre cuenta de desarrollo, rol destino, artifact bucket y KMS.",
+        "testedPattern": "Cross-account CodePipeline mandatory configuration",
+        "correctChoiceWins": "El conjunto correcto cubre identidad y cifrado/artefactos; una sola pieza no completa el flujo.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 39
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "codepipeline",
+        "cross-account"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codebuild-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "codebuild_artifacts_parallel_testing",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Buildspec and runOrder control sentence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read what controls build behavior and pipeline concurrency.",
+      "prompt": "The buildspec defines CodeBuild commands, reports, and artifacts. CodeBuild environment variables can supply branch or commit identity. In CodePipeline, independent actions with the same runOrder execute in parallel; different runOrder values execute sequentially.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "buildspec",
+        "environment variable",
+        "same runOrder",
+        "parallel"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Buildspec controla el build; runOrder controla la dependencia entre actions del stage.",
+        "testedPattern": "CodeBuild and CodePipeline control points",
+        "correctChoiceWins": "Separar ambos niveles evita intentar arreglar serialización cambiando CPU o YAML del build.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 64
+        },
+        {
+          "bank": "verified",
+          "questionId": 81
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codebuild",
+        "buildspec",
+        "runorder"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codebuild-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "codebuild_artifacts_parallel_testing",
+      "domainId": "sdlc_automation",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Parallelize independent test actions",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "Three network-bound test actions in one CodePipeline stage are independent but currently run one after another. Which change MOST directly reduces stage duration?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Assign the actions the same runOrder so they execute in parallel."
+        },
+        {
+          "id": "B",
+          "label": "Increase the runOrder value of each action."
+        },
+        {
+          "id": "C",
+          "label": "Increase only CodeBuild vCPU for every test."
+        },
+        {
+          "id": "D",
+          "label": "Move the tests to separate manual approval actions."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "independent",
+        "network-bound",
+        "one after another",
+        "MOST directly"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "knowledge_gap",
+          "attraction": "runOrder defines action ordering.",
+          "failure": "Different increasing values preserve sequential execution."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "missed_keyword",
+          "attraction": "More compute can speed CPU-bound tests.",
+          "failure": "The scenario identifies network-bound work and unnecessary serialization."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Separate actions can improve visibility.",
+          "failure": "Manual approvals add delay and do not parallelize tests."
+        }
+      ],
+      "explanation": {
+        "concise": "Independent y network-bound elimina la necesidad de serialización y de más CPU.",
+        "testedPattern": "Parallel CodePipeline actions",
+        "correctChoiceWins": "A reduce la duración al máximo de las pruebas paralelas en vez de sumar sus tiempos.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 64
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codepipeline",
+        "parallel-actions",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codebuild-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "codebuild_artifacts_parallel_testing",
+      "domainId": "sdlc_automation",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a scalable test stage",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A pipeline will add more independent functional and security test suites.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "package",
+          "label": "Package each suite in a repeatable CodeBuild environment or suitable short-running action."
+        },
+        {
+          "id": "inputs",
+          "label": "Define common input artifacts and environment metadata."
+        },
+        {
+          "id": "parallel",
+          "label": "Place independent actions in the same stage with the same runOrder."
+        },
+        {
+          "id": "reports",
+          "label": "Publish test reports, logs, and failure artifacts."
+        },
+        {
+          "id": "gate",
+          "label": "Allow the next stage only after all required actions succeed."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "package",
+          "inputs",
+          "parallel",
+          "reports",
+          "gate"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "independent",
+        "same runOrder",
+        "reports",
+        "all succeed"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Paralelizar sin evidencia produce velocidad pero mala operación; reports y gate completan el patrón.",
+        "testedPattern": "Scalable parallel test-stage workflow",
+        "correctChoiceWins": "El orden conserva repetibilidad, concurrencia, diagnóstico y control de promoción.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codebuild",
+        "workflow",
+        "testing"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codebuild-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "codebuild_artifacts_parallel_testing",
+      "domainId": "sdlc_automation",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map CodeBuild and pipeline controls",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each construct to the responsibility it owns.",
+      "answerOptions": [
+        {
+          "id": "commands",
+          "label": "Defines install, pre_build, build, and post_build commands"
+        },
+        {
+          "id": "primary-output",
+          "label": "Packages the primary output files"
+        },
+        {
+          "id": "multiple-outputs",
+          "label": "Publishes separately named artifact sets"
+        },
+        {
+          "id": "dynamic-name",
+          "label": "Supplies branch, revision, or execution identity"
+        },
+        {
+          "id": "dependency-order",
+          "label": "Controls parallel versus sequential actions inside a stage"
+        },
+        {
+          "id": "test-evidence",
+          "label": "Stores structured test or coverage results"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "buildspec-phases",
+          "label": "buildspec phases"
+        },
+        {
+          "id": "buildspec-artifacts",
+          "label": "buildspec artifacts"
+        },
+        {
+          "id": "secondary-artifacts",
+          "label": "secondary artifacts"
+        },
+        {
+          "id": "source-version",
+          "label": "CODEBUILD_SOURCE_VERSION or pipeline variables"
+        },
+        {
+          "id": "runorder",
+          "label": "CodePipeline runOrder"
+        },
+        {
+          "id": "report-group",
+          "label": "CodeBuild report group"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "buildspec-phases": "commands",
+          "buildspec-artifacts": "primary-output",
+          "secondary-artifacts": "multiple-outputs",
+          "source-version": "dynamic-name",
+          "runorder": "dependency-order",
+          "report-group": "test-evidence"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "phases",
+        "artifacts",
+        "secondary",
+        "source version",
+        "runOrder",
+        "reports"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Los nombres están cerca en el pipeline, pero cada uno controla una capa distinta.",
+        "testedPattern": "CodeBuild artifact and execution ownership",
+        "correctChoiceWins": "El mapeo permite diseñar outputs trazables sin crear proyectos por rama.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codebuild",
+        "architecture-mapping",
+        "artifacts"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codebuild-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "codebuild_artifacts_parallel_testing",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate one-build-project-per-branch",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company wants CodeBuild artifacts named by the branch under test. New branches are created frequently, and the team wants the LOWEST maintenance effort. Which approach is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use one reusable buildspec and derive the artifact name from source or pipeline environment metadata at runtime."
+        },
+        {
+          "id": "B",
+          "label": "Create one CodeBuild project and one hard-coded buildspec for every branch."
+        },
+        {
+          "id": "C",
+          "label": "Rename every object manually in S3 after each build."
+        },
+        {
+          "id": "D",
+          "label": "Use the same unversioned artifact name for every branch and overwrite it."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "new branches frequently",
+        "named by branch",
+        "LOWEST maintenance effort"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "A project per branch allows custom settings.",
+          "failure": "It creates continuous infrastructure and configuration work."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "S3 object rename logic can change names.",
+          "failure": "It adds a custom post-processing path when CodeBuild can name artifacts directly."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "missed_keyword",
+          "attraction": "One name is simple.",
+          "failure": "It destroys branch traceability and causes collisions."
+        }
+      ],
+      "explanation": {
+        "concise": "La metadata del source debe parametrizar el artifact en runtime.",
+        "testedPattern": "Dynamic CodeBuild artifact naming",
+        "correctChoiceWins": "A escala automáticamente a nuevas ramas sin nuevos proyectos.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 81
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codebuild",
+        "artifact-naming",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codebuild-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "codebuild_artifacts_parallel_testing",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Long functional tests after staging deployment",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A pipeline deploys to staging and then runs functional tests that normally take more than two hours. Production deployment must occur only after the tests pass. Which design is MOST efficient?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use a CodeBuild action after the staging deployment to run the test suite, publish reports, and allow production only after success."
+        },
+        {
+          "id": "B",
+          "label": "Run the full suite inside one synchronous Lambda invocation."
+        },
+        {
+          "id": "C",
+          "label": "Run the tests before staging exists."
+        },
+        {
+          "id": "D",
+          "label": "Deploy directly to production and run tests afterward."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "after staging deployment",
+        "more than two hours",
+        "only after tests pass"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "service_confusion",
+          "attraction": "Lambda can run custom test code.",
+          "failure": "The long duration and full test environment favor CodeBuild rather than Lambda limits."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "missed_keyword",
+          "attraction": "Testing earlier is generally valuable.",
+          "failure": "These functional tests explicitly target the deployed staging environment."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Post-production testing can detect issues.",
+          "failure": "It violates the required pre-production gate."
+        }
+      ],
+      "explanation": {
+        "concise": "CodeBuild es el action nativo para suites largas y controladas después de staging.",
+        "testedPattern": "Long-running functional-test gate",
+        "correctChoiceWins": "A conserva el orden deploy staging → test → deploy production.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 113
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codebuild",
+        "functional-tests",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-codebuild-bank-64",
+      "version": "drill-definition-v1",
+      "topicId": "codebuild_artifacts_parallel_testing",
+      "domainId": "sdlc_automation",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: parallel network-bound tests",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive CI/CD pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "independent tests",
+        "network-bound",
+        "same runOrder",
+        "parallel"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno verifica si se identifica la serialización como causa principal.",
+        "testedPattern": "CodePipeline parallel action execution",
+        "correctChoiceWins": "La respuesta correcta usa el mismo runOrder y no desperdicia esfuerzo aumentando CPU.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 64
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "codepipeline",
+        "parallel-tests"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-immutable-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "immutable_artifact_promotion",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Build once and promote exact content",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the release-integrity rule.",
+      "prompt": "A release artifact should be built once, assigned immutable identity, tested in staging, and promoted to production without rebuilding. Mutable labels can remain for convenience, but a digest, version, checksum, or S3 object version should identify the deployed bytes.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "build once",
+        "immutable identity",
+        "same artifact",
+        "digest",
+        "version"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La promoción segura mueve el mismo contenido validado; reconstruir en producción reabre el riesgo.",
+        "testedPattern": "Immutable release promotion",
+        "correctChoiceWins": "Usar identidad de contenido permite auditar qué bytes llegaron a cada entorno.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 107
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "artifact",
+        "promotion",
+        "immutable"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-immutable-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "immutable_artifact_promotion",
+      "domainId": "sdlc_automation",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Container tag or digest",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "An ECS service intermittently runs an older image when the pipeline reuses the tag latest. Which reference should the new task definition use to identify the exact image content?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "The image SHA-256 digest"
+        },
+        {
+          "id": "B",
+          "label": "The mutable latest tag only"
+        },
+        {
+          "id": "C",
+          "label": "The ECS cluster name"
+        },
+        {
+          "id": "D",
+          "label": "The CodePipeline execution name without image metadata"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "older image",
+        "reuses",
+        "latest",
+        "exact image content"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "latest is familiar and easy to read.",
+          "failure": "It can point to different image content over time."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "The cluster owns running tasks.",
+          "failure": "It does not identify container-image bytes."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Pipeline execution IDs improve traceability.",
+          "failure": "Without mapping to a digest they do not tell ECS which immutable image to pull."
+        }
+      ],
+      "explanation": {
+        "concise": "Digest es content-addressed; latest es un alias mutable.",
+        "testedPattern": "Immutable container identity",
+        "correctChoiceWins": "A elimina ambigüedad y cache inconsistency al solicitar exactamente la imagen construida.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 107
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "ecr",
+        "digest",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-immutable-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "immutable_artifact_promotion",
+      "domainId": "sdlc_automation",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a build-once release",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A service moves through development, staging, and production.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "build",
+          "label": "Build one artifact and generate checksum, version, or digest metadata."
+        },
+        {
+          "id": "store",
+          "label": "Store the immutable artifact in the approved repository or artifact store."
+        },
+        {
+          "id": "staging",
+          "label": "Deploy the exact identity to staging and run automated tests."
+        },
+        {
+          "id": "approval",
+          "label": "Evaluate metrics and required manual approval."
+        },
+        {
+          "id": "production",
+          "label": "Deploy the same artifact identity to production without rebuilding."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "build",
+          "store",
+          "staging",
+          "approval",
+          "production"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "one artifact",
+        "exact identity",
+        "approval",
+        "without rebuilding"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El artifact no cambia después de las pruebas; solo cambia su estado de promoción.",
+        "testedPattern": "Build-once release workflow",
+        "correctChoiceWins": "El orden mantiene integridad desde build hasta production.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "artifact",
+        "workflow",
+        "promotion"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-immutable-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "immutable_artifact_promotion",
+      "domainId": "sdlc_automation",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map release-artifact identity",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each artifact type to a suitable immutable identity.",
+      "answerOptions": [
+        {
+          "id": "digest",
+          "label": "Image digest"
+        },
+        {
+          "id": "object-version",
+          "label": "S3 object version ID and checksum"
+        },
+        {
+          "id": "package-version",
+          "label": "Package version and revision"
+        },
+        {
+          "id": "template-checksum",
+          "label": "Versioned artifact and template checksum"
+        },
+        {
+          "id": "sdk-version",
+          "label": "Versioned S3 object plus CloudFront invalidation or versioned path"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "container",
+          "label": "ECR container image"
+        },
+        {
+          "id": "s3-binary",
+          "label": "Binary stored in a versioned S3 bucket"
+        },
+        {
+          "id": "codeartifact",
+          "label": "CodeArtifact package"
+        },
+        {
+          "id": "cloudformation",
+          "label": "CloudFormation template bundle"
+        },
+        {
+          "id": "sdk",
+          "label": "Generated SDK distributed through CloudFront"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "container": "digest",
+          "s3-binary": "object-version",
+          "codeartifact": "package-version",
+          "cloudformation": "template-checksum",
+          "sdk": "sdk-version"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "digest",
+        "version ID",
+        "package version",
+        "checksum",
+        "CloudFront"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Immutable no significa el mismo identificador para todos los servicios; significa identidad estable del contenido.",
+        "testedPattern": "Artifact identity by storage type",
+        "correctChoiceWins": "El mapeo permite rastrear releases heterogéneos con el mecanismo nativo correcto.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "artifact",
+        "architecture-mapping",
+        "traceability"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-immutable-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "immutable_artifact_promotion",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate production rebuild drift",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A team builds an application separately in staging and production from the same Git commit. A production-only dependency update causes different bytes to be deployed. Which change BEST prevents this class of problem?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Build once, store an immutable artifact with version or digest metadata, and promote that exact artifact through every environment."
+        },
+        {
+          "id": "B",
+          "label": "Keep rebuilding in each environment and compare file names."
+        },
+        {
+          "id": "C",
+          "label": "Use the mutable latest label in every repository."
+        },
+        {
+          "id": "D",
+          "label": "Add a manual approval before each independent rebuild."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "same Git commit",
+        "different bytes",
+        "production-only dependency",
+        "BEST prevents"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "incorrect_assumption",
+          "attraction": "File-name comparison can reveal obvious differences.",
+          "failure": "It does not prevent environment-dependent builds from producing drift."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "A common label simplifies deployment configuration.",
+          "failure": "Mutable identity conceals which content was validated."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "missed_keyword",
+          "attraction": "Approval can govern release timing.",
+          "failure": "It does not make independently built artifacts identical."
+        }
+      ],
+      "explanation": {
+        "concise": "El commit identifica source, no necesariamente el artifact final si dependencias y entorno cambian.",
+        "testedPattern": "Preventing environment-specific rebuild drift",
+        "correctChoiceWins": "A hace que staging y production reciban exactamente los mismos bytes.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "artifact",
+        "build-once",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-immutable-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "immutable_artifact_promotion",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Automate a generated SDK release",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "After each API deployment, a JavaScript SDK must be exported from API Gateway, uploaded to a versioned S3 location, and made available through CloudFront immediately. Which pipeline design is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Add a post-deployment Lambda action that exports the SDK, writes the versioned object to S3, and creates the required CloudFront invalidation or publishes a versioned path."
+        },
+        {
+          "id": "B",
+          "label": "Ask an operator to export the SDK from the console after every release."
+        },
+        {
+          "id": "C",
+          "label": "Run an unrelated S3 lifecycle transition."
+        },
+        {
+          "id": "D",
+          "label": "Rebuild the entire API every five minutes whether or not a deployment occurred."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "after each API deployment",
+        "export",
+        "S3",
+        "CloudFront",
+        "immediately"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Manual export can create the correct SDK.",
+          "failure": "It is not reliable automation tied to the deployment."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Lifecycle rules manage storage classes and expiration.",
+          "failure": "They do not export SDKs or refresh CloudFront."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "missed_keyword",
+          "attraction": "Scheduled work can eventually update clients.",
+          "failure": "It is wasteful and not coupled to the actual deployment event."
+        }
+      ],
+      "explanation": {
+        "concise": "La custom action está justificada porque no existe una acción nativa que complete export, upload e invalidation.",
+        "testedPattern": "Pipeline post-deployment artifact generation",
+        "correctChoiceWins": "A automatiza el artefacto derivado en el punto exacto del release.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 30
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codepipeline",
+        "api-gateway",
+        "cloudfront",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cap-immutable-bank-107",
+      "version": "drill-definition-v1",
+      "topicId": "immutable_artifact_promotion",
+      "domainId": "sdlc_automation",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: immutable ECS image reference",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive CI/CD pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "older image",
+        "cache",
+        "traceability",
+        "sha256 digest"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno entrena el uso del digest como identidad exacta de la imagen desplegada.",
+        "testedPattern": "Immutable container deployment",
+        "correctChoiceWins": "La respuesta correcta elimina la ambigüedad de tags reutilizados y mejora auditoría.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 107
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "ecs",
+        "ecr",
+        "digest"
+      ],
+      "active": true
+    }
+  ],
+  "sourceQuestionRefs": [
+    {
+      "bank": "verified",
+      "questionId": 30
+    },
+    {
+      "bank": "verified",
+      "questionId": 39
+    },
+    {
+      "bank": "verified",
+      "questionId": 64
+    },
+    {
+      "bank": "verified",
+      "questionId": 68
+    },
+    {
+      "bank": "verified",
+      "questionId": 72
+    },
+    {
+      "bank": "verified",
+      "questionId": 81
+    },
+    {
+      "bank": "verified",
+      "questionId": 92
+    },
+    {
+      "bank": "verified",
+      "questionId": 107
+    },
+    {
+      "bank": "verified",
+      "questionId": 113
+    }
+  ],
+  "prerequisiteRelationships": [
+    {
+      "topicId": "codeartifact_pipeline_events",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "advanced_codepipeline_cross_account",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "codebuild_artifacts_parallel_testing",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "immutable_artifact_promotion",
+      "prerequisiteTopicIds": []
+    }
+  ],
+  "tags": [
+    "dop-c02",
+    "codeartifact",
+    "eventbridge",
+    "codepipeline",
+    "cross-account",
+    "cross-region",
+    "codebuild",
+    "buildspec",
+    "parallel-actions",
+    "immutable-artifacts",
+    "ecr-digest",
+    "personalized"
+  ]
+}

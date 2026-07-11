@@ -1,0 +1,2628 @@
+{
+  "schemaVersion": "1.0",
+  "packageId": "final-mixed-scenarios",
+  "version": "1.0.0",
+  "title": "Final Mixed DOP-C02 Scenarios",
+  "description": "High-value final consolidation for requirement extraction, distractor elimination, multi-select completeness, resource-scope reasoning, cross-account authorization, governance, resilience, observability, remediation, and deployment tradeoffs.",
+  "topicDescriptors": [
+    {
+      "topicId": "mixed_exam_scenarios",
+      "title": "Final Mixed DOP-C02 Decision Scenarios",
+      "domainId": "sdlc_automation",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "requirement_first_reading",
+        "decisive_keyword",
+        "best_answer",
+        "multi_select_completeness",
+        "control_point_identification",
+        "resource_scope",
+        "cross_account",
+        "managed_service_first",
+        "operational_overhead",
+        "rto_rpo",
+        "detect_remediate_verify",
+        "build_once_promote",
+        "confidence_calibration"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 23
+        },
+        {
+          "bank": "verified",
+          "questionId": 32
+        },
+        {
+          "bank": "verified",
+          "questionId": 65
+        },
+        {
+          "bank": "verified",
+          "questionId": 72
+        }
+      ]
+    }
+  ],
+  "conceptMaps": [
+    {
+      "id": "map-final-requirement-first",
+      "schemaVersion": "1.0",
+      "topicId": "mixed_exam_scenarios",
+      "title": "Requirement-first exam reading",
+      "steps": [
+        {
+          "id": "final-sentence",
+          "label": "1. Read the final sentence first",
+          "detail": "Identify the requested output: BEST design, root cause, next action, number of choices, or lowest-overhead solution.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "hard-constraints",
+          "label": "2. Extract hard constraints",
+          "detail": "Mark words such as MUST, immediately, no internet, cross-account, automatically, audit, RTO, RPO, and least operational overhead.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "control-point",
+          "label": "3. Identify the control point",
+          "detail": "Decide whether the problem belongs to identity, network, data, deployment, detection, remediation, routing, or governance.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "eliminate",
+          "label": "4. Eliminate incomplete and over-engineered choices",
+          "detail": "Reject options that solve only one layer, violate a hard constraint, or duplicate a managed AWS capability with custom polling or infrastructure.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "prove",
+          "label": "5. Prove the winner against every requirement",
+          "detail": "For multi-select questions, confirm that the complete selected set covers every required gate without adding a contradictory choice.",
+          "sourceQuestions": []
+        }
+      ]
+    },
+    {
+      "id": "map-final-five-layer-request",
+      "schemaVersion": "1.0",
+      "topicId": "mixed_exam_scenarios",
+      "title": "Five-layer request path",
+      "steps": [
+        {
+          "id": "identity",
+          "label": "1. Identity",
+          "detail": "Who calls, which role is assumed, where the role lives, and which identity policy grants the action?",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 23
+            },
+            {
+              "bank": "verified",
+              "questionId": 32
+            }
+          ]
+        },
+        {
+          "id": "resource",
+          "label": "2. Resource authorization",
+          "detail": "Does the target resource owner require a resource policy, key policy, EKS access entry, file-system policy, or other service-local authorization?",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 23
+            }
+          ]
+        },
+        {
+          "id": "network",
+          "label": "3. Network path",
+          "detail": "Can traffic reach the endpoint through routing, security groups, peering, transit, PrivateLink, or another supported path?",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 23
+            },
+            {
+              "bank": "verified",
+              "questionId": 32
+            }
+          ]
+        },
+        {
+          "id": "data",
+          "label": "4. Data and encryption",
+          "detail": "Can the principal read the artifact or data and use the relevant KMS key?",
+          "sourceQuestions": []
+        },
+        {
+          "id": "operation",
+          "label": "5. Operational lifecycle",
+          "detail": "Will every new instance, account, Region, or deployment receive the same configuration automatically?",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 32
+            },
+            {
+              "bank": "verified",
+              "questionId": 65
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-final-detect-remediate-verify",
+      "schemaVersion": "1.0",
+      "topicId": "mixed_exam_scenarios",
+      "title": "Detect, route, remediate, and verify",
+      "steps": [
+        {
+          "id": "detect",
+          "label": "1. Detect with the authoritative signal",
+          "detail": "Use AWS Config for configuration compliance, CloudWatch for metrics and alarms, CloudTrail plus EventBridge for API activity, and Synthetics for active journey tests.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 65
+            }
+          ]
+        },
+        {
+          "id": "route",
+          "label": "2. Route only the relevant event",
+          "detail": "Filter the exact event or compliance change instead of polling every resource.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "remediate",
+          "label": "3. Use the least-complex remediation",
+          "detail": "Prefer direct targets or Systems Manager Automation before building custom orchestration.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 65
+            }
+          ]
+        },
+        {
+          "id": "audit",
+          "label": "4. Preserve evidence",
+          "detail": "Record who changed what, the compliance transition, execution output, approval, and final state.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "verify",
+          "label": "5. Re-evaluate the actual resource",
+          "detail": "Do not treat a successful automation invocation as proof that the workload is compliant or healthy.",
+          "sourceQuestions": []
+        }
+      ]
+    },
+    {
+      "id": "map-final-release-decision",
+      "schemaVersion": "1.0",
+      "topicId": "mixed_exam_scenarios",
+      "title": "Release, observe, approve, and recover",
+      "steps": [
+        {
+          "id": "artifact",
+          "label": "1. Build one immutable artifact",
+          "detail": "Use a version, object version, package revision, checksum, or image digest.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 72
+            }
+          ]
+        },
+        {
+          "id": "staging",
+          "label": "2. Test the exact artifact",
+          "detail": "Run automated tests against the deployed staging or canary environment.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "limited",
+          "label": "3. Limit initial production exposure",
+          "detail": "Use a canary, traffic split, separate deployment group, or replacement environment that matches the platform.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 72
+            }
+          ]
+        },
+        {
+          "id": "gate",
+          "label": "4. Evaluate signals and approvals",
+          "detail": "Use alarms, test results, and manual approval only where the business requires a human gate.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 72
+            }
+          ]
+        },
+        {
+          "id": "promote",
+          "label": "5. Promote or roll back deterministically",
+          "detail": "Move the same artifact to full traffic or return to the last known-good version without rebuilding.",
+          "sourceQuestions": []
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "cmp-final-control-vs-data-plane",
+      "topicId": "mixed_exam_scenarios",
+      "leftService": "Control-plane event",
+      "rightService": "Data-plane or workload event",
+      "dimensions": [
+        {
+          "id": "example",
+          "label": "Example",
+          "leftValue": "DeleteTable, PutBucketPolicy, StopLogging",
+          "rightValue": "DynamoDB item update, application request, log event"
+        },
+        {
+          "id": "signal",
+          "label": "Typical signal",
+          "leftValue": "CloudTrail delivered to EventBridge",
+          "rightValue": "Service stream, metric, log, or application event"
+        },
+        {
+          "id": "trap",
+          "label": "Exam trap",
+          "leftValue": "Do not use DynamoDB Streams to detect DeleteTable",
+          "rightValue": "Do not use CloudTrail to capture every application data mutation"
+        },
+        {
+          "id": "question",
+          "label": "Question to ask",
+          "leftValue": "Who changed service configuration?",
+          "rightValue": "What happened to workload data or runtime behavior?"
+        }
+      ],
+      "sourceQuestions": []
+    },
+    {
+      "id": "cmp-final-prevent-detect-remediate",
+      "topicId": "mixed_exam_scenarios",
+      "leftService": "Preventive control",
+      "rightService": "Detective plus remediation",
+      "dimensions": [
+        {
+          "id": "timing",
+          "label": "Timing",
+          "leftValue": "Blocks the prohibited action before completion",
+          "rightValue": "Finds noncompliance and restores the desired state afterward"
+        },
+        {
+          "id": "examples",
+          "label": "Examples",
+          "leftValue": "SCP, permissions boundary, Control Tower preventive control",
+          "rightValue": "AWS Config rule plus Systems Manager Automation"
+        },
+        {
+          "id": "tradeoff",
+          "label": "Tradeoff",
+          "leftValue": "Lower exposure window but higher risk of blocking legitimate work",
+          "rightValue": "More flexible but accepts a detection and remediation interval"
+        },
+        {
+          "id": "keyword",
+          "label": "Decisive keyword",
+          "leftValue": "must prevent, cannot be performed",
+          "rightValue": "detect, alert, automatically remediate, audit trail"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 65
+        }
+      ]
+    },
+    {
+      "id": "cmp-final-managed-vs-custom",
+      "topicId": "mixed_exam_scenarios",
+      "leftService": "Managed event integration",
+      "rightService": "Custom polling",
+      "dimensions": [
+        {
+          "id": "trigger",
+          "label": "Trigger",
+          "leftValue": "State-change or API event",
+          "rightValue": "Schedule and repeated list or describe calls"
+        },
+        {
+          "id": "latency",
+          "label": "Latency",
+          "leftValue": "Near real time",
+          "rightValue": "Bounded by polling interval"
+        },
+        {
+          "id": "operations",
+          "label": "Operations",
+          "leftValue": "Fewer custom components",
+          "rightValue": "State tracking, retries, deduplication, and compute must be operated"
+        },
+        {
+          "id": "use",
+          "label": "Use custom polling when",
+          "leftValue": "A supported event already exists",
+          "rightValue": "No reliable event source exists and periodic evaluation is acceptable"
+        }
+      ],
+      "sourceQuestions": []
+    },
+    {
+      "id": "cmp-final-active-passive-vs-active-active",
+      "topicId": "mixed_exam_scenarios",
+      "leftService": "Active-passive",
+      "rightService": "Active-active",
+      "dimensions": [
+        {
+          "id": "traffic",
+          "label": "Normal traffic",
+          "leftValue": "Primary serves; standby waits or serves only tests",
+          "rightValue": "Multiple locations serve production traffic"
+        },
+        {
+          "id": "routing",
+          "label": "Routing clue",
+          "leftValue": "Failover records, primary, secondary",
+          "rightValue": "Latency, weighted, geoproximity, global traffic"
+        },
+        {
+          "id": "cost",
+          "label": "Cost",
+          "leftValue": "Usually lower",
+          "rightValue": "Usually higher"
+        },
+        {
+          "id": "complexity",
+          "label": "Data complexity",
+          "leftValue": "Promotion and failback",
+          "rightValue": "Concurrent writes, conflict strategy, and global consistency"
+        }
+      ],
+      "sourceQuestions": []
+    },
+    {
+      "id": "cmp-final-promote-vs-rebuild",
+      "topicId": "mixed_exam_scenarios",
+      "leftService": "Promote the tested artifact",
+      "rightService": "Rebuild independently per environment",
+      "dimensions": [
+        {
+          "id": "integrity",
+          "label": "Artifact integrity",
+          "leftValue": "Same bytes across environments",
+          "rightValue": "Dependencies and build environment can change output"
+        },
+        {
+          "id": "trace",
+          "label": "Traceability",
+          "leftValue": "One version, checksum, or digest",
+          "rightValue": "Commit identity alone may not identify deployed bytes"
+        },
+        {
+          "id": "rollback",
+          "label": "Rollback",
+          "leftValue": "Redeploy a known-good immutable identity",
+          "rightValue": "May rebuild a different artifact during recovery"
+        },
+        {
+          "id": "keyword",
+          "label": "Decisive keyword",
+          "leftValue": "build once, approved artifact, exact version",
+          "rightValue": "environment-specific build or mutable latest"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 72
+        }
+      ]
+    }
+  ],
+  "drillDefinitions": [
+    {
+      "drillId": "fms-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "The final sentence controls the task",
+      "difficulty": "practice",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the rule, then restate the exact output the question requests.",
+      "prompt": "A long DOP-C02 scenario can contain architecture history, current symptoms, and irrelevant implementation details. The final sentence usually determines whether you must select a design, identify a root cause, choose a next action, or select multiple required components.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "BEST",
+        "MOST",
+        "LEAST",
+        "next action",
+        "Select TWO"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Primero define qué debes entregar. Saber muchos servicios no ayuda si contestas una pregunta distinta.",
+        "testedPattern": "Requirement-first exam reading",
+        "correctChoiceWins": "La técnica reduce errores de interpretación antes de evaluar servicios.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "exam-reasoning",
+        "requirement-first"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-mechanism-02",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "A valid service can still be the wrong answer",
+      "difficulty": "practice",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the elimination rule.",
+      "prompt": "Professional-level distractors often contain a real AWS service and a technically possible architecture. Reject the choice when it violates one hard constraint, acts at the wrong scope, omits a required authorization layer, or adds unnecessary operational overhead.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "hard constraint",
+        "wrong scope",
+        "incomplete",
+        "operational overhead"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La pregunta no evalúa si una opción funciona en algún mundo; evalúa cuál satisface mejor este escenario.",
+        "testedPattern": "BEST-answer elimination",
+        "correctChoiceWins": "Buscar una violación concreta es más fiable que elegir la opción con más servicios.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "exam-reasoning",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-mechanism-03",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Network access and AWS authorization are separate",
+      "difficulty": "practice",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the layered-access rule.",
+      "prompt": "A route, peering connection, VPC endpoint, or security-group rule proves only network reachability. The caller can still fail because of role trust, identity permissions, resource policy, service-local authorization, or KMS key policy.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "network path",
+        "trust policy",
+        "resource policy",
+        "KMS"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Que dos redes se vean no significa que la llamada esté autorizada.",
+        "testedPattern": "Layered access reasoning",
+        "correctChoiceWins": "Separar red, identidad, recurso y cifrado evita respuestas parciales.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "exam-reasoning",
+        "scope",
+        "authorization"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-mechanism-04",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Successful automation is not final verification",
+      "difficulty": "practice",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the closed-loop operations rule.",
+      "prompt": "Detection starts the workflow. Remediation attempts a change. Verification must inspect the actual resource or service state afterward. An execution status of Success proves that the runbook completed, not necessarily that the workload is healthy or compliant.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "detect",
+        "remediate",
+        "verify",
+        "actual state"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Un workflow cerrado termina con re-evaluación del recurso, no con el job en verde.",
+        "testedPattern": "Closed-loop operations",
+        "correctChoiceWins": "La verificación elimina falsas correcciones y mantiene evidencia de cumplimiento.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "exam-reasoning",
+        "operations",
+        "verification"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Private Auto Scaling management without internet",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "An Auto Scaling group runs in private subnets with no public IP addresses. Policy prohibits internet access. Every replacement instance must support Session Manager and centralized session logging. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Move instances to public subnets and allow SSH from the corporate CIDR."
+        },
+        {
+          "id": "B",
+          "label": "Bake or install SSM Agent, reference an EC2 instance profile with Systems Manager permissions in the launch template, create the required interface VPC endpoints, and provide private access to the selected log destination."
+        },
+        {
+          "id": "C",
+          "label": "Create a bastion host and distribute one SSH key to all instances."
+        },
+        {
+          "id": "D",
+          "label": "Attach an SCP that allows Systems Manager and make no instance or network changes."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "private subnets",
+        "prohibits internet",
+        "every replacement",
+        "Session Manager",
+        "logging"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Public access simplifies remote administration.",
+          "failure": "It violates the explicit no-internet design and adds inbound exposure."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "A bastion is a traditional private-subnet access pattern.",
+          "failure": "It adds key management and does not satisfy the managed, automatically inherited configuration as cleanly."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "An SCP can make actions available at the organization level.",
+          "failure": "It does not install the agent, attach an instance profile, or create network connectivity."
+        }
+      ],
+      "explanation": {
+        "concise": "La solución completa debe cubrir agente, identidad, launch template, endpoints y destino de logs.",
+        "testedPattern": "Private Systems Manager architecture",
+        "correctChoiceWins": "B satisface todas las capas y se replica automáticamente en cada instancia nueva.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "ssm",
+        "private-subnet",
+        "autoscaling",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-eliminate-02",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "SCP or permissions boundary",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A platform team may create IAM roles in one member account, but the roles must never receive permissions outside an approved service set. Other accounts are unaffected. Which control is MOST appropriate?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Attach a permissions boundary to every role the platform team creates and prevent removal of the boundary."
+        },
+        {
+          "id": "B",
+          "label": "Attach an SCP to the organization root that denies every unapproved service."
+        },
+        {
+          "id": "C",
+          "label": "Use a Route 53 resolver rule."
+        },
+        {
+          "id": "D",
+          "label": "Create an AWS Config aggregator only."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "one member account",
+        "roles created",
+        "never receive",
+        "other accounts unaffected"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "An SCP can impose the service ceiling.",
+          "failure": "Root scope affects the organization broadly and is unnecessarily wide for delegated role creation in one account."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Resolver rules centralize DNS behavior.",
+          "failure": "They do not limit IAM permissions."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "missed_keyword",
+          "attraction": "An aggregator centralizes compliance data.",
+          "failure": "It neither prevents privilege escalation nor defines a role ceiling."
+        }
+      ],
+      "explanation": {
+        "concise": "La unidad de control es cada rol creado por el equipo, no toda la organización.",
+        "testedPattern": "Permissions-boundary delegation pattern",
+        "correctChoiceWins": "A limita la autoridad delegada sin afectar cuentas no relacionadas.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "iam",
+        "permissions-boundary",
+        "scp",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-eliminate-03",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Direct EventBridge target or Lambda",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "Security needs an SNS alert whenever CloudTrail records a DeleteTrail API call. No enrichment, correlation, or transformation is required. Which design has the LOWEST operational overhead?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create an EventBridge rule for the CloudTrail event and target SNS directly."
+        },
+        {
+          "id": "B",
+          "label": "Invoke Lambda from EventBridge and have Lambda forward the unchanged event to SNS."
+        },
+        {
+          "id": "C",
+          "label": "Run an EC2 polling process that searches CloudTrail every minute."
+        },
+        {
+          "id": "D",
+          "label": "Create a DynamoDB stream."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "CloudTrail",
+        "No enrichment",
+        "LOWEST operational overhead"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Lambda can publish to SNS.",
+          "failure": "It adds code without required logic."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Polling can detect the API call.",
+          "failure": "It duplicates a native event source and adds state and compute."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Streams capture DynamoDB item changes.",
+          "failure": "They do not capture CloudTrail control-plane events."
+        }
+      ],
+      "explanation": {
+        "concise": "Cuando pattern y target completan el requisito, Lambda es un distractor de overhead.",
+        "testedPattern": "Managed direct event routing",
+        "correctChoiceWins": "A usa el menor número de componentes y responde casi en tiempo real.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "eventbridge",
+        "cloudtrail",
+        "sns",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-eliminate-04",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Health signal or DNS TTL",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A regional endpoint returns HTTP 200 from /health while its database is unavailable. Route 53 therefore does not fail over. Which change MOST directly corrects the problem?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Lower the DNS TTL but keep the same health response."
+        },
+        {
+          "id": "B",
+          "label": "Make the health endpoint fail when critical database access is unavailable and use that result in regional health evaluation."
+        },
+        {
+          "id": "C",
+          "label": "Add more secondary DNS records without health checks."
+        },
+        {
+          "id": "D",
+          "label": "Increase the primary Auto Scaling maximum size only."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "HTTP 200",
+        "database unavailable",
+        "does not fail over",
+        "MOST directly"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "missed_keyword",
+          "attraction": "TTL affects how quickly clients adopt a changed answer.",
+          "failure": "No DNS change occurs while the endpoint remains falsely healthy."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "More endpoints can improve redundancy.",
+          "failure": "Without a truthful signal Route 53 still cannot choose correctly."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Scaling can fix resource exhaustion.",
+          "failure": "The explicit defect is the health contract."
+        }
+      ],
+      "explanation": {
+        "concise": "El problema está en la señal, no en la propagación DNS.",
+        "testedPattern": "Dependency-aware health checking",
+        "correctChoiceWins": "B convierte la disponibilidad real de la aplicación en la entrada del failover.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "route53",
+        "health-check",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-eliminate-05",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Cross-account pipeline decryption failure",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A pipeline can assume its deployment role in the target account. The action still fails with AccessDenied when reading the encrypted input artifact. Which area should be checked NEXT?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Artifact-bucket permissions and the customer-managed KMS key policy and IAM permissions for the target role"
+        },
+        {
+          "id": "B",
+          "label": "The Route 53 hosted-zone TTL"
+        },
+        {
+          "id": "C",
+          "label": "The target Auto Scaling cooldown"
+        },
+        {
+          "id": "D",
+          "label": "The pipeline stage name"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "can assume",
+        "still fails",
+        "encrypted input artifact",
+        "NEXT"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "DNS can affect application traffic.",
+          "failure": "It does not authorize S3 or KMS artifact access."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Cooldown affects scaling behavior.",
+          "failure": "The failure occurs before deployment resources can consume the artifact."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Stage naming improves clarity.",
+          "failure": "It has no authorization effect."
+        }
+      ],
+      "explanation": {
+        "concise": "STS ya funciona; el siguiente gate es leer y descifrar el artefacto.",
+        "testedPattern": "Cross-account pipeline troubleshooting order",
+        "correctChoiceWins": "A sigue la evidencia y revisa S3 y KMS en lugar de reiniciar el análisis desde cero.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codepipeline",
+        "cross-account",
+        "kms",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-eliminate-06",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Drift detection or compliance remediation",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "Security requires continuous evidence that CloudTrail is enabled even for resources not created by CloudFormation, plus automatic remediation when it is disabled. Which design is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use an AWS Config rule to evaluate CloudTrail, route noncompliance, and run an approved remediation such as Systems Manager Automation."
+        },
+        {
+          "id": "B",
+          "label": "Run CloudFormation drift detection on one unrelated application stack."
+        },
+        {
+          "id": "C",
+          "label": "Create only a CloudWatch dashboard."
+        },
+        {
+          "id": "D",
+          "label": "Create a change set every five minutes."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "continuous evidence",
+        "not created by CloudFormation",
+        "automatic remediation"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "service_confusion",
+          "attraction": "Drift detects differences from a stack template.",
+          "failure": "It does not provide account-wide compliance for resources outside that stack."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "missed_keyword",
+          "attraction": "A dashboard can display evidence.",
+          "failure": "It does not evaluate or remediate automatically."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Change sets preview stack updates.",
+          "failure": "They are not a compliance engine."
+        }
+      ],
+      "explanation": {
+        "concise": "AWS Config evalúa el estado real; remediation cierra el loop.",
+        "testedPattern": "Detective compliance with automated remediation",
+        "correctChoiceWins": "A cubre evidencia, recursos fuera de CloudFormation y corrección automática.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aws-config",
+        "cloudtrail",
+        "remediation",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Cross-account Lambda access to EFS",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select TWO answers.",
+      "prompt": "Lambda functions in Account B must mount an EFS file system in Account A. The functions run in VPC subnets. Which TWO changes are required?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Give the Lambda execution role the required VPC and EFS client permissions."
+        },
+        {
+          "id": "B",
+          "label": "Create a public IP address for every Lambda execution environment."
+        },
+        {
+          "id": "C",
+          "label": "Use an SCP to grant file-system access."
+        },
+        {
+          "id": "D",
+          "label": "Provide supported network connectivity between the VPCs and authorize the Account B principal in the EFS file-system access design."
+        },
+        {
+          "id": "E",
+          "label": "Create an unrelated EFS file system in Account B because cross-account access is impossible."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "D"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Select TWO",
+        "Account B",
+        "EFS in Account A",
+        "VPC subnets"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Public connectivity can reach many AWS endpoints.",
+          "failure": "EFS mounting uses private VPC networking and does not require public IPs."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "SCPs can limit organization permissions.",
+          "failure": "They do not grant EFS client permissions or create a network path."
+        },
+        {
+          "optionId": "E",
+          "errorCause": "elimination_failure",
+          "attraction": "A local file system avoids cross-account complexity.",
+          "failure": "It changes the requirement instead of implementing the shared file system."
+        }
+      ],
+      "explanation": {
+        "concise": "La respuesta necesita identidad y red/recurso. Una sola de las dos capas deja el mount incompleto.",
+        "testedPattern": "Cross-account EFS layered access",
+        "correctChoiceWins": "A y D forman el conjunto mínimo completo.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 23
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "lambda",
+        "efs",
+        "cross-account",
+        "multi-select"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-scenario-02",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Private multi-account instance operations",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "Hundreds of Auto Scaling instances across member accounts process sensitive data in private subnets with no internet route. Operations needs centralized shell access, session logs, and alerts for new sessions. Which design is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Standardize an AMI with SSM Agent, reference the correct EC2 instance profile in launch templates, provide Systems Manager interface endpoints, centralize session logs in an approved destination, and route session events to notification automation."
+        },
+        {
+          "id": "B",
+          "label": "Create a public bastion in every account and share one SSH key."
+        },
+        {
+          "id": "C",
+          "label": "Allow inbound SSH from 0.0.0.0/0 for ten minutes during incidents."
+        },
+        {
+          "id": "D",
+          "label": "Use only AWS Organizations SCPs."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "hundreds",
+        "Auto Scaling",
+        "private",
+        "no internet",
+        "centralized",
+        "new sessions"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Bastions can centralize entry.",
+          "failure": "Per-account bastions and shared keys add exposure and maintenance."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "missed_keyword",
+          "attraction": "Temporary access can aid incidents.",
+          "failure": "It violates the private managed-access objective."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "SCPs can constrain administration.",
+          "failure": "They cannot install the agent, attach instance identity, or create endpoints and logs."
+        }
+      ],
+      "explanation": {
+        "concise": "La solución debe ser declarativa para que cada reemplazo del ASG nazca administrable.",
+        "testedPattern": "Organization-scale private instance management",
+        "correctChoiceWins": "A cubre software, identidad, red, logging y eventos sin internet público.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 32
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "ssm",
+        "autoscaling",
+        "multi-account",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-scenario-03",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Organization-wide CloudTrail enforcement",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company has more than 100 organization accounts and several Regions. CloudTrail must be enabled everywhere, new accounts must receive the baseline automatically, compliance must be visible centrally, and disabled trails must be remediated. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Deploy the CloudTrail baseline through a service-managed StackSet targeted to OUs with automatic deployment, use organization-scale AWS Config evaluation and aggregation, and attach approved automated remediation for noncompliance."
+        },
+        {
+          "id": "B",
+          "label": "Send an email asking every account owner to enable CloudTrail."
+        },
+        {
+          "id": "C",
+          "label": "Use one permissions boundary in the management account."
+        },
+        {
+          "id": "D",
+          "label": "Create a dashboard without a deployment or remediation mechanism."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "more than 100 accounts",
+        "Regions",
+        "new accounts",
+        "centrally",
+        "remediated"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Account owners can configure the service.",
+          "failure": "Manual action does not scale or guarantee future-account coverage."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Boundaries constrain IAM identities.",
+          "failure": "One management-account boundary does not deploy or evaluate member-account trails."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "missed_keyword",
+          "attraction": "A dashboard satisfies central visibility.",
+          "failure": "It omits automatic baseline and remediation."
+        }
+      ],
+      "explanation": {
+        "concise": "El escenario combina tres funciones: desplegar, evaluar/agregar y remediar.",
+        "testedPattern": "Organization governance control chain",
+        "correctChoiceWins": "A es la única opción que cubre todas las etapas y cuentas futuras.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 65
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "organizations",
+        "stacksets",
+        "aws-config",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-scenario-04",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Cross-account and cross-Region deployment",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select THREE answers.",
+      "prompt": "A pipeline in Account A and eu-west-1 must deploy to Account B and us-east-2. Which THREE design elements are required?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "A deployment role in Account B that trusts the pipeline service role and has target-resource permissions"
+        },
+        {
+          "id": "B",
+          "label": "Artifact-bucket and KMS authorization that permits the cross-account action to read and decrypt artifacts"
+        },
+        {
+          "id": "C",
+          "label": "A regional artifact store in us-east-2 for the cross-Region action"
+        },
+        {
+          "id": "D",
+          "label": "A public IP address on the CodePipeline service"
+        },
+        {
+          "id": "E",
+          "label": "An SCP that grants all required deployment permissions"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "B",
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Select THREE",
+        "Account B",
+        "us-east-2",
+        "cross-account",
+        "cross-Region"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Cross-Region traffic can sound like public networking.",
+          "failure": "CodePipeline is a managed service and does not require a customer-assigned public IP."
+        },
+        {
+          "optionId": "E",
+          "errorCause": "service_confusion",
+          "attraction": "SCPs affect available permissions.",
+          "failure": "They do not grant deployment actions or replace trust, S3, KMS, and artifact-store configuration."
+        }
+      ],
+      "explanation": {
+        "concise": "Cuenta destino y región destino introducen gates distintos y acumulativos.",
+        "testedPattern": "Cross-account plus cross-Region CodePipeline",
+        "correctChoiceWins": "A, B y C cubren identidad, datos/cifrado y movimiento regional del artefacto.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codepipeline",
+        "cross-account",
+        "cross-region",
+        "multi-select"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-scenario-05",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Regional database and DNS recovery",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "An application uses Aurora Global Database with a primary application stack in Region A and a warm standby in Region B. The business requires automatic application failover after a regional outage and accepts possible loss of the latest unreplicated writes. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Promote the selected Aurora secondary through failover, validate the regional application dependencies, and use Route 53 failover routing with a meaningful regional health signal."
+        },
+        {
+          "id": "B",
+          "label": "Use only a lower DNS TTL; the secondary database becomes writable automatically."
+        },
+        {
+          "id": "C",
+          "label": "Use latency routing between two unrelated writable Aurora clusters without replication."
+        },
+        {
+          "id": "D",
+          "label": "Restore a yearly snapshot after every health-check failure."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "regional outage",
+        "warm standby",
+        "automatic application failover",
+        "accepts possible loss"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "incorrect_assumption",
+          "attraction": "TTL affects DNS cache duration.",
+          "failure": "It does not promote the secondary database or validate application readiness."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Latency routing serves active regional endpoints.",
+          "failure": "It does not keep independent relational writers consistent."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Snapshot restore is a valid DR tool.",
+          "failure": "A yearly snapshot violates the available global-replication architecture and recovery objectives."
+        }
+      ],
+      "explanation": {
+        "concise": "La recuperación completa combina promoción de datos y cambio de tráfico.",
+        "testedPattern": "Aurora and Route 53 regional recovery",
+        "correctChoiceWins": "A usa el failover no planeado coherente con el RPO aceptado y una señal DNS real.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aurora",
+        "route53",
+        "dr",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-scenario-06",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Immutable regulated backups",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A regulated workload requires cross-Region backups retained for seven years. After a validation window, no administrator must be able to shorten retention or delete the protected copies. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use AWS Backup copy actions to an appropriate target vault, configure compliance-mode Vault Lock with validated retention boundaries and grace period, and test restores."
+        },
+        {
+          "id": "B",
+          "label": "Use governance mode and grant administrators permission to remove the lock."
+        },
+        {
+          "id": "C",
+          "label": "Store only backup job reports in S3."
+        },
+        {
+          "id": "D",
+          "label": "Create daily snapshots in the production account without a locked target vault."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "cross-Region",
+        "seven years",
+        "no administrator",
+        "validation window"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "Governance mode adds protection and override control.",
+          "failure": "The scenario requires post-validation no-bypass retention."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Reports provide audit evidence.",
+          "failure": "They are not recovery points."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Daily snapshots create backups.",
+          "failure": "They omit immutability and failure-domain separation."
+        }
+      ],
+      "explanation": {
+        "concise": "Copy action resuelve aislamiento; compliance mode resuelve inmutabilidad; restore test verifica utilidad.",
+        "testedPattern": "Immutable and isolated backup design",
+        "correctChoiceWins": "A cubre las tres propiedades sin confundir evidencia con recuperación.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aws-backup",
+        "vault-lock",
+        "compliance",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-scenario-07",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Published package validation pipeline",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A new version of an internal library is published to CodeArtifact. The company must immediately start validation, avoid polling, and ensure that duplicate events do not promote the package twice. Which design is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Match the CodeArtifact Published event in EventBridge, start the validation workflow, and use package version plus revision or sequence metadata as an idempotency key before promotion."
+        },
+        {
+          "id": "B",
+          "label": "Run a scheduled list-packages command every minute and promote latest."
+        },
+        {
+          "id": "C",
+          "label": "Trigger on any S3 object in the pipeline artifact bucket."
+        },
+        {
+          "id": "D",
+          "label": "Use a mutable package alias as the only processing key."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "published",
+        "immediately",
+        "avoid polling",
+        "duplicate events"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Frequent polling can approximate near-real-time.",
+          "failure": "It adds calls and a mutable identity when a native event exists."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Pipeline artifacts are stored in S3.",
+          "failure": "They are not the authoritative package publication event."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "A mutable alias is convenient for consumers.",
+          "failure": "It cannot reliably deduplicate a specific package revision."
+        }
+      ],
+      "explanation": {
+        "concise": "El patrón completo es evento preciso más procesamiento idempotente.",
+        "testedPattern": "CodeArtifact event-driven promotion",
+        "correctChoiceWins": "A satisface latencia, eficiencia y seguridad ante entrega repetida.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "codeartifact",
+        "eventbridge",
+        "idempotency",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-scenario-08",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Prevent, detect, and validate resource compliance",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A governed organization needs to prevent member accounts from leaving the organization, report existing unencrypted EBS volumes, and reject new unencrypted volumes created through CloudFormation before provisioning. Which mapping is correct?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Preventive control for leaving the organization; detective control for existing volumes; proactive control for pre-provisioning CloudFormation validation"
+        },
+        {
+          "id": "B",
+          "label": "Detective control for all three"
+        },
+        {
+          "id": "C",
+          "label": "Permissions boundary for all three"
+        },
+        {
+          "id": "D",
+          "label": "Proactive control for organization departure; SCP for reporting existing volumes; detective control before provisioning"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "prevent",
+        "report existing",
+        "reject before provisioning"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "Detective controls report deployed violations.",
+          "failure": "They cannot satisfy both explicit prevention and pre-provisioning rejection."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "A boundary limits IAM entities.",
+          "failure": "It is not the control model for all three organization and resource outcomes."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "All named mechanisms are real.",
+          "failure": "They are mapped to the wrong lifecycle points."
+        }
+      ],
+      "explanation": {
+        "concise": "Las palabras del requisito mapean directamente a los tres comportamientos.",
+        "testedPattern": "Control Tower control lifecycle",
+        "correctChoiceWins": "A conserva prevention, post-deployment detection y pre-provisioning validation.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "control-tower",
+        "governance",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-scenario-09",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Access discovery and scalable authorization",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select TWO answers.",
+      "prompt": "A company wants to find resources shared outside its organization and reduce project-specific IAM policy updates as new tagged resources are created. Which TWO capabilities address the requirements?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create an organization-level external access analyzer."
+        },
+        {
+          "id": "B",
+          "label": "Use ABAC policies that compare governed principal or session tags with resource tags."
+        },
+        {
+          "id": "C",
+          "label": "Use an unused access analyzer as the only control."
+        },
+        {
+          "id": "D",
+          "label": "Grant AdministratorAccess to every project role."
+        },
+        {
+          "id": "E",
+          "label": "Use a Route 53 health check."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Select TWO",
+        "outside organization",
+        "reduce policy updates",
+        "tagged resources"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Unused analyzers find stale access.",
+          "failure": "They do not discover external resource sharing or create scalable authorization."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Broad access eliminates policy maintenance.",
+          "failure": "It violates least privilege."
+        },
+        {
+          "optionId": "E",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Health checks support availability decisions.",
+          "failure": "They do not analyze or grant IAM access."
+        }
+      ],
+      "explanation": {
+        "concise": "La primera necesidad es análisis; la segunda es diseño de autorización.",
+        "testedPattern": "Access Analyzer plus ABAC",
+        "correctChoiceWins": "A y B resuelven preguntas diferentes sin confundir discovery con granting.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "access-analyzer",
+        "abac",
+        "multi-select"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-scenario-10",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Choose the observability mechanisms",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select THREE answers.",
+      "prompt": "Operations needs to search two weeks of logs during incidents, alarm whenever five Critical events arrive in five minutes, and continuously identify the tenant IDs producing the most errors. Which THREE mechanisms should be used?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "CloudWatch Logs Insights for historical and interactive queries"
+        },
+        {
+          "id": "B",
+          "label": "A CloudWatch Logs metric filter plus alarm for the Critical-event threshold"
+        },
+        {
+          "id": "C",
+          "label": "CloudWatch Contributor Insights over structured logs for top tenant contributors"
+        },
+        {
+          "id": "D",
+          "label": "CloudFormation drift detection for request IDs"
+        },
+        {
+          "id": "E",
+          "label": "Route 53 geolocation routing for log aggregation"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "B",
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Select THREE",
+        "search",
+        "alarm threshold",
+        "tenant IDs",
+        "most errors"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "Drift detection supports operations.",
+          "failure": "It compares stack state, not runtime log data."
+        },
+        {
+          "optionId": "E",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Route 53 routes DNS traffic.",
+          "failure": "It does not query or aggregate application logs."
+        }
+      ],
+      "explanation": {
+        "concise": "Cada verbo produce una herramienta distinta: search, alarm y top contributors.",
+        "testedPattern": "Observability mechanism selection",
+        "correctChoiceWins": "A, B y C cubren investigación, señal alarmable y cardinalidad.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "cloudwatch",
+        "logs-insights",
+        "contributor-insights",
+        "multi-select"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-workflow-01",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order cross-account pipeline troubleshooting",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A cross-account deployment action fails. Order the checks from the earliest identity gate to the target deployment.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "trust",
+          "label": "Confirm the target role trust policy allows the pipeline service role."
+        },
+        {
+          "id": "assume",
+          "label": "Confirm the pipeline service role can call sts:AssumeRole on the target role."
+        },
+        {
+          "id": "artifact",
+          "label": "Confirm bucket policy and S3 permissions allow artifact access."
+        },
+        {
+          "id": "kms",
+          "label": "Confirm the target role can use the customer-managed KMS key."
+        },
+        {
+          "id": "target",
+          "label": "Confirm the assumed target role has permissions on the deployment resources."
+        },
+        {
+          "id": "service-local",
+          "label": "Confirm service-local authorization such as EKS access entries when applicable."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "trust",
+          "assume",
+          "artifact",
+          "kms",
+          "target",
+          "service-local"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "trust",
+        "AssumeRole",
+        "S3",
+        "KMS",
+        "target resource",
+        "service-local"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El orden sigue el camino real de la solicitud y evita cambiar políticas al azar.",
+        "testedPattern": "Cross-account troubleshooting sequence",
+        "correctChoiceWins": "Cada paso depende del anterior y localiza la primera denegación real.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "workflow",
+        "cross-account",
+        "codepipeline"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-workflow-02",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a closed-loop compliance response",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 6,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A resource becomes noncompliant and must be corrected automatically with audit evidence.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "evaluate",
+          "label": "Evaluate the actual resource with the authoritative compliance rule."
+        },
+        {
+          "id": "event",
+          "label": "Emit or route the noncompliance state change."
+        },
+        {
+          "id": "remediate",
+          "label": "Run the approved idempotent remediation."
+        },
+        {
+          "id": "record",
+          "label": "Record execution identity, parameters, and outcome."
+        },
+        {
+          "id": "reevaluate",
+          "label": "Re-evaluate the resource and confirm compliant state."
+        },
+        {
+          "id": "escalate",
+          "label": "Escalate when remediation fails or the resource remains noncompliant."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "evaluate",
+          "event",
+          "remediate",
+          "record",
+          "reevaluate",
+          "escalate"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "evaluate",
+        "state change",
+        "idempotent",
+        "audit",
+        "re-evaluate"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El loop termina con estado compliant comprobado o escalamiento, no con la invocación del runbook.",
+        "testedPattern": "Closed-loop compliance automation",
+        "correctChoiceWins": "El orden produce evidencia y evita falsos positivos de remediación.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "workflow",
+        "aws-config",
+        "remediation"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map the requirement to the AWS control point",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each requirement to the primary control point.",
+      "answerOptions": [
+        {
+          "id": "scp",
+          "label": "Service control policy"
+        },
+        {
+          "id": "boundary",
+          "label": "Permissions boundary"
+        },
+        {
+          "id": "config",
+          "label": "AWS Config rule"
+        },
+        {
+          "id": "proactive",
+          "label": "Control Tower proactive control or CloudFormation hook"
+        },
+        {
+          "id": "analyzer",
+          "label": "IAM Access Analyzer external analyzer"
+        },
+        {
+          "id": "catalog",
+          "label": "AWS Service Catalog"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "org-deny",
+          "label": "Prevent all principals in production member accounts from disabling CloudTrail"
+        },
+        {
+          "id": "role-ceiling",
+          "label": "Allow a team to create roles but cap each role's maximum permissions"
+        },
+        {
+          "id": "detect-state",
+          "label": "Continuously report whether CloudTrail is enabled"
+        },
+        {
+          "id": "pre-cfn",
+          "label": "Reject a noncompliant CloudFormation resource before creation"
+        },
+        {
+          "id": "external-share",
+          "label": "Find supported resources accessible from outside the organization"
+        },
+        {
+          "id": "approved-selfservice",
+          "label": "Let users launch only approved infrastructure products"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "org-deny": "scp",
+          "role-ceiling": "boundary",
+          "detect-state": "config",
+          "pre-cfn": "proactive",
+          "external-share": "analyzer",
+          "approved-selfservice": "catalog"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "prevent all",
+        "cap role",
+        "report state",
+        "before creation",
+        "outside organization",
+        "approved products"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Todos son controles válidos, pero cada uno gobierna una etapa y un alcance distintos.",
+        "testedPattern": "Governance control-point mapping",
+        "correctChoiceWins": "El mapeo entrena la eliminación por scope, una de las fuentes principales de error.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "architecture-mapping",
+        "governance",
+        "scope"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-mapping-02",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map deployment constraints to strategy",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each deployment requirement to the most direct strategy.",
+      "answerOptions": [
+        {
+          "id": "all-at-once",
+          "label": "All at once"
+        },
+        {
+          "id": "rolling-extra",
+          "label": "Rolling with additional batch"
+        },
+        {
+          "id": "blue-green",
+          "label": "Blue/green or immutable replacement environment"
+        },
+        {
+          "id": "lambda-canary",
+          "label": "Lambda canary deployment through alias traffic shifting"
+        },
+        {
+          "id": "eb-traffic",
+          "label": "Elastic Beanstalk traffic splitting"
+        },
+        {
+          "id": "separate-groups",
+          "label": "Separate production canary and full deployment groups with a pipeline approval gate"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "fast-risky",
+          "label": "Fastest deployment; downtime and broad blast radius are acceptable"
+        },
+        {
+          "id": "no-capacity-loss",
+          "label": "Update instances gradually without reducing serving capacity"
+        },
+        {
+          "id": "new-fleet",
+          "label": "Create a fully separate replacement fleet and switch traffic"
+        },
+        {
+          "id": "lambda-small",
+          "label": "Shift a small percentage of Lambda traffic first and roll back on alarms"
+        },
+        {
+          "id": "eb-random",
+          "label": "Send a percentage of Elastic Beanstalk traffic to new instances for an evaluation period"
+        },
+        {
+          "id": "prod-canary-gate",
+          "label": "Deploy to a few production instances, evaluate metrics, then require approval before full production"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "fast-risky": "all-at-once",
+          "no-capacity-loss": "rolling-extra",
+          "new-fleet": "blue-green",
+          "lambda-small": "lambda-canary",
+          "eb-random": "eb-traffic",
+          "prod-canary-gate": "separate-groups"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "downtime acceptable",
+        "no capacity loss",
+        "separate fleet",
+        "Lambda alias",
+        "traffic percentage",
+        "approval"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La palabra canary no implica el mismo mecanismo en todas las plataformas.",
+        "testedPattern": "Deployment-strategy mapping",
+        "correctChoiceWins": "El mapeo conecta el constraint con la implementación concreta y evita respuestas genéricas.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "architecture-mapping",
+        "deployment",
+        "strategy"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-bank-23",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: cross-account Lambda and EFS",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints. State the decisive keywords, eliminate distractors, and provide confidence from 1 to 5.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A",
+          "D"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "Select TWO",
+        "Lambda Account B",
+        "EFS Account A",
+        "VPC connectivity",
+        "file-system authorization"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno exige seleccionar el conjunto completo de identidad y conectividad/recurso.",
+        "testedPattern": "Cross-account EFS request path",
+        "correctChoiceWins": "A y D cubren las dos capas obligatorias sin inventar internet público o un nuevo file system.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 23
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "lambda",
+        "efs",
+        "cross-account"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-bank-32",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: private Auto Scaling management",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints. State the decisive keywords, eliminate distractors, and provide confidence from 1 to 5.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "no internet",
+        "VPC endpoints",
+        "custom AMI",
+        "Auto Scaling",
+        "centralized access",
+        "logs"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La pregunta comprueba si se entiende que Systems Manager puede operar por endpoints privados y que el ASG debe heredar agente e identidad.",
+        "testedPattern": "Private Systems Manager architecture",
+        "correctChoiceWins": "La respuesta correcta resuelve administración, logging y escalado sin bastion ni NAT.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 32
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "ssm",
+        "autoscaling",
+        "private-subnet"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-bank-65",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: organization-wide CloudTrail governance",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints. State the decisive keywords, eliminate distractors, and provide confidence from 1 to 5.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "100 accounts",
+        "all Regions",
+        "dashboard",
+        "automatic alert",
+        "remediation"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno combina StackSets para baseline, AWS Config para evidencia y remediación administrada.",
+        "testedPattern": "Organization-scale deploy-detect-remediate",
+        "correctChoiceWins": "La respuesta correcta cubre cuentas actuales y futuras, regiones, visibilidad y corrección.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 65
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "organizations",
+        "cloudtrail",
+        "aws-config"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "fms-bank-72",
+      "version": "drill-definition-v1",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "sdlc_automation",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: production canary and approval gate",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 8,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints. State the decisive keywords, eliminate distractors, and provide confidence from 1 to 5.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "few production instances",
+        "collect metrics",
+        "manual approval",
+        "full deployment"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno exige modelar canary y full production como deployment groups separados dentro del mismo pipeline.",
+        "testedPattern": "CodeDeploy production promotion flow",
+        "correctChoiceWins": "La respuesta correcta conserva una sola orquestación y coloca la aprobación entre exposición limitada y despliegue completo.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 72
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "codedeploy",
+        "canary",
+        "approval"
+      ],
+      "active": true
+    }
+  ],
+  "sourceQuestionRefs": [
+    {
+      "bank": "verified",
+      "questionId": 23
+    },
+    {
+      "bank": "verified",
+      "questionId": 32
+    },
+    {
+      "bank": "verified",
+      "questionId": 65
+    },
+    {
+      "bank": "verified",
+      "questionId": 72
+    }
+  ],
+  "prerequisiteRelationships": [
+    {
+      "topicId": "mixed_exam_scenarios",
+      "prerequisiteTopicIds": []
+    }
+  ],
+  "tags": [
+    "dop-c02",
+    "final-review",
+    "mixed-scenarios",
+    "best-answer",
+    "multi-select",
+    "distractor-elimination",
+    "cross-account",
+    "governance",
+    "resilience",
+    "observability",
+    "deployment",
+    "personalized"
+  ]
+}

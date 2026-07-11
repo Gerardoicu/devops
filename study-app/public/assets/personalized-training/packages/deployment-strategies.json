@@ -1,0 +1,3007 @@
+{
+  "schemaVersion": "1.0",
+  "packageId": "deployment-strategies",
+  "version": "1.0.0",
+  "title": "Deployment Strategies and Operational Rollback",
+  "description": "Personalized DOP-C02 training for selecting deployment strategies from operational constraints; CodeDeploy lifecycle, load balancer, alarm, rollback, and Auto Scaling behavior; Lambda alias traffic shifting with hooks and alarms; and Elastic Beanstalk rolling, immutable, and traffic-splitting deployments.",
+  "topicDescriptors": [
+    {
+      "topicId": "deployment_strategy_selection",
+      "title": "Choose the Deployment Strategy from Operational Constraints",
+      "domainId": "sdlc_automation",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "blue_green_vs_rolling",
+        "zero_downtime",
+        "test_window",
+        "extra_capacity",
+        "rollback_speed"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 52
+        },
+        {
+          "bank": "verified",
+          "questionId": 58
+        },
+        {
+          "bank": "verified",
+          "questionId": 72
+        },
+        {
+          "bank": "verified",
+          "questionId": 93
+        }
+      ]
+    },
+    {
+      "topicId": "codedeploy_operational_flow",
+      "title": "CodeDeploy Operational Flow, Hooks, Load Balancers, and Rollback",
+      "domainId": "sdlc_automation",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "relatedPatternIds": [
+        "allow_traffic",
+        "validate_service",
+        "alb_health_checks",
+        "cloudwatch_alarm_rollback",
+        "asg_scale_out_during_deploy"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 5
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 51
+        },
+        {
+          "bank": "verified",
+          "questionId": 58
+        },
+        {
+          "bank": "verified",
+          "questionId": 93
+        }
+      ]
+    },
+    {
+      "topicId": "lambda_deployment_traffic",
+      "title": "Lambda Aliases, Traffic Shifting, Validation Hooks, and Alarms",
+      "domainId": "sdlc_automation",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "developing",
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "relatedPatternIds": [
+        "lambda_alias",
+        "canary_linear_all_at_once",
+        "before_allow_traffic",
+        "pretraffic_posttraffic",
+        "automatic_rollback"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 10
+        },
+        {
+          "bank": "verified",
+          "questionId": 19
+        },
+        {
+          "bank": "verified",
+          "questionId": 97
+        }
+      ]
+    },
+    {
+      "topicId": "elastic_beanstalk_deployment",
+      "title": "Elastic Beanstalk Rolling, Immutable, and Traffic-Splitting Deployments",
+      "domainId": "configuration_management_iac",
+      "blueprintRelevance": 0.9,
+      "currentStatus": "weak",
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "relatedPatternIds": [
+        "rolling",
+        "rolling_additional_batch",
+        "immutable",
+        "traffic_splitting",
+        "blue_green_cname",
+        "ebextensions_option_settings"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 52
+        },
+        {
+          "bank": "verified",
+          "questionId": 69
+        },
+        {
+          "bank": "verified",
+          "questionId": 75
+        },
+        {
+          "bank": "verified",
+          "questionId": 111
+        }
+      ]
+    }
+  ],
+  "conceptMaps": [
+    {
+      "id": "map-deployment-constraint-ladder",
+      "schemaVersion": "1.0",
+      "topicId": "deployment_strategy_selection",
+      "title": "Choose a deployment strategy from constraints, not service names",
+      "steps": [
+        {
+          "id": "availability",
+          "label": "1. Availability",
+          "detail": "Decide whether any capacity loss or downtime is acceptable. All-at-once is immediately eliminated when availability must be preserved.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 25
+            },
+            {
+              "bank": "verified",
+              "questionId": 52
+            }
+          ]
+        },
+        {
+          "id": "capacity",
+          "label": "2. Extra capacity",
+          "detail": "Ask whether the solution may launch a parallel fleet or extra batch. Blue/green and immutable trade additional capacity for isolation and safer rollback.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 25
+            },
+            {
+              "bank": "verified",
+              "questionId": 52
+            }
+          ]
+        },
+        {
+          "id": "traffic",
+          "label": "3. Traffic control",
+          "detail": "Identify whether traffic must move all at once, by percentage, or only after a test window and approval.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 25
+            },
+            {
+              "bank": "verified",
+              "questionId": 72
+            }
+          ]
+        },
+        {
+          "id": "rollback",
+          "label": "4. Rollback mechanism",
+          "detail": "Prefer a strategy whose rollback directly matches the failure signal: target health, lifecycle hook failure, or CloudWatch alarm.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 58
+            },
+            {
+              "bank": "verified",
+              "questionId": 93
+            }
+          ]
+        },
+        {
+          "id": "scope",
+          "label": "5. Platform scope",
+          "detail": "Separate an application-version deployment from an environment replacement, configuration update, or Lambda alias shift.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 10
+            },
+            {
+              "bank": "verified",
+              "questionId": 52
+            },
+            {
+              "bank": "verified",
+              "questionId": 111
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-codedeploy-ec2-flow",
+      "schemaVersion": "1.0",
+      "topicId": "codedeploy_operational_flow",
+      "title": "CodeDeploy EC2 blue/green operational flow",
+      "steps": [
+        {
+          "id": "replacement",
+          "label": "1. Provision replacement",
+          "detail": "Create or identify the green instances with the intended launch configuration and application revision.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 25
+            },
+            {
+              "bank": "verified",
+              "questionId": 51
+            }
+          ]
+        },
+        {
+          "id": "install",
+          "label": "2. Install and start",
+          "detail": "Run the configured EC2 lifecycle scripts and validate the application before production traffic.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 93
+            }
+          ]
+        },
+        {
+          "id": "register",
+          "label": "3. Register with target group",
+          "detail": "The load balancer health check must succeed before traffic can be safely routed.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 5
+            },
+            {
+              "bank": "verified",
+              "questionId": 93
+            }
+          ]
+        },
+        {
+          "id": "shift",
+          "label": "4. Shift traffic",
+          "detail": "CodeDeploy reroutes production traffic to the replacement environment according to the deployment configuration.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 25
+            }
+          ]
+        },
+        {
+          "id": "observe",
+          "label": "5. Observe and roll back",
+          "detail": "Deployment failures or configured CloudWatch alarms can trigger automatic rollback to the last known good revision.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 58
+            },
+            {
+              "bank": "verified",
+              "questionId": 93
+            }
+          ]
+        },
+        {
+          "id": "retire",
+          "label": "6. Retire blue",
+          "detail": "Keep or terminate the original instances after the configured wait period.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 25
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-lambda-safe-deployment",
+      "schemaVersion": "1.0",
+      "topicId": "lambda_deployment_traffic",
+      "title": "Lambda alias traffic-shifting flow",
+      "steps": [
+        {
+          "id": "publish",
+          "label": "1. Publish immutable version",
+          "detail": "A deployment targets a published Lambda version, not mutable $LATEST.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 10
+            },
+            {
+              "bank": "verified",
+              "questionId": 19
+            }
+          ]
+        },
+        {
+          "id": "pre",
+          "label": "2. Run pre-traffic validation",
+          "detail": "Use a pre-traffic or BeforeAllowTraffic validation when a prerequisite must complete before any production traffic reaches the new version.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 10
+            },
+            {
+              "bank": "verified",
+              "questionId": 19
+            },
+            {
+              "bank": "verified",
+              "questionId": 97
+            }
+          ]
+        },
+        {
+          "id": "shift",
+          "label": "3. Shift alias traffic",
+          "detail": "CodeDeploy changes alias weights using canary, linear, or all-at-once behavior.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 10
+            }
+          ]
+        },
+        {
+          "id": "alarm",
+          "label": "4. Observe alarms",
+          "detail": "CloudWatch alarms can stop the deployment and trigger rollback while traffic is shifting.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 10
+            }
+          ]
+        },
+        {
+          "id": "post",
+          "label": "5. Run post-traffic validation",
+          "detail": "Use post-traffic validation for checks that require the new version to be serving production traffic.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-eb-policy-decision",
+      "schemaVersion": "1.0",
+      "topicId": "elastic_beanstalk_deployment",
+      "title": "Elastic Beanstalk deployment policy decision tree",
+      "steps": [
+        {
+          "id": "downtime",
+          "label": "Can downtime occur?",
+          "detail": "All at once is the fastest and cheapest but removes all serving capacity during deployment.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 52
+            }
+          ]
+        },
+        {
+          "id": "existing",
+          "label": "Update existing instances?",
+          "detail": "Rolling updates batches of existing instances. Rolling with additional batch temporarily preserves full capacity.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 52
+            }
+          ]
+        },
+        {
+          "id": "new",
+          "label": "Need isolated new instances?",
+          "detail": "Immutable launches a full new Auto Scaling group and provides safer rollback by terminating the new group if deployment fails.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 52
+            }
+          ]
+        },
+        {
+          "id": "canary",
+          "label": "Need production canary traffic?",
+          "detail": "Traffic splitting launches new instances and sends a configured percentage of traffic for an evaluation period.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 52
+            }
+          ]
+        },
+        {
+          "id": "environment",
+          "label": "Need separate environment ownership?",
+          "detail": "Blue/green uses a second environment and swaps CNAMEs, which is different from an in-environment deployment policy.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 52
+            },
+            {
+              "bank": "verified",
+              "questionId": 111
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-rollback-signal-chain",
+      "schemaVersion": "1.0",
+      "topicId": "codedeploy_operational_flow",
+      "title": "Signal to rollback chain",
+      "steps": [
+        {
+          "id": "signal",
+          "label": "1. Choose the signal",
+          "detail": "Use application lifecycle validation, load balancer health, or a CloudWatch alarm that represents user impact.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 5
+            },
+            {
+              "bank": "verified",
+              "questionId": 58
+            },
+            {
+              "bank": "verified",
+              "questionId": 93
+            }
+          ]
+        },
+        {
+          "id": "attach",
+          "label": "2. Attach it to the deployment group",
+          "detail": "The signal must be configured where CodeDeploy can consume it; a metric without an alarm is not enough.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 58
+            }
+          ]
+        },
+        {
+          "id": "rollback",
+          "label": "3. Enable automatic rollback",
+          "detail": "Configure rollback for failed deployments and/or alarm threshold breaches.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 58
+            },
+            {
+              "bank": "verified",
+              "questionId": 93
+            }
+          ]
+        },
+        {
+          "id": "verify",
+          "label": "4. Verify last known good revision",
+          "detail": "CodeDeploy rollback creates a new deployment of the previously known good revision.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 58
+            },
+            {
+              "bank": "verified",
+              "questionId": 93
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "cmp-bluegreen-vs-rolling",
+      "topicId": "deployment_strategy_selection",
+      "leftService": "Blue/Green",
+      "rightService": "Rolling",
+      "dimensions": [
+        {
+          "id": "fleet",
+          "label": "Fleet model",
+          "leftValue": "Parallel replacement fleet",
+          "rightValue": "Existing fleet updated in batches"
+        },
+        {
+          "id": "traffic",
+          "label": "Traffic",
+          "leftValue": "Explicit reroute to green",
+          "rightValue": "Remaining healthy batches continue serving"
+        },
+        {
+          "id": "rollback",
+          "label": "Rollback",
+          "leftValue": "Route back or keep blue",
+          "rightValue": "Redeploy previous version through batches"
+        },
+        {
+          "id": "capacity",
+          "label": "Capacity cost",
+          "leftValue": "Higher temporary capacity",
+          "rightValue": "Lower, unless extra batch is used"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 52
+        },
+        {
+          "bank": "verified",
+          "questionId": 93
+        }
+      ]
+    },
+    {
+      "id": "cmp-codedeploy-vs-beanstalk",
+      "topicId": "deployment_strategy_selection",
+      "leftService": "AWS CodeDeploy",
+      "rightService": "Elastic Beanstalk deployment policies",
+      "dimensions": [
+        {
+          "id": "control",
+          "label": "Primary control",
+          "leftValue": "Deployment group, AppSpec, lifecycle hooks, traffic configuration",
+          "rightValue": "Environment deployment policy and platform configuration"
+        },
+        {
+          "id": "targets",
+          "label": "Common targets",
+          "leftValue": "EC2/on-premises, Lambda, ECS",
+          "rightValue": "Elastic Beanstalk environments"
+        },
+        {
+          "id": "bluegreen",
+          "label": "Blue/green",
+          "leftValue": "Managed replacement environment and traffic reroute",
+          "rightValue": "Usually separate EB environments plus CNAME swap"
+        },
+        {
+          "id": "exam",
+          "label": "Exam clue",
+          "leftValue": "Hooks, deployment group, alarms, original instances",
+          "rightValue": ".ebextensions, environment, rolling/immutable/traffic splitting"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 10
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 52
+        },
+        {
+          "bank": "verified",
+          "questionId": 111
+        }
+      ]
+    },
+    {
+      "id": "cmp-before-vs-after-traffic",
+      "topicId": "lambda_deployment_traffic",
+      "leftService": "BeforeAllowTraffic / PreTraffic",
+      "rightService": "AfterAllowTraffic / PostTraffic",
+      "dimensions": [
+        {
+          "id": "when",
+          "label": "Runs",
+          "leftValue": "Before production traffic reaches new version",
+          "rightValue": "After traffic shift completes"
+        },
+        {
+          "id": "use",
+          "label": "Use for",
+          "leftValue": "Prerequisites and gate checks",
+          "rightValue": "Integration or production-path validation"
+        },
+        {
+          "id": "failure",
+          "label": "Failure effect",
+          "leftValue": "Prevents traffic shift",
+          "rightValue": "Fails after new version has received traffic"
+        },
+        {
+          "id": "clue",
+          "label": "Exam clue",
+          "leftValue": "MUST complete before traffic",
+          "rightValue": "Validate after traffic is serving"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 10
+        },
+        {
+          "bank": "verified",
+          "questionId": 19
+        },
+        {
+          "bank": "verified",
+          "questionId": 97
+        }
+      ]
+    },
+    {
+      "id": "cmp-canary-vs-linear",
+      "topicId": "lambda_deployment_traffic",
+      "leftService": "Canary traffic shifting",
+      "rightService": "Linear traffic shifting",
+      "dimensions": [
+        {
+          "id": "shape",
+          "label": "Traffic shape",
+          "leftValue": "Small first increment, then remaining traffic",
+          "rightValue": "Repeated equal increments"
+        },
+        {
+          "id": "observation",
+          "label": "Observation",
+          "leftValue": "Focused evaluation after initial exposure",
+          "rightValue": "Evaluation between each increment"
+        },
+        {
+          "id": "risk",
+          "label": "Blast radius",
+          "leftValue": "Initially bounded to canary percentage",
+          "rightValue": "Grows step by step"
+        },
+        {
+          "id": "common",
+          "label": "Shared controls",
+          "leftValue": "Aliases, alarms, rollback, hooks",
+          "rightValue": "Aliases, alarms, rollback, hooks"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 10
+        }
+      ]
+    },
+    {
+      "id": "cmp-eb-immutable-vs-traffic-splitting",
+      "topicId": "elastic_beanstalk_deployment",
+      "leftService": "Elastic Beanstalk Immutable",
+      "rightService": "Elastic Beanstalk Traffic Splitting",
+      "dimensions": [
+        {
+          "id": "instances",
+          "label": "Instances",
+          "leftValue": "Full new set of instances",
+          "rightValue": "Full new set of instances"
+        },
+        {
+          "id": "production",
+          "label": "Production traffic",
+          "leftValue": "Moves after new fleet is healthy",
+          "rightValue": "Configured percentage is sent during evaluation"
+        },
+        {
+          "id": "canary",
+          "label": "Canary validation",
+          "leftValue": "No percentage-based production canary",
+          "rightValue": "Built-in percentage-based canary"
+        },
+        {
+          "id": "rollback",
+          "label": "Rollback",
+          "leftValue": "Terminate failed new group",
+          "rightValue": "Return traffic to old instances and terminate new ones"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 52
+        }
+      ]
+    }
+  ],
+  "drillDefinitions": [
+    {
+      "drillId": "dep-select-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "deployment_strategy_selection",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Constraint-to-strategy sentence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the mechanism and identify the tradeoff before naming a service.",
+      "prompt": "Deployment choice is a constraint-matching problem: availability, extra capacity, traffic-control granularity, rollback speed, and resource scope determine the strategy.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "availability",
+        "extra capacity",
+        "traffic shift",
+        "rollback",
+        "scope"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La estrategia se elige por restricciones operativas, no por el nombre del servicio.",
+        "testedPattern": "Deployment strategy selection",
+        "correctChoiceWins": "Esta secuencia elimina opciones que son técnicamente posibles pero no cumplen el costo, el tiempo de prueba o el alcance.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 52
+        },
+        {
+          "bank": "verified",
+          "questionId": 58
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "dep-select-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "deployment_strategy_selection",
+      "domainId": "sdlc_automation",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Rolling or blue/green?",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the mechanism that matches the requirement.",
+      "prompt": "A production team must keep the original fleet untouched for two hours, test a full-capacity replacement fleet, then shift traffic and automatically terminate the original fleet. Which strategy fits?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Rolling deployment"
+        },
+        {
+          "id": "B",
+          "label": "Blue/green deployment"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "original fleet untouched",
+        "full-capacity replacement",
+        "shift traffic",
+        "terminate original"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "service_confusion",
+          "attraction": "Rolling también puede mantener disponibilidad.",
+          "failure": "Rolling modifica la flota existente por lotes; no conserva una flota azul completa e intacta durante dos horas."
+        }
+      ],
+      "explanation": {
+        "concise": "El requisito pide dos flotas simultáneas y una transferencia explícita de tráfico.",
+        "testedPattern": "Blue/green recognition",
+        "correctChoiceWins": "Blue/green crea el entorno de reemplazo y conserva el original durante la validación.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "service_confusion",
+            "attraction": "Rolling también puede mantener disponibilidad.",
+            "failure": "Rolling modifica la flota existente por lotes; no conserva una flota azul completa e intacta durante dos horas."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 25
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "deployment",
+        "binary"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "dep-select-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "deployment_strategy_selection",
+      "domainId": "sdlc_automation",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map constraints to deployment mechanisms",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each requirement ID to the best strategy ID.",
+      "prompt": "Match each operational requirement to its deployment strategy.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "req-fast",
+          "label": "Fastest deployment; downtime is acceptable"
+        },
+        {
+          "id": "req-batches",
+          "label": "Update existing instances in batches"
+        },
+        {
+          "id": "req-isolated",
+          "label": "Deploy only to a new full set of instances with quick rollback"
+        },
+        {
+          "id": "req-canary",
+          "label": "Send a percentage of real traffic for an evaluation period"
+        },
+        {
+          "id": "req-parallel",
+          "label": "Keep a complete original environment while testing a replacement"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "req-fast": "all-at-once",
+          "req-batches": "rolling",
+          "req-isolated": "immutable",
+          "req-canary": "traffic-splitting",
+          "req-parallel": "blue-green"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "downtime",
+        "batches",
+        "new instances",
+        "percentage traffic",
+        "parallel fleet"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Cada estrategia tiene una señal decisiva distinta.",
+        "testedPattern": "Deployment strategy discrimination",
+        "correctChoiceWins": "El mapa obliga a traducir requisitos operativos a mecanismos antes de considerar servicios.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 52
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "dep-select-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "deployment_strategy_selection",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate the almost-correct deployment",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the BEST answer, not merely an available strategy.",
+      "prompt": "An EC2 application behind an ALB needs a full replacement fleet, zero downtime, a two-hour validation window, traffic cutover after approval, and automatic termination of the old fleet. What is the BEST design?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Elastic Beanstalk rolling update with 20% batches"
+        },
+        {
+          "id": "B",
+          "label": "CodeDeploy blue/green and terminate original instances after a two-hour wait"
+        },
+        {
+          "id": "C",
+          "label": "CodeDeploy in-place OneAtATime deployment"
+        },
+        {
+          "id": "D",
+          "label": "Create a second environment manually and delete the first immediately after DNS change"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "full replacement fleet",
+        "two-hour validation",
+        "automatic termination",
+        "zero downtime"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "service_confusion",
+          "attraction": "Rolling conserva disponibilidad y parece menos costoso.",
+          "failure": "No crea una flota paralela completa ni conserva la original intacta."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "OneAtATime parece gradual y seguro.",
+          "failure": "Es in-place y no ofrece la ventana de prueba sobre una flota verde completa."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Una segunda flota manual se parece a blue/green.",
+          "failure": "Añade trabajo manual y no cumple la terminación administrada después de dos horas."
+        }
+      ],
+      "explanation": {
+        "concise": "CodeDeploy blue/green satisface todas las restricciones y configura la espera antes de terminar la flota original.",
+        "testedPattern": "BEST deployment strategy",
+        "correctChoiceWins": "Es la única opción con flota paralela, cambio de tráfico administrado, ventana de prueba y terminación automática.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "service_confusion",
+            "attraction": "Rolling conserva disponibilidad y parece menos costoso.",
+            "failure": "No crea una flota paralela completa ni conserva la original intacta."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "OneAtATime parece gradual y seguro.",
+            "failure": "Es in-place y no ofrece la ventana de prueba sobre una flota verde completa."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "elimination_failure",
+            "attraction": "Una segunda flota manual se parece a blue/green.",
+            "failure": "Añade trabajo manual y no cumple la terminación administrada después de dos horas."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 25
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "deployment",
+        "elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "dep-select-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "deployment_strategy_selection",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Preserve environment resources and DNS",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Identify the constraints that eliminate immutable and blue/green.",
+      "prompt": "An Elastic Beanstalk environment uses an ALB, an Auto Scaling group, and a DynamoDB table created by environment configuration. The application must remain available, the existing DNS name must not change, and no parallel environment or full replacement fleet may be created. Which approach is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Rolling deployment in small batches"
+        },
+        {
+          "id": "B",
+          "label": "Immutable deployment"
+        },
+        {
+          "id": "C",
+          "label": "Blue/green with CNAME swap"
+        },
+        {
+          "id": "D",
+          "label": "All at once"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "remain available",
+        "DNS must not change",
+        "no parallel environment",
+        "no full replacement fleet"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "service_confusion",
+          "attraction": "Immutable ofrece rollback más seguro.",
+          "failure": "Crea un conjunto nuevo completo de instancias, prohibido por el escenario."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Blue/green ofrece cero downtime.",
+          "failure": "Crea otro entorno y cambia CNAME, contrario al alcance requerido."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "missed_keyword",
+          "attraction": "All at once es simple.",
+          "failure": "Introduce downtime y falla el requisito de disponibilidad."
+        }
+      ],
+      "explanation": {
+        "concise": "Rolling actualiza lotes dentro del mismo entorno y mantiene capacidad restante sirviendo tráfico.",
+        "testedPattern": "In-environment rolling deployment",
+        "correctChoiceWins": "Cumple disponibilidad y conserva el mismo entorno sin crear una flota completa paralela.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "service_confusion",
+            "attraction": "Immutable ofrece rollback más seguro.",
+            "failure": "Crea un conjunto nuevo completo de instancias, prohibido por el escenario."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "Blue/green ofrece cero downtime.",
+            "failure": "Crea otro entorno y cambia CNAME, contrario al alcance requerido."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "missed_keyword",
+            "attraction": "All at once es simple.",
+            "failure": "Introduce downtime y falla el requisito de disponibilidad."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 52
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "elastic-beanstalk",
+        "scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "dep-select-spaced-01",
+      "version": "drill-definition-v1",
+      "topicId": "deployment_strategy_selection",
+      "domainId": "sdlc_automation",
+      "activityType": "spaced_review",
+      "drillForm": "spaced_review",
+      "title": "Name the decisive difference",
+      "difficulty": "intro",
+      "estimatedMinutes": 2,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Review the distinction without scoring it as an exam answer.",
+      "prompt": "Rolling changes the existing fleet in batches. Blue/green creates a replacement environment and reroutes traffic. Immutable creates a new full fleet inside the environment. Traffic splitting adds percentage-based production canary traffic.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "existing fleet",
+        "replacement environment",
+        "new full fleet",
+        "percentage traffic"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El repaso separa cuatro mecanismos que suelen sonar equivalentes en opciones largas.",
+        "testedPattern": "Deployment strategy spaced review",
+        "correctChoiceWins": "Recordar qué recurso se reemplaza evita elegir por palabras como gradual o zero downtime.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 52
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "dep-select-bank-25",
+      "version": "drill-definition-v1",
+      "topicId": "deployment_strategy_selection",
+      "domainId": "sdlc_automation",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: full-fleet blue/green with wait window",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the original verified-bank question in English. Identify decisive keywords, eliminate distractors, and submit confidence explicitly.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La revisión completa se resuelve desde la referencia del banco sin copiar el contenido al paquete.",
+        "testedPattern": "Verified-bank return",
+        "correctChoiceWins": "El objetivo es comprobar si el mecanismo aprendido se transfiere al escenario original.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 25
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "blue-green"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "cd-ec2-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "codedeploy_operational_flow",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "CodeDeploy EC2 control plane",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Trace what CodeDeploy controls and what the ALB validates.",
+      "prompt": "For EC2 deployments, CodeDeploy coordinates the revision, AppSpec lifecycle scripts, deployment group, instance registration or deregistration, traffic routing, alarms, and rollback. The ALB independently reports target health.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "deployment group",
+        "AppSpec",
+        "target health",
+        "traffic routing",
+        "rollback"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "CodeDeploy orquesta el despliegue; el ALB aporta la señal de salud de los targets.",
+        "testedPattern": "CodeDeploy EC2 mechanism",
+        "correctChoiceWins": "Separar orquestación de health checks permite diagnosticar AllowTraffic y rollback.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 5
+        },
+        {
+          "bank": "verified",
+          "questionId": 58
+        },
+        {
+          "bank": "verified",
+          "questionId": 93
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "cd-ec2-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "codedeploy_operational_flow",
+      "domainId": "sdlc_automation",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "AllowTraffic failed with no deployment-log error",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the most direct root-cause layer.",
+      "prompt": "A blue/green EC2 deployment reaches AllowTraffic, but the replacement targets never become healthy and deployment scripts show no error. Which area should be checked first?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "ALB target-group health check configuration"
+        },
+        {
+          "id": "B",
+          "label": "The previous deployment ApplicationStop script"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "AllowTraffic",
+        "targets never healthy",
+        "no script error"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Los hooks pueden causar fallos de CodeDeploy.",
+          "failure": "No explica que el fallo ocurra al permitir tráfico mientras los targets permanecen unhealthy."
+        }
+      ],
+      "explanation": {
+        "concise": "AllowTraffic depende de que los targets puedan registrarse y aprobar health checks.",
+        "testedPattern": "ALB health during CodeDeploy",
+        "correctChoiceWins": "La señal apunta a la capa de balanceador, no a un script de un despliegue anterior.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Los hooks pueden causar fallos de CodeDeploy.",
+            "failure": "No explica que el fallo ocurra al permitir tráfico mientras los targets permanecen unhealthy."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 5
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "cd-ec2-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "codedeploy_operational_flow",
+      "domainId": "sdlc_automation",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order the EC2 blue/green flow",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the deployment actions in operational order.",
+      "prompt": "Order the CodeDeploy blue/green workflow.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "green",
+          "label": "Provision or identify replacement instances"
+        },
+        {
+          "id": "install",
+          "label": "Install and start the new revision"
+        },
+        {
+          "id": "health",
+          "label": "Register targets and pass health checks"
+        },
+        {
+          "id": "shift",
+          "label": "Reroute production traffic"
+        },
+        {
+          "id": "observe",
+          "label": "Monitor hooks and alarms"
+        },
+        {
+          "id": "retire",
+          "label": "Keep or terminate original instances after wait"
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "green",
+          "install",
+          "health",
+          "shift",
+          "observe",
+          "retire"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "replacement environment",
+        "health checks",
+        "traffic shift",
+        "termination wait"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El flujo separa preparación, validación, tráfico y retiro.",
+        "testedPattern": "CodeDeploy blue/green sequence",
+        "correctChoiceWins": "El tráfico solo debe moverse después de que la revisión esté instalada y la flota verde esté saludable.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 5
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 58
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "cd-ec2-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "codedeploy_operational_flow",
+      "domainId": "sdlc_automation",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map lifecycle signals to purpose",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each signal to its operational purpose.",
+      "prompt": "Match each lifecycle or monitoring signal to the correct use.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "validate",
+          "label": "ValidateService hook"
+        },
+        {
+          "id": "allow",
+          "label": "AllowTraffic lifecycle stage"
+        },
+        {
+          "id": "alarm",
+          "label": "CloudWatch alarm attached to deployment group"
+        },
+        {
+          "id": "wait",
+          "label": "Blue instance termination wait"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "validate": "application-validation",
+          "allow": "traffic-registration",
+          "alarm": "metric-rollback",
+          "wait": "blue-retention"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "ValidateService",
+        "AllowTraffic",
+        "CloudWatch alarm",
+        "termination wait"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Los eventos de ciclo de vida y las alarmas resuelven problemas distintos.",
+        "testedPattern": "Lifecycle signal mapping",
+        "correctChoiceWins": "El mapeo evita usar un hook cuando el requisito pide una alarma o una espera administrada.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 5
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 58
+        },
+        {
+          "bank": "verified",
+          "questionId": 93
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "cd-ec2-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "codedeploy_operational_flow",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Automatic rollback on high CPU",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Find the complete monitoring chain.",
+      "prompt": "A gradual EC2 deployment must roll back automatically if maximum CPU becomes unusually high while new instances serve traffic. Which configuration is complete?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create the CPU metric and attach it directly to CodeDeploy"
+        },
+        {
+          "id": "B",
+          "label": "Create a CloudWatch alarm on the CPU metric, attach the alarm to the deployment group, and enable automatic rollback"
+        },
+        {
+          "id": "C",
+          "label": "Measure CPU for five minutes inside ValidateService only"
+        },
+        {
+          "id": "D",
+          "label": "Create an ALB CPU alarm"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "CloudWatch alarm",
+        "deployment group",
+        "automatic rollback",
+        "EC2 CPU"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "incomplete_multi_select",
+          "attraction": "La métrica es el dato correcto.",
+          "failure": "Falta la alarma que cambia de estado y la configuración de rollback."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "ValidateService puede fallar el despliegue.",
+          "failure": "No es el mecanismo administrado para observar una métrica durante el tráfico."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "El ALB participa en el tráfico.",
+          "failure": "La utilización solicitada pertenece a las instancias EC2, no al ALB."
+        }
+      ],
+      "explanation": {
+        "concise": "CodeDeploy consume el estado de una alarma, no una métrica aislada.",
+        "testedPattern": "Alarm-driven rollback",
+        "correctChoiceWins": "La cadena completa es métrica → alarma → deployment group → auto rollback.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "incomplete_multi_select",
+            "attraction": "La métrica es el dato correcto.",
+            "failure": "Falta la alarma que cambia de estado y la configuración de rollback."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "ValidateService puede fallar el despliegue.",
+            "failure": "No es el mecanismo administrado para observar una métrica durante el tráfico."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "El ALB participa en el tráfico.",
+            "failure": "La utilización solicitada pertenece a las instancias EC2, no al ALB."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 58
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "cd-ec2-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "codedeploy_operational_flow",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Successful deployment, mixed application versions",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Diagnose the interaction between deployment and scaling.",
+      "prompt": "During an in-place rolling CodeDeploy deployment to an Auto Scaling group, a scale-out event launches two additional instances from an unchanged launch template. CodeDeploy reports success, but the new instances run the old baked application version. What is the MOST likely explanation?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "The ALB health check automatically restored the old version"
+        },
+        {
+          "id": "B",
+          "label": "Scale-out created instances from the unchanged launch template outside the already selected deployment targets"
+        },
+        {
+          "id": "C",
+          "label": "CloudWatch alarm rollback updated only two instances"
+        },
+        {
+          "id": "D",
+          "label": "ValidateService installs the previous revision on new instances"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "scale-out during deployment",
+        "unchanged launch template",
+        "mixed versions",
+        "deployment reports success"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "incorrect_assumption",
+          "attraction": "El ALB decide qué targets reciben tráfico.",
+          "failure": "No instala ni restaura versiones de aplicación."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Rollback puede causar versiones anteriores.",
+          "failure": "El escenario declara éxito y no una alarma activada."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "ValidateService forma parte del ciclo de vida.",
+          "failure": "Valida el servicio; no instala deliberadamente la revisión anterior."
+        }
+      ],
+      "explanation": {
+        "concise": "Un scale-out puede introducir instancias creadas desde una configuración que todavía contiene la versión anterior.",
+        "testedPattern": "ASG scaling during deployment",
+        "correctChoiceWins": "CodeDeploy puede completar sobre su conjunto de targets mientras nuevas instancias aparecen desde la plantilla no actualizada.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "incorrect_assumption",
+            "attraction": "El ALB decide qué targets reciben tráfico.",
+            "failure": "No instala ni restaura versiones de aplicación."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Rollback puede causar versiones anteriores.",
+            "failure": "El escenario declara éxito y no una alarma activada."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "ValidateService forma parte del ciclo de vida.",
+            "failure": "Valida el servicio; no instala deliberadamente la revisión anterior."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 51
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "cd-ec2-bank-5",
+      "version": "drill-definition-v1",
+      "topicId": "codedeploy_operational_flow",
+      "domainId": "sdlc_automation",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: AllowTraffic failure",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the original verified-bank question in English. Identify decisive keywords, eliminate distractors, and submit confidence explicitly.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La revisión completa se resuelve desde la referencia del banco sin copiar el contenido al paquete.",
+        "testedPattern": "Verified-bank return",
+        "correctChoiceWins": "El objetivo es comprobar si el mecanismo aprendido se transfiere al escenario original.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 5
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [
+        "bank-return",
+        "codedeploy",
+        "alb"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "lambda-deploy-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "lambda_deployment_traffic",
+      "domainId": "sdlc_automation",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Version, alias, and traffic weights",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the mechanism before selecting a deployment configuration.",
+      "prompt": "A safe Lambda deployment publishes an immutable version, points an alias at versions, and lets CodeDeploy change alias traffic weights. Hooks gate or validate the shift, and CloudWatch alarms can trigger rollback.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "published version",
+        "alias",
+        "traffic weights",
+        "hooks",
+        "alarms"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El alias es el punto estable de tráfico entre versiones inmutables.",
+        "testedPattern": "Lambda traffic shifting mechanism",
+        "correctChoiceWins": "CodeDeploy no reemplaza llamadas arbitrariamente; actualiza pesos del alias según la configuración.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 10
+        },
+        {
+          "bank": "verified",
+          "questionId": 19
+        },
+        {
+          "bank": "verified",
+          "questionId": 97
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "lambda-deploy-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "lambda_deployment_traffic",
+      "domainId": "sdlc_automation",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "BeforeAllowTraffic or AfterAllowTraffic?",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the hook based on when the prerequisite must be true.",
+      "prompt": "A data-restructuring Step Functions execution must finish before the new Lambda version receives any production request. Which hook is correct?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "BeforeAllowTraffic / PreTraffic"
+        },
+        {
+          "id": "B",
+          "label": "AfterAllowTraffic / PostTraffic"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "must finish before",
+        "any production request"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "Post-traffic hooks también validan despliegues.",
+          "failure": "Se ejecuta después de que el nuevo código ya recibió tráfico, demasiado tarde para este requisito."
+        }
+      ],
+      "explanation": {
+        "concise": "La condición es un gate previo al tráfico.",
+        "testedPattern": "Lambda lifecycle hook timing",
+        "correctChoiceWins": "BeforeAllowTraffic impide que el alias envíe tráfico hasta validar el prerrequisito.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "missed_keyword",
+            "attraction": "Post-traffic hooks también validan despliegues.",
+            "failure": "Se ejecuta después de que el nuevo código ya recibió tráfico, demasiado tarde para este requisito."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 19
+        },
+        {
+          "bank": "verified",
+          "questionId": 97
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "lambda-deploy-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "lambda_deployment_traffic",
+      "domainId": "sdlc_automation",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a safe Lambda deployment",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place each control in the safe deployment sequence.",
+      "prompt": "Order the Lambda traffic-shifting workflow.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "publish",
+          "label": "Publish the new immutable version"
+        },
+        {
+          "id": "pre",
+          "label": "Run pre-traffic validation"
+        },
+        {
+          "id": "shift",
+          "label": "Shift alias traffic by deployment configuration"
+        },
+        {
+          "id": "observe",
+          "label": "Evaluate CloudWatch alarms during the shift"
+        },
+        {
+          "id": "post",
+          "label": "Run post-traffic validation"
+        },
+        {
+          "id": "complete",
+          "label": "Complete or roll back the deployment"
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "publish",
+          "pre",
+          "shift",
+          "observe",
+          "post",
+          "complete"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "published version",
+        "pre-traffic",
+        "alias shift",
+        "alarms",
+        "post-traffic"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El orden muestra dónde detener el despliegue antes y después del tráfico.",
+        "testedPattern": "Lambda safe deployment sequence",
+        "correctChoiceWins": "La validación previa ocurre antes del cambio de pesos; la validación posterior ocurre después del tráfico.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 10
+        },
+        {
+          "bank": "verified",
+          "questionId": 19
+        },
+        {
+          "bank": "verified",
+          "questionId": 97
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "lambda-deploy-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "lambda_deployment_traffic",
+      "domainId": "sdlc_automation",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map traffic patterns",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each description to the traffic-shifting strategy.",
+      "prompt": "Match the traffic behavior to its strategy.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "two-step",
+          "label": "Small initial percentage, then remaining traffic"
+        },
+        {
+          "id": "equal-steps",
+          "label": "Repeated equal percentage increments"
+        },
+        {
+          "id": "single-step",
+          "label": "All traffic moves immediately"
+        },
+        {
+          "id": "gate-before",
+          "label": "Validation must succeed before any traffic shift"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "two-step": "canary",
+          "equal-steps": "linear",
+          "single-step": "all-at-once",
+          "gate-before": "pretraffic"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "canary",
+        "linear",
+        "all-at-once",
+        "pre-traffic gate"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Canary, linear y all-at-once describen la forma del cambio de pesos; un hook describe una validación.",
+        "testedPattern": "Lambda deployment configuration mapping",
+        "correctChoiceWins": "Separar estrategia de tráfico y hook evita mezclar controles diferentes.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 10
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "lambda-deploy-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "lambda_deployment_traffic",
+      "domainId": "sdlc_automation",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Complete the prerequisite before traffic",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Eliminate answers that validate too late or merely reduce blast radius.",
+      "prompt": "A new Lambda version cannot operate until a Fargate migration task invoked by Step Functions has completed. The pipeline may start the task before deployment. What is the BEST CodeDeploy control?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use a canary deployment and let the migration finish during the canary interval"
+        },
+        {
+          "id": "B",
+          "label": "Use AfterAllowTraffic to poll Step Functions"
+        },
+        {
+          "id": "C",
+          "label": "Use BeforeAllowTraffic to poll Step Functions and report success only after completion"
+        },
+        {
+          "id": "D",
+          "label": "Use a CloudFront origin rollback script"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "cannot operate until",
+        "completed",
+        "before traffic"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "elimination_failure",
+          "attraction": "Canary limita el impacto.",
+          "failure": "Aun enviaría tráfico a una versión que no puede operar."
+        },
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "AfterAllowTraffic puede ejecutar validaciones.",
+          "failure": "Valida después de exponer la versión, violando MUST complete before."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "CloudFront puede enrutar tráfico.",
+          "failure": "El control requerido pertenece al ciclo de vida de Lambda/CodeDeploy."
+        }
+      ],
+      "explanation": {
+        "concise": "El prerrequisito debe convertirse en un gate de BeforeAllowTraffic.",
+        "testedPattern": "Prerequisite gating",
+        "correctChoiceWins": "La validación bloquea todo tráfico a la nueva versión hasta que Step Functions confirme finalización.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "elimination_failure",
+            "attraction": "Canary limita el impacto.",
+            "failure": "Aun enviaría tráfico a una versión que no puede operar."
+          },
+          {
+            "optionId": "B",
+            "errorCause": "missed_keyword",
+            "attraction": "AfterAllowTraffic puede ejecutar validaciones.",
+            "failure": "Valida después de exponer la versión, violando MUST complete before."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "CloudFront puede enrutar tráfico.",
+            "failure": "El control requerido pertenece al ciclo de vida de Lambda/CodeDeploy."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 97
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "lambda-deploy-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "lambda_deployment_traffic",
+      "domainId": "sdlc_automation",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Replace CLI rollback scripts with managed safe deployment",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Select the workflow that reduces both deployment and rollback detection time.",
+      "prompt": "A serverless application currently publishes a Lambda version with CLI scripts and runs another script to restore the previous version after errors are noticed. The team wants gradual deployment, automated validation, fast detection, and automatic rollback. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use AWS SAM DeploymentPreference with CodeDeploy traffic shifting, pre/post traffic hooks, CloudWatch alarms, and rollback"
+        },
+        {
+          "id": "B",
+          "label": "Create a new API Gateway endpoint and manually change CloudFront origins"
+        },
+        {
+          "id": "C",
+          "label": "Use a CloudFormation change set as a traffic-testing engine"
+        },
+        {
+          "id": "D",
+          "label": "Update $LATEST directly and rely on Lambda retries"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "gradual deployment",
+        "automated validation",
+        "fast detection",
+        "automatic rollback"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Un endpoint paralelo puede aislar tráfico.",
+          "failure": "Añade infraestructura y operaciones manuales que no ofrecen el flujo administrado solicitado."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Change sets previsualizan cambios.",
+          "failure": "No proporcionan hooks de tráfico de Lambda ni rollback basado en alarmas."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Actualizar directamente parece rápido.",
+          "failure": "No proporciona versionado seguro, tráfico gradual ni rollback administrado."
+        }
+      ],
+      "explanation": {
+        "concise": "SAM configura el despliegue seguro de Lambda con CodeDeploy, hooks y alarmas.",
+        "testedPattern": "Managed Lambda safe deployment",
+        "correctChoiceWins": "Integra versión/alias, tráfico gradual, validación y rollback sin scripts manuales de conmutación.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "elimination_failure",
+            "attraction": "Un endpoint paralelo puede aislar tráfico.",
+            "failure": "Añade infraestructura y operaciones manuales que no ofrecen el flujo administrado solicitado."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "Change sets previsualizan cambios.",
+            "failure": "No proporcionan hooks de tráfico de Lambda ni rollback basado en alarmas."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Actualizar directamente parece rápido.",
+            "failure": "No proporciona versionado seguro, tráfico gradual ni rollback administrado."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 10
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "lambda-deploy-bank-10",
+      "version": "drill-definition-v1",
+      "topicId": "lambda_deployment_traffic",
+      "domainId": "sdlc_automation",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: SAM safe Lambda deployment",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the original verified-bank question in English. Identify decisive keywords, eliminate distractors, and submit confidence explicitly.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La revisión completa se resuelve desde la referencia del banco sin copiar el contenido al paquete.",
+        "testedPattern": "Verified-bank return",
+        "correctChoiceWins": "El objetivo es comprobar si el mecanismo aprendido se transfiere al escenario original.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 10
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [
+        "bank-return",
+        "lambda",
+        "sam",
+        "codedeploy"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "eb-policy-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "elastic_beanstalk_deployment",
+      "domainId": "configuration_management_iac",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Elastic Beanstalk policy sentence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the deployment policy as a capacity and isolation decision.",
+      "prompt": "All at once updates every instance together. Rolling updates existing instances in batches. Rolling with additional batch preserves full capacity. Immutable launches a full new set. Traffic splitting adds percentage-based canary traffic. Blue/green uses a separate environment and CNAME swap.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "all at once",
+        "rolling",
+        "additional batch",
+        "immutable",
+        "traffic splitting",
+        "CNAME swap"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La frase separa políticas dentro del entorno de blue/green entre entornos.",
+        "testedPattern": "Elastic Beanstalk deployment policies",
+        "correctChoiceWins": "Recordar capacidad, aislamiento y tráfico reduce la confusión entre nombres parecidos.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 52
+        },
+        {
+          "bank": "verified",
+          "questionId": 111
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "eb-policy-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "elastic_beanstalk_deployment",
+      "domainId": "configuration_management_iac",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Rolling or immutable?",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose based on whether instances may be updated in place.",
+      "prompt": "The environment must remain available, but every new application version must be installed only on newly launched instances and rollback should avoid another rolling update. Which policy fits?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Rolling"
+        },
+        {
+          "id": "B",
+          "label": "Immutable"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "only newly launched instances",
+        "rollback should avoid another rolling update"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "service_confusion",
+          "attraction": "Rolling mantiene disponibilidad por lotes.",
+          "failure": "Actualiza instancias existentes y un rollback fallido requiere otro rolling update."
+        }
+      ],
+      "explanation": {
+        "concise": "Immutable crea un Auto Scaling group nuevo y, si falla, basta con terminarlo.",
+        "testedPattern": "Elastic Beanstalk immutable deployment",
+        "correctChoiceWins": "Cumple aislamiento por instancia nueva y rollback más directo.",
+        "distractorReview": [
+          {
+            "optionId": "A",
+            "errorCause": "service_confusion",
+            "attraction": "Rolling mantiene disponibilidad por lotes.",
+            "failure": "Actualiza instancias existentes y un rollback fallido requiere otro rolling update."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 52
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "eb-policy-mapping-01",
+      "version": "drill-definition-v1",
+      "topicId": "elastic_beanstalk_deployment",
+      "domainId": "configuration_management_iac",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map Elastic Beanstalk policies",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each operational requirement to the policy ID.",
+      "prompt": "Match each requirement to the Elastic Beanstalk deployment policy.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "fast",
+          "label": "Fastest; downtime acceptable"
+        },
+        {
+          "id": "batch",
+          "label": "Update existing instances in batches"
+        },
+        {
+          "id": "capacity",
+          "label": "Batch update while preserving full serving capacity"
+        },
+        {
+          "id": "newfleet",
+          "label": "Deploy to a complete new set of instances"
+        },
+        {
+          "id": "canary",
+          "label": "Send a configured percentage of production traffic"
+        },
+        {
+          "id": "separate",
+          "label": "Operate two environments and swap CNAME"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "fast": "all-at-once",
+          "batch": "rolling",
+          "capacity": "rolling-additional",
+          "newfleet": "immutable",
+          "canary": "traffic-splitting",
+          "separate": "blue-green"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "downtime",
+        "batches",
+        "full capacity",
+        "new fleet",
+        "canary",
+        "separate environment"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Cada política responde a una restricción distinta de capacidad o aislamiento.",
+        "testedPattern": "Elastic Beanstalk policy mapping",
+        "correctChoiceWins": "El mapa evita usar blue/green como respuesta universal a zero downtime.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 52
+        },
+        {
+          "bank": "verified",
+          "questionId": 111
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "eb-policy-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "elastic_beanstalk_deployment",
+      "domainId": "configuration_management_iac",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Same DNS, no new full fleet",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Use every constraint to eliminate safer but out-of-scope strategies.",
+      "prompt": "An Elastic Beanstalk application must remain available during deployment. The same environment and DNS must remain in use, and the team does not want a full new fleet or second environment. What is the BEST policy?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Rolling in small batches"
+        },
+        {
+          "id": "B",
+          "label": "Immutable"
+        },
+        {
+          "id": "C",
+          "label": "Traffic splitting"
+        },
+        {
+          "id": "D",
+          "label": "Blue/green CNAME swap"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "same environment",
+        "same DNS",
+        "no full new fleet",
+        "remain available"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Immutable ofrece rollback seguro.",
+          "failure": "Crea una flota nueva completa."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Traffic splitting parece ideal para probar.",
+          "failure": "También lanza una flota nueva completa para el canary."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Blue/green preserva disponibilidad.",
+          "failure": "Usa otro entorno y cambia CNAME, prohibido por el escenario."
+        }
+      ],
+      "explanation": {
+        "concise": "Rolling usa el mismo entorno e instancias por lotes mientras el resto continúa atendiendo.",
+        "testedPattern": "Elastic Beanstalk rolling selection",
+        "correctChoiceWins": "Es la única opción que cumple disponibilidad sin crear una flota completa ni un segundo entorno.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "elimination_failure",
+            "attraction": "Immutable ofrece rollback seguro.",
+            "failure": "Crea una flota nueva completa."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "service_confusion",
+            "attraction": "Traffic splitting parece ideal para probar.",
+            "failure": "También lanza una flota nueva completa para el canary."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "wrong_resource_scope",
+            "attraction": "Blue/green preserva disponibilidad.",
+            "failure": "Usa otro entorno y cambia CNAME, prohibido por el escenario."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 52
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "eb-policy-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "elastic_beanstalk_deployment",
+      "domainId": "configuration_management_iac",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Deliver ALB listener configuration through the application source",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the mechanism that the managed deployment pipeline can apply.",
+      "prompt": "A CodePipeline deploy action updates an Elastic Beanstalk environment. The DevOps engineer cannot edit the environment manually and must add an ALB HTTP-to-HTTPS redirect configuration as part of the deployment artifact. What is the BEST approach?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Add .ebextensions/alb.config with option_settings for the appropriate Elastic Beanstalk namespace and push the source"
+        },
+        {
+          "id": "B",
+          "label": "Use container_commands on one instance to call the ALB API"
+        },
+        {
+          "id": "C",
+          "label": "Run EB CLI manually from a laptop"
+        },
+        {
+          "id": "D",
+          "label": "Put the listener rule in a saved configuration and require CodePipeline to execute EB CLI"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "part of deployment artifact",
+        "cannot edit manually",
+        "Elastic Beanstalk configuration",
+        "ALB listener"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Una instancia puede llamar APIs.",
+          "failure": "Introduce cambios imperativos, permisos adicionales y dependencia de una instancia líder."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "EB CLI puede aplicar configuración.",
+          "failure": "Rompe la automatización del pipeline y requiere permisos/manualidad local."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "Saved configurations pertenecen a Elastic Beanstalk.",
+          "failure": "El deploy action de CodePipeline no necesita ejecutar EB CLI para aplicar `.ebextensions`."
+        }
+      ],
+      "explanation": {
+        "concise": "`.ebextensions` con `option_settings` permite que Elastic Beanstalk aplique configuración declarativa junto con la versión.",
+        "testedPattern": "Elastic Beanstalk configuration as code",
+        "correctChoiceWins": "La configuración viaja en el artefacto y el deploy action existente la aplica sin llamadas manuales ni leader-only scripts.",
+        "distractorReview": [
+          {
+            "optionId": "B",
+            "errorCause": "incorrect_assumption",
+            "attraction": "Una instancia puede llamar APIs.",
+            "failure": "Introduce cambios imperativos, permisos adicionales y dependencia de una instancia líder."
+          },
+          {
+            "optionId": "C",
+            "errorCause": "elimination_failure",
+            "attraction": "EB CLI puede aplicar configuración.",
+            "failure": "Rompe la automatización del pipeline y requiere permisos/manualidad local."
+          },
+          {
+            "optionId": "D",
+            "errorCause": "service_confusion",
+            "attraction": "Saved configurations pertenecen a Elastic Beanstalk.",
+            "failure": "El deploy action de CodePipeline no necesita ejecutar EB CLI para aplicar `.ebextensions`."
+          }
+        ]
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 111
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "eb-policy-spaced-01",
+      "version": "drill-definition-v1",
+      "topicId": "elastic_beanstalk_deployment",
+      "domainId": "configuration_management_iac",
+      "activityType": "spaced_review",
+      "drillForm": "spaced_review",
+      "title": "Capacity and rollback tradeoffs",
+      "difficulty": "intro",
+      "estimatedMinutes": 2,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Review without scoring.",
+      "prompt": "Rolling saves temporary capacity but modifies the current fleet. Rolling with additional batch preserves full capacity. Immutable and traffic splitting launch a full new set; traffic splitting adds percentage traffic. Blue/green uses a separate environment.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "temporary capacity",
+        "current fleet",
+        "full new set",
+        "percentage traffic",
+        "separate environment"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El costo temporal y el alcance del reemplazo distinguen las políticas.",
+        "testedPattern": "Elastic Beanstalk spaced review",
+        "correctChoiceWins": "Estas dos preguntas —qué flota cambia y cómo entra tráfico— resuelven la mayoría de distractores.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 52
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [],
+      "active": true
+    },
+    {
+      "drillId": "eb-policy-bank-52",
+      "version": "drill-definition-v1",
+      "topicId": "elastic_beanstalk_deployment",
+      "domainId": "configuration_management_iac",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: Elastic Beanstalk rolling update",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the original verified-bank question in English. Identify decisive keywords, eliminate distractors, and submit confidence explicitly.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La revisión completa se resuelve desde la referencia del banco sin copiar el contenido al paquete.",
+        "testedPattern": "Verified-bank return",
+        "correctChoiceWins": "El objetivo es comprobar si el mecanismo aprendido se transfiere al escenario original.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 52
+        }
+      ],
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ],
+      "tags": [
+        "bank-return",
+        "elastic-beanstalk",
+        "rolling"
+      ],
+      "active": true
+    }
+  ],
+  "sourceQuestionRefs": [
+    {
+      "bank": "verified",
+      "questionId": 5
+    },
+    {
+      "bank": "verified",
+      "questionId": 10
+    },
+    {
+      "bank": "verified",
+      "questionId": 19
+    },
+    {
+      "bank": "verified",
+      "questionId": 25
+    },
+    {
+      "bank": "verified",
+      "questionId": 51
+    },
+    {
+      "bank": "verified",
+      "questionId": 52
+    },
+    {
+      "bank": "verified",
+      "questionId": 58
+    },
+    {
+      "bank": "verified",
+      "questionId": 69
+    },
+    {
+      "bank": "verified",
+      "questionId": 72
+    },
+    {
+      "bank": "verified",
+      "questionId": 75
+    },
+    {
+      "bank": "verified",
+      "questionId": 93
+    },
+    {
+      "bank": "verified",
+      "questionId": 97
+    },
+    {
+      "bank": "verified",
+      "questionId": 111
+    }
+  ],
+  "prerequisiteRelationships": [
+    {
+      "topicId": "deployment_strategy_selection",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "codedeploy_operational_flow",
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ]
+    },
+    {
+      "topicId": "lambda_deployment_traffic",
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ]
+    },
+    {
+      "topicId": "elastic_beanstalk_deployment",
+      "prerequisiteTopicIds": [
+        "deployment_strategy_selection"
+      ]
+    }
+  ],
+  "tags": [
+    "dop-c02",
+    "deployment",
+    "codedeploy",
+    "lambda",
+    "elastic-beanstalk",
+    "blue-green",
+    "canary",
+    "linear",
+    "rolling",
+    "immutable",
+    "rollback",
+    "personalized"
+  ]
+}

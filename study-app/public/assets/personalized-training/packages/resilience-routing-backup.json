@@ -1,0 +1,2705 @@
+{
+  "schemaVersion": "1.0",
+  "packageId": "resilience-routing-backup",
+  "version": "1.0.0",
+  "title": "Resilience, Route 53, Aurora Global Database, and AWS Backup",
+  "description": "Personalized DOP-C02 training for Route 53 health-based routing, Aurora Global Database regional transitions, immutable AWS Backup designs, and disaster-recovery strategy selection from RTO, RPO, cost, and operational readiness.",
+  "topicDescriptors": [
+    {
+      "topicId": "route53_failover",
+      "title": "Route 53 Failover Routing and Health-Signal Design",
+      "domainId": "resilient_cloud_solutions",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "active_passive_failover",
+        "primary_secondary_records",
+        "health_check",
+        "evaluate_target_health",
+        "alias_record",
+        "dns_ttl",
+        "dependency_aware_health",
+        "routing_policy_selection"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 31
+        },
+        {
+          "bank": "verified",
+          "questionId": 84
+        },
+        {
+          "bank": "verified",
+          "questionId": 95
+        }
+      ]
+    },
+    {
+      "topicId": "aurora_global_database",
+      "title": "Aurora Global Database Switchover, Failover, and Application Readiness",
+      "domainId": "resilient_cloud_solutions",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "global_database",
+        "asynchronous_replication",
+        "planned_switchover",
+        "unplanned_failover",
+        "global_writer_endpoint",
+        "replication_lag",
+        "regional_configuration_parity",
+        "rpo_rto"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 86
+        }
+      ]
+    },
+    {
+      "topicId": "aws_backup_vault_lock",
+      "title": "AWS Backup Plans, Cross-Region Copies, and Backup Vault Lock",
+      "domainId": "resilient_cloud_solutions",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "backup_plan",
+        "backup_selection",
+        "cross_region_copy",
+        "recovery_point",
+        "vault_lock_governance",
+        "vault_lock_compliance",
+        "minimum_retention",
+        "maximum_retention",
+        "immutability"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 15
+        }
+      ]
+    },
+    {
+      "topicId": "dr_resilience_tradeoffs",
+      "title": "Disaster Recovery Strategy Selection from RTO, RPO, Cost, and Readiness",
+      "domainId": "resilient_cloud_solutions",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "developing",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "backup_restore",
+        "pilot_light",
+        "warm_standby",
+        "multi_site_active_active",
+        "rto",
+        "rpo",
+        "cost_effective",
+        "infrastructure_as_code",
+        "dr_testing"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 17
+        },
+        {
+          "bank": "verified",
+          "questionId": 31
+        },
+        {
+          "bank": "verified",
+          "questionId": 79
+        }
+      ]
+    }
+  ],
+  "conceptMaps": [
+    {
+      "id": "map-route53-active-passive-flow",
+      "schemaVersion": "1.0",
+      "topicId": "route53_failover",
+      "title": "Route 53 active-passive failover flow",
+      "steps": [
+        {
+          "id": "records",
+          "label": "1. Create primary and secondary records",
+          "detail": "Both records use the same name and type, but one is marked PRIMARY and the other SECONDARY.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 31
+            }
+          ]
+        },
+        {
+          "id": "signal",
+          "label": "2. Attach a meaningful health signal",
+          "detail": "Use a Route 53 health check or alias EvaluateTargetHealth when supported. The signal must reflect whether the endpoint can actually serve users.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 95
+            }
+          ]
+        },
+        {
+          "id": "primary",
+          "label": "3. Serve the healthy primary",
+          "detail": "Route 53 returns the primary endpoint while its health signal is healthy.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "secondary",
+          "label": "4. Return the secondary after primary failure",
+          "detail": "When the primary becomes unhealthy, DNS answers change to the secondary record. Clients still depend on DNS caching and TTL behavior.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "recover",
+          "label": "5. Validate failback deliberately",
+          "detail": "Confirm application, data, and dependencies before allowing traffic to return to the recovered primary.",
+          "sourceQuestions": []
+        }
+      ]
+    },
+    {
+      "id": "map-route53-health-signal-layers",
+      "schemaVersion": "1.0",
+      "topicId": "route53_failover",
+      "title": "Health signal must match the failure domain",
+      "steps": [
+        {
+          "id": "process",
+          "label": "1. Process health",
+          "detail": "A shallow endpoint only proves that the web process responds.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 95
+            }
+          ]
+        },
+        {
+          "id": "dependency",
+          "label": "2. Dependency health",
+          "detail": "A deeper endpoint can fail when a critical database or downstream dependency is unavailable.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 95
+            }
+          ]
+        },
+        {
+          "id": "load-balancer",
+          "label": "3. Load balancer target health",
+          "detail": "The load balancer removes unhealthy targets from service inside the Region.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 95
+            }
+          ]
+        },
+        {
+          "id": "regional",
+          "label": "4. Regional endpoint health",
+          "detail": "Route 53 failover decides whether the complete regional endpoint should remain in DNS answers.",
+          "sourceQuestions": []
+        }
+      ]
+    },
+    {
+      "id": "map-aurora-global-recovery-flow",
+      "schemaVersion": "1.0",
+      "topicId": "aurora_global_database",
+      "title": "Aurora Global Database planned and unplanned regional transition",
+      "steps": [
+        {
+          "id": "prepare",
+          "label": "1. Prepare secondary Regions",
+          "detail": "Maintain compatible engine versions, instances, parameter groups, secrets, networking, alarms, and service integrations in each recovery Region.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 86
+            }
+          ]
+        },
+        {
+          "id": "observe",
+          "label": "2. Observe replication lag",
+          "detail": "CloudWatch replication-lag metrics show how far each secondary is behind the primary.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "choose-operation",
+          "label": "3. Choose switchover or failover",
+          "detail": "Use switchover for a controlled healthy transition and failover for an unplanned primary-Region outage.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "promote",
+          "label": "4. Promote the selected secondary",
+          "detail": "The selected secondary becomes the new primary writer. An unplanned failover can lose writes that had not replicated.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "application",
+          "label": "5. Resume application traffic",
+          "detail": "Use the global writer endpoint or update application connections, then validate writes, secrets, monitoring, and dependent integrations.",
+          "sourceQuestions": []
+        }
+      ]
+    },
+    {
+      "id": "map-backup-vault-lock-flow",
+      "schemaVersion": "1.0",
+      "topicId": "aws_backup_vault_lock",
+      "title": "Immutable backup design flow",
+      "steps": [
+        {
+          "id": "plan",
+          "label": "1. Define backup plan and selections",
+          "detail": "Specify schedules, lifecycle, copy actions, and the tagged or explicitly selected resources to protect.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 15
+            }
+          ]
+        },
+        {
+          "id": "copy",
+          "label": "2. Create independent recovery points",
+          "detail": "Use cross-Region and, when required, cross-account copy actions to separate recovery points from the production failure domain.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "retention",
+          "label": "3. Define retention boundaries",
+          "detail": "Choose minimum and maximum retention values that align with compliance and operational requirements.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "mode",
+          "label": "4. Choose governance or compliance mode",
+          "detail": "Governance mode remains administratively reversible with sufficient permissions. Compliance mode becomes immutable after its cooling-off period.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "restore",
+          "label": "5. Test restoration",
+          "detail": "A locked backup is useful only when the organization can restore it into a working application environment.",
+          "sourceQuestions": []
+        }
+      ]
+    },
+    {
+      "id": "map-dr-strategy-selection",
+      "schemaVersion": "1.0",
+      "topicId": "dr_resilience_tradeoffs",
+      "title": "Select a DR strategy from business constraints",
+      "steps": [
+        {
+          "id": "objectives",
+          "label": "1. Translate RTO and RPO",
+          "detail": "RTO limits acceptable downtime. RPO limits acceptable data loss measured in time.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 17
+            }
+          ]
+        },
+        {
+          "id": "state",
+          "label": "2. Identify stateful recovery requirements",
+          "detail": "Choose replication, backup, or multi-Region data services that can satisfy the RPO.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 17
+            },
+            {
+              "bank": "verified",
+              "questionId": 86
+            }
+          ]
+        },
+        {
+          "id": "compute",
+          "label": "3. Decide how much compute remains running",
+          "detail": "Backup-and-restore runs almost nothing; pilot light keeps core state; warm standby keeps a reduced functional stack; active-active keeps production capacity live.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 17
+            }
+          ]
+        },
+        {
+          "id": "routing",
+          "label": "4. Define traffic transition",
+          "detail": "Use health checks, routing controls, or load-balancer changes that match the active-passive or active-active architecture.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 31
+            }
+          ]
+        },
+        {
+          "id": "test",
+          "label": "5. Test the entire runbook",
+          "detail": "Measure actual recovery time, validate data consistency, and verify failback instead of assuming the design meets objectives.",
+          "sourceQuestions": []
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "cmp-route53-failover-vs-latency",
+      "topicId": "route53_failover",
+      "leftService": "Route 53 failover routing",
+      "rightService": "Route 53 latency-based routing",
+      "dimensions": [
+        {
+          "id": "goal",
+          "label": "Primary goal",
+          "leftValue": "Active-passive availability",
+          "rightValue": "Send users to the Region with the best measured latency"
+        },
+        {
+          "id": "normal",
+          "label": "Normal traffic",
+          "leftValue": "Primary endpoint receives traffic",
+          "rightValue": "Multiple healthy regional endpoints can receive traffic"
+        },
+        {
+          "id": "failure",
+          "label": "Failure behavior",
+          "leftValue": "Secondary is returned after the primary is unhealthy",
+          "rightValue": "Unhealthy records can be excluded while other low-latency records remain"
+        },
+        {
+          "id": "keyword",
+          "label": "Decisive keyword",
+          "leftValue": "primary, secondary, standby, active-passive",
+          "rightValue": "global users, lowest latency, multi-Region active"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 31
+        }
+      ]
+    },
+    {
+      "id": "cmp-route53-healthcheck-vs-evaluate-target-health",
+      "topicId": "route53_failover",
+      "leftService": "Route 53 health check",
+      "rightService": "Alias EvaluateTargetHealth",
+      "dimensions": [
+        {
+          "id": "signal",
+          "label": "Health source",
+          "leftValue": "Endpoint, calculated, or CloudWatch-alarm health-check logic",
+          "rightValue": "Health of the supported AWS alias target"
+        },
+        {
+          "id": "use",
+          "label": "Typical use",
+          "leftValue": "Direct endpoint monitoring or composite health logic",
+          "rightValue": "Alias records for AWS resources such as load balancers"
+        },
+        {
+          "id": "trap",
+          "label": "Exam trap",
+          "leftValue": "A shallow endpoint can report healthy while dependencies fail",
+          "rightValue": "It does not replace application-level dependency design"
+        },
+        {
+          "id": "decision",
+          "label": "Decision",
+          "leftValue": "Use when explicit or composite health logic is required",
+          "rightValue": "Use when supported target health is the correct signal"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 95
+        }
+      ]
+    },
+    {
+      "id": "cmp-aurora-switchover-vs-failover",
+      "topicId": "aurora_global_database",
+      "leftService": "Aurora Global Database switchover",
+      "rightService": "Aurora Global Database failover",
+      "dimensions": [
+        {
+          "id": "scenario",
+          "label": "Scenario",
+          "leftValue": "Planned and controlled transition while clusters are healthy",
+          "rightValue": "Unplanned primary-Region outage"
+        },
+        {
+          "id": "rpo",
+          "label": "Data-loss objective",
+          "leftValue": "Synchronizes before role transition for zero data loss",
+          "rightValue": "Can lose writes that had not replicated asynchronously"
+        },
+        {
+          "id": "readiness",
+          "label": "Readiness requirement",
+          "leftValue": "Compatible, healthy clusters and coordinated maintenance window",
+          "rightValue": "Choose a viable secondary, normally the one with the least lag"
+        },
+        {
+          "id": "keyword",
+          "label": "Decisive keyword",
+          "leftValue": "planned maintenance, rotation, test, zero data loss",
+          "rightValue": "regional disaster, unavailable primary, emergency recovery"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 86
+        }
+      ]
+    },
+    {
+      "id": "cmp-vault-lock-governance-vs-compliance",
+      "topicId": "aws_backup_vault_lock",
+      "leftService": "Vault Lock governance mode",
+      "rightService": "Vault Lock compliance mode",
+      "dimensions": [
+        {
+          "id": "purpose",
+          "label": "Purpose",
+          "leftValue": "Administrative protection with controlled override capability",
+          "rightValue": "Strong WORM-style immutability for regulated retention"
+        },
+        {
+          "id": "change",
+          "label": "Administrative change",
+          "leftValue": "Authorized principals can change or remove the lock",
+          "rightValue": "After the grace period, the lock cannot be changed or removed"
+        },
+        {
+          "id": "use",
+          "label": "Best fit",
+          "leftValue": "Operational guardrail and pre-production validation",
+          "rightValue": "Compliance requirement that administrators, including highly privileged ones, must not bypass"
+        },
+        {
+          "id": "trap",
+          "label": "Exam trap",
+          "leftValue": "Not absolute immutability",
+          "rightValue": "Must configure carefully before the lock becomes permanent"
+        }
+      ],
+      "sourceQuestions": []
+    },
+    {
+      "id": "cmp-pilot-light-vs-warm-standby",
+      "topicId": "dr_resilience_tradeoffs",
+      "leftService": "Pilot light",
+      "rightService": "Warm standby",
+      "dimensions": [
+        {
+          "id": "running",
+          "label": "What is already running",
+          "leftValue": "Core stateful services and minimal critical components",
+          "rightValue": "A reduced but functional copy of the complete workload"
+        },
+        {
+          "id": "recovery",
+          "label": "Recovery action",
+          "leftValue": "Provision or activate most application capacity",
+          "rightValue": "Scale the existing standby stack and redirect traffic"
+        },
+        {
+          "id": "rto",
+          "label": "Relative RTO",
+          "leftValue": "Longer",
+          "rightValue": "Shorter"
+        },
+        {
+          "id": "cost",
+          "label": "Relative steady-state cost",
+          "leftValue": "Lower",
+          "rightValue": "Higher"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 17
+        }
+      ]
+    }
+  ],
+  "drillDefinitions": [
+    {
+      "drillId": "rrb-route53-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "route53_failover",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Route 53 failover control sentence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the mechanism before selecting a routing policy.",
+      "prompt": "Failover routing answers an availability question: return the PRIMARY record while it is healthy, and return the SECONDARY record when the primary health signal is unhealthy. It is not the default choice for lowest-latency active-active traffic.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "PRIMARY",
+        "SECONDARY",
+        "healthy",
+        "active-passive"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Failover routing separa los roles primario y secundario. La política de latencia resuelve otro problema: elegir el endpoint activo con menor latencia.",
+        "testedPattern": "Route 53 routing-policy intent",
+        "correctChoiceWins": "Identificar primero el objetivo —disponibilidad activa/pasiva o rendimiento global— evita escoger una política por familiaridad.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 31
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "route53",
+        "failover",
+        "mechanism"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-route53-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "route53_failover",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Failover routing or latency routing",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company runs an API in two Regions. Only one Region should receive traffic during normal operations. The second Region must receive traffic only when the first Region is unhealthy. Which routing policy directly matches the requirement?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Latency-based routing"
+        },
+        {
+          "id": "B",
+          "label": "Failover routing with primary and secondary records"
+        },
+        {
+          "id": "C",
+          "label": "Geolocation routing"
+        },
+        {
+          "id": "D",
+          "label": "Multivalue answer routing without health checks"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "only one Region",
+        "only when",
+        "unhealthy",
+        "primary",
+        "secondary"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "service_confusion",
+          "attraction": "Latency routing is common in multi-Region systems.",
+          "failure": "It is designed for active endpoints and lowest-latency selection, not explicit primary/secondary behavior."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "missed_keyword",
+          "attraction": "Geolocation can direct users to different Regions.",
+          "failure": "The scenario is about health-based active-passive failover, not user location."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Multivalue answers can return multiple records.",
+          "failure": "Without health checks it does not implement the requested failover control."
+        }
+      ],
+      "explanation": {
+        "concise": "La frase decisiva es que solo una región atiende normalmente y la otra entra únicamente si la primaria falla.",
+        "testedPattern": "Failover versus performance routing",
+        "correctChoiceWins": "B modela exactamente PRIMARY/SECONDARY y usa salud para cambiar la respuesta DNS.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 31
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "route53",
+        "routing-policy",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-route53-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "route53_failover",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order an active-passive failover implementation",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A web application must fail over from a primary ALB to a secondary regional ALB.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "secondary-ready",
+          "label": "Deploy and validate the secondary regional application and its data dependencies."
+        },
+        {
+          "id": "health-signal",
+          "label": "Create a health signal that represents the primary application's ability to serve users."
+        },
+        {
+          "id": "records",
+          "label": "Create Route 53 PRIMARY and SECONDARY records with the same name and type."
+        },
+        {
+          "id": "test",
+          "label": "Run a controlled failure test and observe DNS and application recovery."
+        },
+        {
+          "id": "failback",
+          "label": "Validate the recovered primary before restoring normal routing."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "secondary-ready",
+          "health-signal",
+          "records",
+          "test",
+          "failback"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "secondary ready",
+        "health signal",
+        "PRIMARY",
+        "SECONDARY",
+        "failback"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "DNS no crea el entorno de recuperación. Primero debe existir un secundario funcional, después se conecta la señal de salud y se prueba el cambio.",
+        "testedPattern": "End-to-end Route 53 failover workflow",
+        "correctChoiceWins": "El orden correcto evita una falsa sensación de resiliencia basada únicamente en registros DNS.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "route53",
+        "workflow",
+        "failover-test"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-route53-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "route53_failover",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map the health and routing layers",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each component to the decision it owns.",
+      "answerOptions": [
+        {
+          "id": "dependency-status",
+          "label": "Reports whether the application and critical dependencies can serve requests"
+        },
+        {
+          "id": "target-removal",
+          "label": "Stops sending regional load-balancer traffic to unhealthy instances"
+        },
+        {
+          "id": "regional-status",
+          "label": "Determines whether the regional endpoint is considered healthy for DNS"
+        },
+        {
+          "id": "primary-secondary",
+          "label": "Marks the DNS answer as PRIMARY or SECONDARY"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "app-endpoint",
+          "label": "Application health endpoint"
+        },
+        {
+          "id": "alb-health",
+          "label": "ALB target health check"
+        },
+        {
+          "id": "route53-health",
+          "label": "Route 53 health evaluation"
+        },
+        {
+          "id": "failover-record",
+          "label": "Route 53 failover record"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "app-endpoint": "dependency-status",
+          "alb-health": "target-removal",
+          "route53-health": "regional-status",
+          "failover-record": "primary-secondary"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "health endpoint",
+        "ALB",
+        "Route 53",
+        "PRIMARY",
+        "SECONDARY"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Cada capa toma una decisión distinta. Un health check del ALB elimina targets; Route 53 decide qué endpoint regional publicar.",
+        "testedPattern": "Health-signal ownership",
+        "correctChoiceWins": "Separar la salud local de la decisión DNS evita atribuir a Route 53 la reparación de instancias.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "architecture-mapping",
+        "route53",
+        "health-check"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-route53-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "route53_failover",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate the shallow health-check design",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A primary regional application returns HTTP 200 from /health even when its database connection pool is exhausted. Route 53 therefore continues returning the primary endpoint while users receive errors. Which change MOST directly improves failover accuracy?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Lower the DNS TTL to one second but keep the same shallow health endpoint."
+        },
+        {
+          "id": "B",
+          "label": "Change the health endpoint to return an unhealthy status when critical database access is unavailable, and use that signal for regional health evaluation."
+        },
+        {
+          "id": "C",
+          "label": "Replace failover routing with geolocation routing."
+        },
+        {
+          "id": "D",
+          "label": "Increase the Auto Scaling group maximum capacity without changing health evaluation."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "MOST directly",
+        "HTTP 200",
+        "database",
+        "continues returning primary"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "elimination_failure",
+          "attraction": "A lower TTL can speed client adoption of a changed DNS answer.",
+          "failure": "No DNS change occurs while the primary remains falsely healthy."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Another Route 53 policy sounds like a routing fix.",
+          "failure": "Geolocation does not correct the health signal."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "More instances can mitigate capacity problems.",
+          "failure": "The explicit defect is false health reporting, not only capacity."
+        }
+      ],
+      "explanation": {
+        "concise": "El fallo está en la señal, no en la velocidad de propagación. El endpoint debe representar dependencias críticas.",
+        "testedPattern": "Dependency-aware health checks",
+        "correctChoiceWins": "B corrige la causa que impide activar el failover: el primario se reporta sano aunque no puede atender usuarios.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 95
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "route53",
+        "health-check",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-route53-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "route53_failover",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Regional failover without active-active traffic",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "An application runs behind an ALB in us-east-1. A smaller but functional standby stack runs behind another ALB in us-west-2. The company requires automatic regional failover, and the standby must not receive production traffic while the primary is healthy. Which solution has the LOWEST operational overhead?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create Route 53 failover alias records for the two ALBs, mark us-east-1 PRIMARY and us-west-2 SECONDARY, and evaluate an appropriate health signal."
+        },
+        {
+          "id": "B",
+          "label": "Use latency-based routing with equal weights and remove health checks."
+        },
+        {
+          "id": "C",
+          "label": "Run a Lambda function every minute to resolve both ALB DNS names and manually update a simple Route 53 record."
+        },
+        {
+          "id": "D",
+          "label": "Use geoproximity routing and set the bias to favor us-east-1."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "automatic regional failover",
+        "must not receive production traffic",
+        "LOWEST operational overhead"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "Latency routing supports multiple Regions.",
+          "failure": "It does not preserve the explicit active-passive requirement."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "Custom automation could change DNS.",
+          "failure": "It duplicates a managed Route 53 capability and adds polling and code operations."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "Bias can influence routing preference.",
+          "failure": "It is not an explicit primary/secondary health-based failover mechanism."
+        }
+      ],
+      "explanation": {
+        "concise": "Los alias failover records implementan el patrón solicitado sin una función personalizada que vigile y cambie DNS.",
+        "testedPattern": "Managed active-passive regional routing",
+        "correctChoiceWins": "A cumple automático, activo/pasivo y bajo overhead con una función nativa de Route 53.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "route53",
+        "regional-failover",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-route53-bank-31",
+      "version": "drill-definition-v1",
+      "topicId": "route53_failover",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: global routing objective",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive architecture pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "global users",
+        "low latency",
+        "high availability",
+        "latency-based routing"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno obliga a distinguir baja latencia multi-región de failover activo/pasivo.",
+        "testedPattern": "Routing policy selection from the stated objective",
+        "correctChoiceWins": "La respuesta correcta combina endpoints regionales activos, health checks y la política que optimiza latencia.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 31
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "route53",
+        "latency-routing"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-aurora-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "aurora_global_database",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Aurora Global Database recovery sentence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the replication and promotion model.",
+      "prompt": "Aurora Global Database replicates from one primary Region to secondary Regions asynchronously. A planned switchover waits for synchronization before changing roles. An unplanned failover promotes a secondary but can lose writes that had not replicated.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "asynchronously",
+        "switchover",
+        "failover",
+        "replication lag"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La palabra planned conduce a switchover; una caída regional no planeada conduce a failover y puede implicar RPO distinto de cero.",
+        "testedPattern": "Aurora Global Database transition model",
+        "correctChoiceWins": "Separar operación planeada de recuperación de emergencia evita prometer cero pérdida de datos en un failover asíncrono.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 86
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aurora",
+        "global-database",
+        "mechanism"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-aurora-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "aurora_global_database",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Switchover or failover",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company must move the Aurora Global Database writer to another Region during a scheduled resilience exercise. All clusters are healthy, and the requirement is zero data loss. Which operation should be used?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Perform a managed switchover to the selected secondary Region."
+        },
+        {
+          "id": "B",
+          "label": "Perform an unplanned failover and accept data loss."
+        },
+        {
+          "id": "C",
+          "label": "Delete the primary cluster and restore the newest snapshot."
+        },
+        {
+          "id": "D",
+          "label": "Convert the secondary cluster to an independent database before replication catches up."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "scheduled",
+        "all clusters are healthy",
+        "zero data loss"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "Failover promotes a secondary Region.",
+          "failure": "The scenario is planned and requires zero data loss; switchover is the matching operation."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "Snapshot restore is a recovery mechanism.",
+          "failure": "It introduces unnecessary RTO and does not use the existing global topology."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Detaching can create an independent writer.",
+          "failure": "Doing so before synchronization conflicts with the zero-data-loss requirement."
+        }
+      ],
+      "explanation": {
+        "concise": "Switchover sincroniza el secundario antes del cambio de roles. Failover se reserva para interrupciones no planeadas.",
+        "testedPattern": "Planned Aurora regional transition",
+        "correctChoiceWins": "A coincide con las tres pistas decisivas: scheduled, healthy y zero data loss.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aurora",
+        "switchover",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-aurora-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "aurora_global_database",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a planned Aurora Global Database switchover",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A team is preparing a controlled regional rotation.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "parity",
+          "label": "Confirm engine compatibility, capacity, parameter groups, secrets, networking, alarms, and integrations in the target Region."
+        },
+        {
+          "id": "lag",
+          "label": "Check replication-lag metrics and choose a low-traffic window."
+        },
+        {
+          "id": "switchover",
+          "label": "Initiate the managed switchover to the selected secondary cluster."
+        },
+        {
+          "id": "validate",
+          "label": "Validate the new writer, application connections, writes, and monitoring."
+        },
+        {
+          "id": "failback",
+          "label": "Later, use another controlled switchover if the original Region must become primary again."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "parity",
+          "lag",
+          "switchover",
+          "validate",
+          "failback"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "planned",
+        "compatibility",
+        "replication lag",
+        "new writer"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El cambio de rol de la base no replica automáticamente todas las configuraciones externas de la aplicación.",
+        "testedPattern": "Aurora switchover operational readiness",
+        "correctChoiceWins": "La preparación regional evita que la base se promueva correctamente pero la aplicación falle por secretos, red o parámetros ausentes.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aurora",
+        "workflow",
+        "switchover"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-aurora-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "aurora_global_database",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map Aurora Global Database recovery components",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match the component to its recovery responsibility.",
+      "answerOptions": [
+        {
+          "id": "promotion-target",
+          "label": "Becomes the new primary writer during transition"
+        },
+        {
+          "id": "rpo-signal",
+          "label": "Shows how far a secondary is behind"
+        },
+        {
+          "id": "connection-stability",
+          "label": "Allows the application to follow the current global writer"
+        },
+        {
+          "id": "application-readiness",
+          "label": "Makes the promoted database usable by the complete workload"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "secondary-cluster",
+          "label": "Secondary regional Aurora cluster"
+        },
+        {
+          "id": "lag-metric",
+          "label": "Aurora global replication-lag metric"
+        },
+        {
+          "id": "global-writer-endpoint",
+          "label": "Global writer endpoint"
+        },
+        {
+          "id": "regional-config",
+          "label": "Regional secrets, networking, parameters, and alarms"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "secondary-cluster": "promotion-target",
+          "lag-metric": "rpo-signal",
+          "global-writer-endpoint": "connection-stability",
+          "regional-config": "application-readiness"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "secondary",
+        "replication lag",
+        "global writer endpoint",
+        "regional configuration"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La base global resuelve replicación y promoción; la aplicación todavía necesita configuración regional preparada.",
+        "testedPattern": "Aurora recovery ownership",
+        "correctChoiceWins": "El mapeo evita asumir que promover la base completa automáticamente secretos, alarmas y redes.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aurora",
+        "architecture-mapping",
+        "global-database"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-aurora-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "aurora_global_database",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate the zero-RPO failover assumption",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "The primary Region of an Aurora Global Database is unavailable. The business asks whether an immediate failover guarantees zero data loss. Which statement is MOST accurate?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Yes. Cross-Region Aurora replication is synchronous, so RPO is always zero."
+        },
+        {
+          "id": "B",
+          "label": "No. The selected secondary can be promoted, but unreplicated asynchronous writes can be lost; replication lag should inform the choice when multiple secondaries are available."
+        },
+        {
+          "id": "C",
+          "label": "Yes. Route 53 health checks copy missing transactions before DNS failover."
+        },
+        {
+          "id": "D",
+          "label": "No. Aurora Global Database cannot promote a secondary Region."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "primary Region unavailable",
+        "immediate failover",
+        "guarantees zero data loss",
+        "MOST accurate"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "knowledge_gap",
+          "attraction": "Aurora Global Database is designed for low-lag global replication.",
+          "failure": "Cross-Region replication is asynchronous, so an emergency failover can have non-zero RPO."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "DNS participates in application routing.",
+          "failure": "Route 53 does not replicate database transactions."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "A standard read replica can require promotion steps.",
+          "failure": "Aurora Global Database specifically supports promoting a secondary through failover."
+        }
+      ],
+      "explanation": {
+        "concise": "Unplanned failover puede perder transacciones aún no replicadas. Switchover planeado es el mecanismo para sincronizar antes de cambiar roles.",
+        "testedPattern": "Aurora failover RPO",
+        "correctChoiceWins": "B describe promoción, asincronía y la utilidad operativa de observar lag sin prometer una garantía falsa.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aurora",
+        "rpo",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-aurora-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "aurora_global_database",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Aurora global recovery with minimal application changes",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company already uses Aurora PostgreSQL. It needs local read capacity in Europe and a cross-Region disaster-recovery target, while preserving the relational engine and minimizing application refactoring. Which design is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create an Aurora Global Database with a secondary cluster in Europe, prepare regional application dependencies, and use the appropriate switchover or failover operation when the writer Region changes."
+        },
+        {
+          "id": "B",
+          "label": "Migrate every table to DynamoDB global tables regardless of access pattern."
+        },
+        {
+          "id": "C",
+          "label": "Export nightly database snapshots to an S3 bucket in Europe and use the export files directly as the relational database."
+        },
+        {
+          "id": "D",
+          "label": "Use Route 53 latency routing between two unrelated writable Aurora clusters without database replication."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "already uses Aurora PostgreSQL",
+        "local read capacity",
+        "cross-Region DR",
+        "minimizing refactoring"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "DynamoDB global tables are multi-Region and multi-active.",
+          "failure": "The required relational model and minimal-refactor constraint favor Aurora Global Database."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Snapshots provide recoverable copies.",
+          "failure": "Nightly export cannot provide local live reads or low-RPO regional promotion."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "DNS can distribute application traffic.",
+          "failure": "DNS does not keep independent writable relational databases consistent."
+        }
+      ],
+      "explanation": {
+        "concise": "Aurora Global Database conserva el motor relacional, proporciona secundarios regionales y soporta transición del writer.",
+        "testedPattern": "Relational multi-Region service selection",
+        "correctChoiceWins": "A satisface lectura local, DR regional y mínimo refactor con un servicio diseñado para ese patrón.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 86
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aurora",
+        "exam-scenario",
+        "minimal-refactor"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-aurora-bank-86",
+      "version": "drill-definition-v1",
+      "topicId": "aurora_global_database",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: preserve the relational data model",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive architecture pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "minimum refactor",
+        "Aurora",
+        "globally accessible",
+        "regional tables"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno exige mantener el modelo relacional y separar datos globales de datos regionales sin migrar innecesariamente a DynamoDB.",
+        "testedPattern": "Aurora Global Database service fit",
+        "correctChoiceWins": "La opción correcta usa Aurora para ambos conjuntos y aplica Global Database donde la accesibilidad global lo exige.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 86
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "aurora",
+        "global-database"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-backup-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "aws_backup_vault_lock",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Backup protection control sentence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the protection layers before selecting a control.",
+      "prompt": "A backup plan creates and copies recovery points. A backup vault stores them. Vault Lock constrains deletion and retention. Governance mode is reversible by authorized administrators; compliance mode becomes immutable after its grace period. Restore testing proves recoverability.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "backup plan",
+        "backup vault",
+        "Vault Lock",
+        "governance",
+        "compliance",
+        "restore testing"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Plan, vault, lock y restore test resuelven etapas distintas: creación, almacenamiento, inmutabilidad y validación.",
+        "testedPattern": "AWS Backup control separation",
+        "correctChoiceWins": "Separar las capas evita tratar una política de retención como si fuera una prueba de restauración.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 15
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aws-backup",
+        "vault-lock",
+        "mechanism"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-backup-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "aws_backup_vault_lock",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Governance mode or compliance mode",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A regulated workload requires backups that no administrator, including highly privileged administrators, can delete before the retention period expires after the lock becomes effective. Which Vault Lock mode matches the requirement?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Governance mode"
+        },
+        {
+          "id": "B",
+          "label": "Compliance mode"
+        },
+        {
+          "id": "C",
+          "label": "An S3 lifecycle rule"
+        },
+        {
+          "id": "D",
+          "label": "A backup plan without Vault Lock"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "regulated",
+        "no administrator",
+        "cannot delete",
+        "retention period"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "missed_keyword",
+          "attraction": "Governance mode protects recovery points from ordinary deletion.",
+          "failure": "Authorized administrators can still change or remove governance controls."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "S3 lifecycle controls object transitions and expiration.",
+          "failure": "It is not the immutability control for AWS Backup recovery points."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Backup plans define schedules and retention.",
+          "failure": "A plan alone does not meet the explicit no-administrator-bypass requirement."
+        }
+      ],
+      "explanation": {
+        "concise": "La frase no administrator can delete apunta a compliance mode una vez terminado el periodo de gracia.",
+        "testedPattern": "Backup Vault Lock mode selection",
+        "correctChoiceWins": "B implementa la inmutabilidad fuerte que el requisito regulatorio exige.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aws-backup",
+        "compliance-mode",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-backup-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "aws_backup_vault_lock",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order an immutable backup rollout",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A company is implementing protected cross-Region backups for production resources.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "objectives",
+          "label": "Define backup frequency, RPO, retention, restore-time, and compliance requirements."
+        },
+        {
+          "id": "plan",
+          "label": "Create the backup plan, resource selections, lifecycle, and cross-Region copy action."
+        },
+        {
+          "id": "test-restore",
+          "label": "Create recovery points and validate restoration in a controlled environment."
+        },
+        {
+          "id": "lock-settings",
+          "label": "Configure the target vault retention boundaries and the appropriate Vault Lock mode."
+        },
+        {
+          "id": "operational-test",
+          "label": "Continue scheduled restore tests and monitor failed jobs or copies."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "objectives",
+          "plan",
+          "test-restore",
+          "lock-settings",
+          "operational-test"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "RPO",
+        "retention",
+        "cross-Region copy",
+        "restore",
+        "Vault Lock"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La inmutabilidad debe aplicarse después de confirmar que retención y restauración son correctas, especialmente antes de que compliance mode sea permanente.",
+        "testedPattern": "Safe immutable-backup rollout",
+        "correctChoiceWins": "El orden reduce el riesgo de bloquear una política incorrecta o descubrir tarde que el backup no restaura.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aws-backup",
+        "workflow",
+        "immutability"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-backup-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "aws_backup_vault_lock",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map AWS Backup components to responsibilities",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each component to the control it owns.",
+      "answerOptions": [
+        {
+          "id": "schedule-lifecycle",
+          "label": "Defines schedule, lifecycle, and copy behavior"
+        },
+        {
+          "id": "resource-scope",
+          "label": "Determines which resources are protected"
+        },
+        {
+          "id": "failure-domain",
+          "label": "Creates an independent recovery point in another boundary"
+        },
+        {
+          "id": "immutability",
+          "label": "Restricts deletion and retention changes"
+        },
+        {
+          "id": "recoverability",
+          "label": "Proves that data can become a working restored resource"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "backup-plan",
+          "label": "Backup plan"
+        },
+        {
+          "id": "backup-selection",
+          "label": "Backup selection"
+        },
+        {
+          "id": "copy-action",
+          "label": "Cross-Region or cross-account copy action"
+        },
+        {
+          "id": "vault-lock",
+          "label": "Backup Vault Lock"
+        },
+        {
+          "id": "restore-test",
+          "label": "Restore test"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "backup-plan": "schedule-lifecycle",
+          "backup-selection": "resource-scope",
+          "copy-action": "failure-domain",
+          "vault-lock": "immutability",
+          "restore-test": "recoverability"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "backup plan",
+        "selection",
+        "copy action",
+        "Vault Lock",
+        "restore"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Crear backups, aislarlos, impedir borrado y comprobar restore son controles complementarios, no equivalentes.",
+        "testedPattern": "AWS Backup component ownership",
+        "correctChoiceWins": "El mapeo correcto permite elegir el componente exacto en lugar de responder genéricamente AWS Backup.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aws-backup",
+        "architecture-mapping",
+        "vault-lock"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-backup-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "aws_backup_vault_lock",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate the backup-plan-only answer",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company already creates daily backups. A security requirement now states that compromised production administrators must not be able to delete the protected copies, and a regional outage must not remove every recovery point. Which design BEST addresses both risks?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Increase the backup frequency in the existing production-account vault."
+        },
+        {
+          "id": "B",
+          "label": "Copy recovery points to a vault in another Region and appropriate security boundary, configure Vault Lock with retention settings that match the requirement, and regularly test restore."
+        },
+        {
+          "id": "C",
+          "label": "Create a CloudWatch dashboard showing successful backup jobs."
+        },
+        {
+          "id": "D",
+          "label": "Store the backup job reports in the application log group."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "compromised administrators",
+        "must not delete",
+        "regional outage",
+        "both risks"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "elimination_failure",
+          "attraction": "More frequent backups can improve RPO.",
+          "failure": "It does not isolate recovery points or make them immutable."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Dashboards improve visibility.",
+          "failure": "Visibility neither creates an independent copy nor prevents deletion."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "Logs provide audit evidence.",
+          "failure": "Audit data is not a protected recovery point."
+        }
+      ],
+      "explanation": {
+        "concise": "Se necesitan dos propiedades distintas: separación del failure domain e inmutabilidad de retención.",
+        "testedPattern": "Immutable and isolated recovery points",
+        "correctChoiceWins": "B combina copy, Vault Lock y restore testing; las demás opciones solo observan o cambian frecuencia.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aws-backup",
+        "distractor-elimination",
+        "cross-region-copy"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-backup-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "aws_backup_vault_lock",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Compliance retention with operational safety",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A financial company must retain backups for seven years. After an approval window, nobody must be able to shorten retention or remove the vault lock. The team also wants time to validate the configuration before it becomes permanent. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Configure Backup Vault Lock in compliance mode with the required retention controls and an appropriate grace period, validate the settings and restore process during that period, and allow the lock to become effective."
+        },
+        {
+          "id": "B",
+          "label": "Use governance mode permanently because it can never be changed by administrators."
+        },
+        {
+          "id": "C",
+          "label": "Use a backup plan with seven-year retention and give all administrators backup:DeleteRecoveryPoint."
+        },
+        {
+          "id": "D",
+          "label": "Export the backup job history to CloudTrail and delete the recovery points after one year."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "seven years",
+        "nobody",
+        "shorten retention",
+        "time to validate",
+        "permanent"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "knowledge_gap",
+          "attraction": "Governance mode is a Vault Lock feature.",
+          "failure": "It is intentionally administratively reversible and does not meet the permanent no-bypass requirement."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "The plan can specify seven-year retention.",
+          "failure": "Delete permissions directly conflict with the immutability requirement."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "CloudTrail helps audit administrative activity.",
+          "failure": "Audit evidence does not satisfy seven-year protected retention."
+        }
+      ],
+      "explanation": {
+        "concise": "Compliance mode con periodo de gracia permite validar antes de que la configuración quede inmutable.",
+        "testedPattern": "Compliance-mode rollout",
+        "correctChoiceWins": "A satisface retención, no-bypass y ventana de validación sin confundir auditoría con protección.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "aws-backup",
+        "compliance",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-backup-bank-15",
+      "version": "drill-definition-v1",
+      "topicId": "aws_backup_vault_lock",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: ensure backup-selection metadata",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive architecture pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "D"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "all EBS volumes",
+        "required tag",
+        "AWS Config",
+        "EC2::Volume",
+        "remediation"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Antes de proteger backups con retención o Vault Lock, la selección debe incluir realmente todos los recursos requeridos.",
+        "testedPattern": "Backup coverage governance",
+        "correctChoiceWins": "La respuesta correcta evalúa el tipo de recurso exacto y remedia la etiqueta que controla la selección de backup.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 15
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "aws-backup",
+        "coverage"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-dr-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "dr_resilience_tradeoffs",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "DR strategy control sentence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the tradeoff before choosing a strategy.",
+      "prompt": "As RTO and RPO become more aggressive, more infrastructure and fresher data must already exist in the recovery Region. Backup and restore is cheapest and slowest; pilot light keeps core state; warm standby keeps a reduced functional stack; active-active keeps full production capability.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "RTO",
+        "RPO",
+        "cost",
+        "pilot light",
+        "warm standby",
+        "active-active"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La estrategia no se elige por nombre sino por cuánto debe estar listo antes del desastre.",
+        "testedPattern": "DR cost-readiness continuum",
+        "correctChoiceWins": "Traducir RTO/RPO a infraestructura ya encendida permite eliminar estrategias demasiado lentas o innecesariamente costosas.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 17
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "disaster-recovery",
+        "rto",
+        "rpo"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-dr-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "dr_resilience_tradeoffs",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Pilot light or warm standby",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A recovery Region already runs a complete but smaller application stack that serves synthetic tests. During a disaster, the team only needs to scale capacity and redirect traffic. Which DR strategy is this?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Backup and restore"
+        },
+        {
+          "id": "B",
+          "label": "Pilot light"
+        },
+        {
+          "id": "C",
+          "label": "Warm standby"
+        },
+        {
+          "id": "D",
+          "label": "Multi-site active-active"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "complete but smaller",
+        "serves synthetic tests",
+        "only needs to scale"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "service_confusion",
+          "attraction": "Backups are part of many DR designs.",
+          "failure": "The scenario already has a functional application stack running."
+        },
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "Pilot light keeps critical components alive.",
+          "failure": "A complete functional workload, even at reduced capacity, is warm standby."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Both Regions have running infrastructure.",
+          "failure": "The recovery Region is not serving normal production traffic at full active capacity."
+        }
+      ],
+      "explanation": {
+        "concise": "Complete but smaller y only scale son las pistas de warm standby.",
+        "testedPattern": "DR strategy identification",
+        "correctChoiceWins": "C describe un entorno funcional reducido que puede escalar rápidamente.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "dr",
+        "warm-standby",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-dr-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "dr_resilience_tradeoffs",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a DR design decision",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A team must choose a cost-effective multi-Region recovery design.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "business",
+          "label": "Obtain business RTO, RPO, compliance, and cost constraints."
+        },
+        {
+          "id": "dependencies",
+          "label": "Inventory application, data, identity, network, secrets, and external dependencies."
+        },
+        {
+          "id": "strategy",
+          "label": "Choose backup-and-restore, pilot light, warm standby, or active-active."
+        },
+        {
+          "id": "implementation",
+          "label": "Implement replication, infrastructure as code, routing, observability, and runbooks."
+        },
+        {
+          "id": "exercise",
+          "label": "Run recovery and failback exercises and compare measured results with objectives."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "business",
+          "dependencies",
+          "strategy",
+          "implementation",
+          "exercise"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "RTO",
+        "RPO",
+        "dependencies",
+        "runbook",
+        "failback"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La arquitectura sigue a los objetivos del negocio. Elegir primero un servicio suele producir sobrecosto o incumplimiento de RTO.",
+        "testedPattern": "DR design workflow",
+        "correctChoiceWins": "El orden conecta objetivos, dependencias, estrategia, implementación y evidencia medida.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "dr",
+        "workflow",
+        "resilience"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-dr-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "dr_resilience_tradeoffs",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map DR strategies to readiness levels",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each strategy to its steady-state recovery posture.",
+      "answerOptions": [
+        {
+          "id": "backups-only",
+          "label": "Data backups and reproducible infrastructure; workload is rebuilt after disaster"
+        },
+        {
+          "id": "core-state",
+          "label": "Critical stateful components run; most application capacity is activated after disaster"
+        },
+        {
+          "id": "reduced-stack",
+          "label": "A complete reduced-capacity workload is already functional"
+        },
+        {
+          "id": "full-live",
+          "label": "Multiple locations actively serve production traffic"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "backup-restore",
+          "label": "Backup and restore"
+        },
+        {
+          "id": "pilot-light",
+          "label": "Pilot light"
+        },
+        {
+          "id": "warm-standby",
+          "label": "Warm standby"
+        },
+        {
+          "id": "active-active",
+          "label": "Multi-site active-active"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "backup-restore": "backups-only",
+          "pilot-light": "core-state",
+          "warm-standby": "reduced-stack",
+          "active-active": "full-live"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "backup",
+        "pilot light",
+        "warm standby",
+        "active-active"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La diferencia clave es cuánto del workload completo permanece activo antes del incidente.",
+        "testedPattern": "DR readiness mapping",
+        "correctChoiceWins": "El mapeo convierte nombres abstractos en estados operativos concretos.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "dr",
+        "architecture-mapping",
+        "strategy"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-dr-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "dr_resilience_tradeoffs",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate the over-engineered DR design",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A workload permits three hours of downtime and fifteen minutes of data loss. The business emphasizes cost effectiveness. Which reasoning should guide the design?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Always choose full multi-site active-active because it has the lowest RTO."
+        },
+        {
+          "id": "B",
+          "label": "Choose the least expensive strategy that can demonstrably meet the stated RTO and RPO, potentially pilot light with continuously replicated critical data."
+        },
+        {
+          "id": "C",
+          "label": "Use backup and restore even if restore tests show six hours of recovery time."
+        },
+        {
+          "id": "D",
+          "label": "Ignore RPO because Route 53 can redirect traffic."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "three hours",
+        "fifteen minutes",
+        "cost effectiveness",
+        "demonstrably meet"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "elimination_failure",
+          "attraction": "Active-active provides aggressive recovery.",
+          "failure": "It can be unnecessary and expensive when objectives allow a slower recovery."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "missed_keyword",
+          "attraction": "Backup and restore is often the cheapest option.",
+          "failure": "Measured six-hour recovery violates the three-hour RTO."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "DNS controls traffic transition.",
+          "failure": "DNS cannot recover missing or unreplicated data."
+        }
+      ],
+      "explanation": {
+        "concise": "Cost-effective no significa escoger lo más barato; significa escoger lo más barato que sí cumple RTO y RPO medidos.",
+        "testedPattern": "DR optimization under constraints",
+        "correctChoiceWins": "B conserva la prioridad correcta: cumplir objetivos primero y minimizar costo después.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 17
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "dr",
+        "distractor-elimination",
+        "cost-effective"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-dr-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "dr_resilience_tradeoffs",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Select the DR strategy from RTO and readiness",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company requires regional recovery within 20 minutes. The recovery Region must continuously prove that the full application can start and serve requests, but running full production capacity in both Regions is too expensive. Which strategy is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Backup and restore from daily snapshots"
+        },
+        {
+          "id": "B",
+          "label": "Pilot light with only the database running and all application infrastructure created after the outage"
+        },
+        {
+          "id": "C",
+          "label": "Warm standby with a complete reduced-capacity stack, replicated data, automated scaling, and tested traffic failover"
+        },
+        {
+          "id": "D",
+          "label": "Multi-site active-active at full production capacity in both Regions"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "within 20 minutes",
+        "full application",
+        "reduced cost",
+        "not full production capacity"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "missed_keyword",
+          "attraction": "Daily backups are cost effective.",
+          "failure": "They are unlikely to prove a complete running application or meet a 20-minute RTO."
+        },
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Pilot light reduces cost.",
+          "failure": "Creating most application infrastructure after failure adds risk against the aggressive RTO."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Active-active easily supports fast recovery.",
+          "failure": "The scenario explicitly rejects the cost of full capacity in both Regions."
+        }
+      ],
+      "explanation": {
+        "concise": "Warm standby mantiene el workload completo funcionando a menor escala y solo necesita escalar y cambiar tráfico.",
+        "testedPattern": "Warm standby selection",
+        "correctChoiceWins": "C es la única opción que combina RTO agresivo, prueba continua de la aplicación y costo menor que active-active.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "dr",
+        "warm-standby",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "rrb-dr-bank-17",
+      "version": "drill-definition-v1",
+      "topicId": "dr_resilience_tradeoffs",
+      "domainId": "resilient_cloud_solutions",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: cost-effective RTO and RPO",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive architecture pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "RTO",
+        "RPO",
+        "cost-effective",
+        "pilot light",
+        "read replica"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno exige justificar la estrategia por objetivos, no reconocer solo el nombre pilot light.",
+        "testedPattern": "DR strategy tradeoff",
+        "correctChoiceWins": "La opción correcta mantiene datos replicados y prepara activación regional sin pagar una segunda producción completa.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 17
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "dr",
+        "pilot-light"
+      ],
+      "active": true
+    }
+  ],
+  "sourceQuestionRefs": [
+    {
+      "bank": "verified",
+      "questionId": 15
+    },
+    {
+      "bank": "verified",
+      "questionId": 17
+    },
+    {
+      "bank": "verified",
+      "questionId": 31
+    },
+    {
+      "bank": "verified",
+      "questionId": 79
+    },
+    {
+      "bank": "verified",
+      "questionId": 84
+    },
+    {
+      "bank": "verified",
+      "questionId": 86
+    },
+    {
+      "bank": "verified",
+      "questionId": 95
+    }
+  ],
+  "prerequisiteRelationships": [
+    {
+      "topicId": "route53_failover",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "aurora_global_database",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "aws_backup_vault_lock",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "dr_resilience_tradeoffs",
+      "prerequisiteTopicIds": []
+    }
+  ],
+  "tags": [
+    "dop-c02",
+    "resilience",
+    "route53",
+    "failover",
+    "aurora-global-database",
+    "aws-backup",
+    "vault-lock",
+    "disaster-recovery",
+    "rto",
+    "rpo",
+    "personalized"
+  ]
+}

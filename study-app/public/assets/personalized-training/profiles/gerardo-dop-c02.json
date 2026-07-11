@@ -1,0 +1,410 @@
+{
+  "schemaVersion": "1.0",
+  "profileId": "profile-gerardo-dop-c02",
+  "learnerId": "gerardo",
+  "displayName": "Gerardo",
+  "targetCertification": "AWS Certified DevOps Engineer - Professional (DOP-C02)",
+  "examDate": "2026-07-24",
+  "manuallyCuratedWeakPatterns": [
+    {
+      "id": "weak-exam-interpretation",
+      "label": "Scenario interpretation and decisive keyword detection",
+      "topicIds": [
+        "exam_reasoning_keywords",
+        "exam_reasoning_elimination",
+        "exam_reasoning_scope"
+      ],
+      "errorCauses": [
+        "missed_keyword",
+        "english_interpretation",
+        "elimination_failure",
+        "incorrect_assumption"
+      ],
+      "priority": "urgent",
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 30
+        },
+        {
+          "bank": "verified",
+          "questionId": 94
+        }
+      ]
+    },
+    {
+      "id": "weak-multi-select",
+      "label": "Multi-select completion and option-set validation",
+      "topicIds": [
+        "exam_reasoning_multi_select"
+      ],
+      "errorCauses": [
+        "incomplete_multi_select",
+        "elimination_failure",
+        "missed_keyword"
+      ],
+      "priority": "high",
+      "sourceQuestions": []
+    },
+    {
+      "id": "weak-cross-account",
+      "label": "Cross-account role placement, trust, resource policy, and KMS authorization",
+      "topicIds": [
+        "cross_account_role_flow",
+        "cross_account_s3_kms",
+        "cross_account_codepipeline"
+      ],
+      "errorCauses": [
+        "service_confusion",
+        "wrong_resource_scope",
+        "incorrect_assumption"
+      ],
+      "priority": "urgent",
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        },
+        {
+          "bank": "verified",
+          "questionId": 23
+        },
+        {
+          "bank": "verified",
+          "questionId": 39
+        },
+        {
+          "bank": "verified",
+          "questionId": 43
+        }
+      ]
+    },
+    {
+      "id": "weak-deployment-selection",
+      "label": "Deployment strategy selection and operational control points",
+      "topicIds": [
+        "deployment_strategy_selection",
+        "codedeploy_operational_flow",
+        "lambda_deployment_traffic",
+        "elastic_beanstalk_deployment"
+      ],
+      "errorCauses": [
+        "service_confusion",
+        "elimination_failure",
+        "incorrect_assumption"
+      ],
+      "priority": "high",
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 5
+        },
+        {
+          "bank": "verified",
+          "questionId": 10
+        },
+        {
+          "bank": "verified",
+          "questionId": 25
+        },
+        {
+          "bank": "verified",
+          "questionId": 52
+        }
+      ]
+    },
+    {
+      "id": "weak-iac-asg-config",
+      "label": "CloudFormation recovery, Auto Scaling replacement, and AWS Config remediation",
+      "topicIds": [
+        "cloudformation_update_recovery",
+        "autoscaling_replacement_lifecycle",
+        "aws_config_remediation",
+        "conformance_packs_aggregators"
+      ],
+      "errorCauses": [
+        "wrong_resource_scope",
+        "service_confusion",
+        "incorrect_assumption"
+      ],
+      "priority": "urgent",
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 34
+        },
+        {
+          "bank": "verified",
+          "questionId": 53
+        },
+        {
+          "bank": "verified",
+          "questionId": 65
+        },
+        {
+          "bank": "verified",
+          "questionId": 119
+        }
+      ]
+    },
+    {
+      "id": "weak-resilience-routing",
+      "label": "Failover routing, regional resilience, and backup immutability",
+      "topicIds": [
+        "route53_failover",
+        "aurora_global_database",
+        "aws_backup_vault_lock",
+        "dr_resilience_tradeoffs"
+      ],
+      "errorCauses": [
+        "service_confusion",
+        "missed_keyword",
+        "elimination_failure"
+      ],
+      "priority": "high",
+      "sourceQuestions": []
+    },
+    {
+      "id": "weak-observability-events",
+      "label": "Observability signal selection and event-driven incident automation",
+      "topicIds": [
+        "cloudwatch_observability",
+        "eventbridge_incident_automation",
+        "systems_manager_incident_change",
+        "synthetics_contributor_insights"
+      ],
+      "errorCauses": [
+        "service_confusion",
+        "wrong_resource_scope",
+        "elimination_failure"
+      ],
+      "priority": "high",
+      "sourceQuestions": []
+    },
+    {
+      "id": "weak-governance-advanced",
+      "label": "Multi-account governance and preventive versus detective controls",
+      "topicIds": [
+        "organizations_governance",
+        "control_tower_governance",
+        "access_analyzer_abac",
+        "service_catalog_proton"
+      ],
+      "errorCauses": [
+        "service_confusion",
+        "wrong_resource_scope",
+        "incorrect_assumption"
+      ],
+      "priority": "high",
+      "sourceQuestions": []
+    },
+    {
+      "id": "weak-cicd-advanced",
+      "label": "Artifact events, package governance, and advanced pipeline patterns",
+      "topicIds": [
+        "codeartifact_pipeline_events",
+        "advanced_codepipeline_cross_account"
+      ],
+      "errorCauses": [
+        "service_confusion",
+        "wrong_resource_scope",
+        "elimination_failure"
+      ],
+      "priority": "high",
+      "sourceQuestions": []
+    },
+    {
+      "id": "weak-private-management",
+      "label": "Private-instance management without assuming public internet access",
+      "topicIds": [
+        "ssm_private_instance_management"
+      ],
+      "errorCauses": [
+        "incorrect_assumption",
+        "knowledge_gap",
+        "wrong_resource_scope"
+      ],
+      "priority": "urgent",
+      "sourceQuestions": []
+    }
+  ],
+  "manualCoachingEvidence": [
+    {
+      "evidenceId": "coach-001-exam-keywords",
+      "topicId": "exam_reasoning_keywords",
+      "domainId": "sdlc_automation",
+      "observedResult": "wrong",
+      "occurredAt": "2026-07-08T22:00:00.000Z",
+      "reliability": "high",
+      "errorCause": "missed_keyword",
+      "notes": "Repeated difficulty identifying the decisive constraint among several technically valid answers."
+    },
+    {
+      "evidenceId": "coach-002-elimination",
+      "topicId": "exam_reasoning_elimination",
+      "domainId": "security_compliance",
+      "observedResult": "wrong",
+      "occurredAt": "2026-07-08T22:05:00.000Z",
+      "reliability": "high",
+      "errorCause": "elimination_failure",
+      "notes": "Often recognizes the relevant service but does not eliminate options with incorrect scope or unnecessary operational overhead."
+    },
+    {
+      "evidenceId": "coach-003-cross-account",
+      "topicId": "cross_account_role_flow",
+      "domainId": "security_compliance",
+      "observedResult": "wrong",
+      "occurredAt": "2026-07-09T23:20:00.000Z",
+      "reliability": "high",
+      "errorCause": "wrong_resource_scope",
+      "notes": "Needs reinforcement on where the role lives, who assumes it, and which policy controls each side of the request."
+    },
+    {
+      "evidenceId": "coach-004-cross-account-kms",
+      "topicId": "cross_account_s3_kms",
+      "domainId": "security_compliance",
+      "observedResult": "wrong",
+      "occurredAt": "2026-07-09T23:25:00.000Z",
+      "reliability": "high",
+      "errorCause": "incorrect_assumption",
+      "notes": "Needs a concrete request-path model for identity policy, resource policy, and KMS key policy."
+    },
+    {
+      "evidenceId": "coach-005-deployment",
+      "topicId": "deployment_strategy_selection",
+      "domainId": "sdlc_automation",
+      "observedResult": "partial",
+      "occurredAt": "2026-07-07T22:30:00.000Z",
+      "reliability": "high",
+      "errorCause": "service_confusion",
+      "notes": "Recognizes blue/green and canary patterns but still confuses which AWS deployment mechanism controls traffic and rollback."
+    },
+    {
+      "evidenceId": "coach-006-config",
+      "topicId": "aws_config_remediation",
+      "domainId": "security_compliance",
+      "observedResult": "wrong",
+      "occurredAt": "2026-07-08T22:20:00.000Z",
+      "reliability": "high",
+      "errorCause": "wrong_resource_scope",
+      "notes": "Needs stronger separation between detection, aggregation, conformance distribution, and remediation."
+    },
+    {
+      "evidenceId": "coach-007-asg",
+      "topicId": "autoscaling_replacement_lifecycle",
+      "domainId": "configuration_management_iac",
+      "observedResult": "partial",
+      "occurredAt": "2026-07-09T23:35:00.000Z",
+      "reliability": "high",
+      "errorCause": "knowledge_gap",
+      "notes": "Launch templates, instance profiles, lifecycle hooks, and replacement mechanisms require tangible workflow practice."
+    },
+    {
+      "evidenceId": "coach-008-private-ssm",
+      "topicId": "ssm_private_instance_management",
+      "domainId": "security_compliance",
+      "observedResult": "wrong",
+      "occurredAt": "2026-07-09T23:10:00.000Z",
+      "reliability": "high",
+      "errorCause": "incorrect_assumption",
+      "notes": "Assumed an EC2 instance required public internet access to communicate with AWS management services."
+    },
+    {
+      "evidenceId": "coach-009-fatigue",
+      "topicId": "mixed_exam_scenarios",
+      "domainId": "incident_event_response",
+      "observedResult": "unknown",
+      "occurredAt": "2026-07-08T23:30:00.000Z",
+      "reliability": "low",
+      "errorCause": "rushed_reading",
+      "notes": "A large simulator tail was answered while tired; treat this as reduced-reliability evidence rather than a hard knowledge gap."
+    },
+    {
+      "evidenceId": "coach-010-boundary-scp",
+      "topicId": "organizations_governance",
+      "domainId": "security_compliance",
+      "observedResult": "reinforced",
+      "occurredAt": "2026-07-07T22:45:00.000Z",
+      "reliability": "medium",
+      "errorCause": "service_confusion",
+      "notes": "Repeated drills improved SCP versus permissions boundary recognition, but scenario-level transfer still needs confirmation."
+    }
+  ],
+  "topicStatuses": {
+    "exam_reasoning_keywords": "weak",
+    "exam_reasoning_elimination": "weak",
+    "exam_reasoning_multi_select": "developing",
+    "exam_reasoning_scope": "weak",
+    "cross_account_role_flow": "weak",
+    "cross_account_s3_kms": "weak",
+    "cross_account_codepipeline": "untested",
+    "organizations_governance": "developing",
+    "deployment_strategy_selection": "developing",
+    "codedeploy_operational_flow": "developing",
+    "lambda_deployment_traffic": "developing",
+    "elastic_beanstalk_deployment": "moderate",
+    "cloudformation_update_recovery": "weak",
+    "autoscaling_replacement_lifecycle": "weak",
+    "aws_config_remediation": "weak",
+    "conformance_packs_aggregators": "weak",
+    "route53_failover": "untested",
+    "aurora_global_database": "untested",
+    "aws_backup_vault_lock": "untested",
+    "dr_resilience_tradeoffs": "developing",
+    "cloudwatch_observability": "developing",
+    "eventbridge_incident_automation": "untested",
+    "systems_manager_incident_change": "untested",
+    "synthetics_contributor_insights": "untested",
+    "control_tower_governance": "untested",
+    "access_analyzer_abac": "untested",
+    "service_catalog_proton": "untested",
+    "codeartifact_pipeline_events": "untested",
+    "advanced_codepipeline_cross_account": "weak",
+    "ssm_private_instance_management": "weak",
+    "mixed_exam_scenarios": "untested",
+    "cross_account_network_identity": "weak",
+    "codebuild_artifacts_parallel_testing": "developing",
+    "immutable_artifact_promotion": "developing"
+  },
+  "preferences": {
+    "goals": [
+      "close_weak_areas",
+      "improve_exam_reading",
+      "build_service_map",
+      "prepare_bank_return"
+    ],
+    "preferredSessionMinutes": 15,
+    "includeBankReturn": true,
+    "includeMentalMaps": true,
+    "explanationDepth": "deep"
+  },
+  "priorityTopicIds": [
+    "exam_reasoning_keywords",
+    "exam_reasoning_elimination",
+    "exam_reasoning_scope",
+    "cross_account_role_flow",
+    "cross_account_s3_kms",
+    "ssm_private_instance_management",
+    "cloudformation_update_recovery",
+    "autoscaling_replacement_lifecycle",
+    "aws_config_remediation",
+    "deployment_strategy_selection",
+    "route53_failover",
+    "eventbridge_incident_automation"
+  ],
+  "studyConstraints": {
+    "preferredSessionMinutes": [
+      5,
+      10,
+      15,
+      20,
+      30
+    ],
+    "maxSessionMinutes": 30,
+    "notes": "Prefer operational flows, concrete implementation artifacts, service comparisons, distractor elimination, and short low-energy sessions when tired. Questions should remain in English; post-answer explanations should be in Spanish. Do not treat rushed simulator tails or known bank issues as hard knowledge gaps."
+  }
+}

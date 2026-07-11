@@ -1,6 +1,71 @@
 {
   "schemaVersion": "1.0",
-  "contentVersion": "1.0.0",
-  "updatedAt": "2026-07-10T00:00:00.000Z",
-  "packages": []
+  "contentVersion": "2.0.0",
+  "updatedAt": "2026-07-11T02:00:24Z",
+  "defaultProfileFile": "profiles/gerardo-dop-c02.json",
+  "packages": [
+    {
+      "packageId": "exam-reasoning-foundations",
+      "version": "1.0.0",
+      "file": "packages/exam-reasoning-foundations.json",
+      "enabled": true,
+      "order": 10
+    },
+    {
+      "packageId": "cross-account-access-private-management",
+      "version": "1.0.0",
+      "file": "packages/cross-account-access-private-management.json",
+      "enabled": true,
+      "order": 20
+    },
+    {
+      "packageId": "deployment-strategies",
+      "version": "1.0.0",
+      "file": "packages/deployment-strategies.json",
+      "enabled": true,
+      "order": 30
+    },
+    {
+      "packageId": "cloudformation-autoscaling-config",
+      "version": "1.0.0",
+      "file": "packages/cloudformation-autoscaling-config.json",
+      "enabled": true,
+      "order": 40
+    },
+    {
+      "packageId": "resilience-routing-backup",
+      "version": "1.0.0",
+      "file": "packages/resilience-routing-backup.json",
+      "enabled": true,
+      "order": 50
+    },
+    {
+      "packageId": "monitoring-events-incidents",
+      "version": "1.0.0",
+      "file": "packages/monitoring-events-incidents.json",
+      "enabled": true,
+      "order": 60
+    },
+    {
+      "packageId": "security-governance-multi-account",
+      "version": "1.0.0",
+      "file": "packages/security-governance-multi-account.json",
+      "enabled": true,
+      "order": 70
+    },
+    {
+      "packageId": "cicd-artifacts-advanced-pipelines",
+      "version": "1.0.0",
+      "file": "packages/cicd-artifacts-advanced-pipelines.json",
+      "enabled": true,
+      "order": 80
+    },
+    {
+      "packageId": "final-mixed-scenarios",
+      "version": "1.0.0",
+      "file": "packages/final-mixed-scenarios.json",
+      "enabled": true,
+      "order": 90
+    }
+  ]
 }

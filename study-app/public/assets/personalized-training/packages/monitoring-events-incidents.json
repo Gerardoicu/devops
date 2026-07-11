@@ -1,0 +1,2901 @@
+{
+  "schemaVersion": "1.0",
+  "packageId": "monitoring-events-incidents",
+  "version": "1.0.0",
+  "title": "Monitoring, Event Automation, and Incident Operations",
+  "description": "Personalized DOP-C02 training for CloudWatch signal selection and cross-account observability, EventBridge filtering and safe automation, Systems Manager incident and change workflows with current service-availability awareness, and proactive monitoring with CloudWatch Synthetics and Contributor Insights.",
+  "topicDescriptors": [
+    {
+      "topicId": "cloudwatch_observability",
+      "title": "CloudWatch Metrics, Logs, Traces, Alarms, and Cross-Account Observability",
+      "domainId": "monitoring_logging",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "developing",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "metrics_logs_traces",
+        "logs_insights",
+        "metric_filter",
+        "subscription_filter",
+        "composite_alarm",
+        "monitoring_account",
+        "source_account",
+        "observability_access_manager",
+        "organizations_auto_onboarding"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        },
+        {
+          "bank": "verified",
+          "questionId": 11
+        },
+        {
+          "bank": "verified",
+          "questionId": 16
+        },
+        {
+          "bank": "verified",
+          "questionId": 44
+        },
+        {
+          "bank": "verified",
+          "questionId": 78
+        }
+      ]
+    },
+    {
+      "topicId": "eventbridge_incident_automation",
+      "title": "EventBridge Filtering, Routing, Retry, and Incident Automation",
+      "domainId": "incident_event_response",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "event_pattern",
+        "event_bus",
+        "direct_target",
+        "lambda_transformation",
+        "step_functions_orchestration",
+        "cloudtrail_api_event",
+        "retry_policy",
+        "dead_letter_queue",
+        "idempotency",
+        "recursive_loop_prevention"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 8
+        },
+        {
+          "bank": "verified",
+          "questionId": 11
+        },
+        {
+          "bank": "verified",
+          "questionId": 30
+        },
+        {
+          "bank": "verified",
+          "questionId": 100
+        }
+      ]
+    },
+    {
+      "topicId": "systems_manager_incident_change",
+      "title": "Systems Manager Incident Response, Automation, and Governed Operational Change",
+      "domainId": "incident_event_response",
+      "blueprintRelevance": 0.9,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "response_plan",
+        "engagement_plan",
+        "automation_runbook",
+        "incident_timeline",
+        "post_incident_analysis",
+        "change_template",
+        "change_request",
+        "manual_approval",
+        "change_calendar",
+        "delegated_administrator",
+        "legacy_availability_awareness"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 85
+        }
+      ]
+    },
+    {
+      "topicId": "synthetics_contributor_insights",
+      "title": "CloudWatch Synthetics and Contributor Insights",
+      "domainId": "monitoring_logging",
+      "blueprintRelevance": 0.9,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "scheduled_canary",
+        "customer_journey",
+        "endpoint_availability",
+        "latency",
+        "screenshots",
+        "xray_tracing",
+        "top_n_contributors",
+        "high_cardinality",
+        "top_talkers",
+        "incoming_log_analysis"
+      ],
+      "sourceQuestions": []
+    }
+  ],
+  "conceptMaps": [
+    {
+      "id": "map-cloudwatch-signal-selection",
+      "schemaVersion": "1.0",
+      "topicId": "cloudwatch_observability",
+      "title": "Select the CloudWatch mechanism from the required output",
+      "steps": [
+        {
+          "id": "query",
+          "label": "1. Ask whether the task is investigation",
+          "detail": "Use Logs Insights to interactively query existing CloudWatch Logs and correlate fields during troubleshooting.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 4
+            }
+          ]
+        },
+        {
+          "id": "alarm",
+          "label": "2. Ask whether a recurring log pattern must become an alarmable number",
+          "detail": "Use a metric filter to convert matching incoming log events into a CloudWatch metric, then attach an alarm.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 16
+            },
+            {
+              "bank": "verified",
+              "questionId": 78
+            }
+          ]
+        },
+        {
+          "id": "stream",
+          "label": "3. Ask whether matching log events require near-real-time custom processing",
+          "detail": "Use a CloudWatch Logs subscription filter to deliver matching events to Lambda, Kinesis Data Streams, or Firehose.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 11
+            }
+          ]
+        },
+        {
+          "id": "noise",
+          "label": "4. Ask whether multiple alarms must be combined",
+          "detail": "Use a composite alarm with AND, OR, and NOT logic to reduce duplicate or low-context notifications.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "central",
+          "label": "5. Ask whether telemetry spans accounts",
+          "detail": "Use a monitoring account and source accounts through CloudWatch cross-account observability; Organizations can auto-onboard future accounts.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 44
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-cloudwatch-cross-account-flow",
+      "schemaVersion": "1.0",
+      "topicId": "cloudwatch_observability",
+      "title": "CloudWatch cross-account observability flow",
+      "steps": [
+        {
+          "id": "monitoring",
+          "label": "1. Designate the monitoring account",
+          "detail": "The monitoring account owns the regional sink and central observability experience.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 44
+            }
+          ]
+        },
+        {
+          "id": "sources",
+          "label": "2. Link source accounts",
+          "detail": "Source accounts create links and share selected telemetry types with the monitoring account.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 44
+            }
+          ]
+        },
+        {
+          "id": "telemetry",
+          "label": "3. Select shared telemetry",
+          "detail": "Share required metrics, log groups, traces, and supported application-observability data.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 44
+            }
+          ]
+        },
+        {
+          "id": "org",
+          "label": "4. Use Organizations for scale",
+          "detail": "Organization or OU onboarding allows future accounts to become source accounts automatically.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 44
+            }
+          ]
+        },
+        {
+          "id": "operate",
+          "label": "5. Query and troubleshoot centrally",
+          "detail": "Operators can search and visualize linked-account telemetry without copying every signal into a custom data lake.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 44
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-eventbridge-response-flow",
+      "schemaVersion": "1.0",
+      "topicId": "eventbridge_incident_automation",
+      "title": "EventBridge event-to-response flow",
+      "steps": [
+        {
+          "id": "event",
+          "label": "1. An AWS service, application, or CloudTrail produces an event",
+          "detail": "The event contains metadata such as source and detail-type plus service-specific detail fields.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 100
+            }
+          ]
+        },
+        {
+          "id": "pattern",
+          "label": "2. An event pattern selects the exact subset",
+          "detail": "The pattern should match only the source, event type, account, Region, resource, or detail values needed by the response.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 100
+            }
+          ]
+        },
+        {
+          "id": "target",
+          "label": "3. Choose the simplest sufficient target",
+          "detail": "Send directly to SNS, SQS, Step Functions, Automation, or another target when no custom code is needed.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 100
+            }
+          ]
+        },
+        {
+          "id": "logic",
+          "label": "4. Add Lambda or orchestration only for missing logic",
+          "detail": "Use code for enrichment, correlation, unsupported transformations, or branching that the event pattern and target cannot express.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 8
+            },
+            {
+              "bank": "verified",
+              "questionId": 11
+            }
+          ]
+        },
+        {
+          "id": "failure",
+          "label": "5. Design retries, DLQ, and idempotency",
+          "detail": "A delivery path must tolerate retries and duplicate events without repeating destructive remediation.",
+          "sourceQuestions": []
+        }
+      ]
+    },
+    {
+      "id": "map-incident-change-lifecycle",
+      "schemaVersion": "1.0",
+      "topicId": "systems_manager_incident_change",
+      "title": "Incident response and operational change are different workflows",
+      "steps": [
+        {
+          "id": "detect",
+          "label": "1. Detect an unplanned incident",
+          "detail": "CloudWatch alarms or EventBridge events can initiate an incident workflow for an existing Incident Manager customer.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "respond",
+          "label": "2. Engage responders and run mitigation",
+          "detail": "A response plan coordinates contacts, escalation, collaboration, metrics, and Automation runbooks.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "analyze",
+          "label": "3. Capture timeline and post-incident actions",
+          "detail": "The incident record supports diagnosis, timeline updates, follow-up items, and post-incident analysis.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "request",
+          "label": "4. Govern a planned operational change",
+          "detail": "For an existing Change Manager customer, a change request is created from a template that defines runbooks and approvers.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 85
+            }
+          ]
+        },
+        {
+          "id": "approve-execute",
+          "label": "5. Check calendar, approve, execute, and audit",
+          "detail": "Change Calendar and approval levels gate the Automation runbook; completion records who requested, approved, and implemented the change.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 85
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-synthetics-contributors-flow",
+      "schemaVersion": "1.0",
+      "topicId": "synthetics_contributor_insights",
+      "title": "Proactive journey testing and high-cardinality contributor analysis",
+      "steps": [
+        {
+          "id": "journey",
+          "label": "1. Define the customer journey or API transaction",
+          "detail": "A Synthetics canary scripts the steps that must work even when no real user traffic exists.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "schedule",
+          "label": "2. Run the canary on a schedule",
+          "detail": "The canary executes as a Lambda-based script and publishes availability, latency, and step metrics.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "artifacts",
+          "label": "3. Capture artifacts and traces",
+          "detail": "Screenshots, logs, and optional X-Ray tracing help locate the failing journey step.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "contributors",
+          "label": "4. Apply Contributor Insights to incoming structured logs",
+          "detail": "Rules identify top-N contributors, unique contributors, heavy users, bad hosts, or URLs producing the most errors.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "act",
+          "label": "5. Alarm or investigate",
+          "detail": "Canary metrics indicate that a journey fails; contributor reports identify who or what dominates the impact.",
+          "sourceQuestions": []
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "cmp-logs-insights-vs-metric-filter",
+      "topicId": "cloudwatch_observability",
+      "leftService": "CloudWatch Logs Insights",
+      "rightService": "CloudWatch Logs metric filter",
+      "dimensions": [
+        {
+          "id": "goal",
+          "label": "Primary goal",
+          "leftValue": "Interactive investigation and aggregation of existing logs",
+          "rightValue": "Convert matching incoming log events into a numeric metric"
+        },
+        {
+          "id": "output",
+          "label": "Output",
+          "leftValue": "Query result table, statistics, patterns, or dashboard query",
+          "rightValue": "CloudWatch metric that can be graphed or alarmed"
+        },
+        {
+          "id": "timing",
+          "label": "Timing",
+          "leftValue": "On-demand or scheduled query",
+          "rightValue": "Evaluates events as they arrive after the filter exists"
+        },
+        {
+          "id": "keyword",
+          "label": "Exam clue",
+          "leftValue": "query, search, analyze, troubleshoot",
+          "rightValue": "count errors, threshold, metric, alarm"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        },
+        {
+          "bank": "verified",
+          "questionId": 16
+        },
+        {
+          "bank": "verified",
+          "questionId": 78
+        }
+      ]
+    },
+    {
+      "id": "cmp-eventbridge-direct-vs-lambda",
+      "topicId": "eventbridge_incident_automation",
+      "leftService": "EventBridge direct target",
+      "rightService": "EventBridge to Lambda or Step Functions",
+      "dimensions": [
+        {
+          "id": "logic",
+          "label": "Logic required",
+          "leftValue": "Event pattern and target parameters are sufficient",
+          "rightValue": "Custom enrichment, correlation, branching, or multi-step control is required"
+        },
+        {
+          "id": "overhead",
+          "label": "Operational overhead",
+          "leftValue": "Lower; no custom runtime",
+          "rightValue": "Higher; code or workflow must be operated"
+        },
+        {
+          "id": "example",
+          "label": "Typical example",
+          "leftValue": "Send one CloudTrail API event directly to SNS",
+          "rightValue": "Inspect retry history, call multiple APIs, or coordinate approval and remediation"
+        },
+        {
+          "id": "trap",
+          "label": "Exam trap",
+          "leftValue": "Do not insert Lambda merely because EventBridge is present",
+          "rightValue": "Do not force unsupported business logic into an event pattern"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 8
+        },
+        {
+          "bank": "verified",
+          "questionId": 100
+        }
+      ]
+    },
+    {
+      "id": "cmp-incident-manager-vs-change-manager",
+      "topicId": "systems_manager_incident_change",
+      "leftService": "Systems Manager Incident Manager",
+      "rightService": "Systems Manager Change Manager",
+      "dimensions": [
+        {
+          "id": "trigger",
+          "label": "Trigger",
+          "leftValue": "Unplanned interruption or reduction in service quality",
+          "rightValue": "Planned standard, emergency, or approval-gated operational change"
+        },
+        {
+          "id": "control",
+          "label": "Core control",
+          "leftValue": "Response plans, engagement, escalation, runbooks, timeline, analysis",
+          "rightValue": "Change templates, approvers, Change Calendar, Automation runbooks, audit history"
+        },
+        {
+          "id": "outcome",
+          "label": "Outcome",
+          "leftValue": "Mitigate and recover from an incident",
+          "rightValue": "Implement an approved change safely and audibly"
+        },
+        {
+          "id": "availability",
+          "label": "Current availability",
+          "leftValue": "Not open to new customers; existing customers can continue",
+          "rightValue": "Not open to new customers since November 7, 2025; existing customers can continue"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 85
+        }
+      ]
+    },
+    {
+      "id": "cmp-synthetics-vs-rum",
+      "topicId": "synthetics_contributor_insights",
+      "leftService": "CloudWatch Synthetics",
+      "rightService": "CloudWatch RUM",
+      "dimensions": [
+        {
+          "id": "traffic",
+          "label": "Traffic source",
+          "leftValue": "Scheduled synthetic transactions generated by canaries",
+          "rightValue": "Real end-user browser sessions"
+        },
+        {
+          "id": "when",
+          "label": "Works without users",
+          "leftValue": "Yes",
+          "rightValue": "No real-user telemetry exists without real users"
+        },
+        {
+          "id": "purpose",
+          "label": "Primary purpose",
+          "leftValue": "Continuously verify known APIs and journeys",
+          "rightValue": "Observe actual user performance, errors, devices, and locations"
+        },
+        {
+          "id": "keyword",
+          "label": "Exam clue",
+          "leftValue": "proactive, schedule, canary, before customers report",
+          "rightValue": "real users, client-side, browser experience"
+        }
+      ],
+      "sourceQuestions": []
+    },
+    {
+      "id": "cmp-contributor-vs-logs-insights",
+      "topicId": "synthetics_contributor_insights",
+      "leftService": "CloudWatch Contributor Insights",
+      "rightService": "CloudWatch Logs Insights",
+      "dimensions": [
+        {
+          "id": "question",
+          "label": "Question answered",
+          "leftValue": "Who or what contributes the most?",
+          "rightValue": "What do the selected logs show?"
+        },
+        {
+          "id": "output",
+          "label": "Output",
+          "leftValue": "Top-N and unique-contributor time series",
+          "rightValue": "Flexible query results and aggregations"
+        },
+        {
+          "id": "operation",
+          "label": "Operation",
+          "leftValue": "Rules analyze matching incoming data continuously",
+          "rightValue": "Operators run queries interactively or on a schedule"
+        },
+        {
+          "id": "example",
+          "label": "Typical example",
+          "leftValue": "Top source IPs, users, hosts, or URLs causing errors",
+          "rightValue": "Trace one request ID or summarize exceptions by service"
+        }
+      ],
+      "sourceQuestions": []
+    }
+  ],
+  "drillDefinitions": [
+    {
+      "drillId": "mei-cloudwatch-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "cloudwatch_observability",
+      "domainId": "monitoring_logging",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Choose query, metric, stream, or alarm composition",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the four mechanisms and identify the output each one creates.",
+      "prompt": "Logs Insights returns query results. A metric filter converts matching incoming logs into a metric. A subscription filter streams matching logs to a processor or destination. A composite alarm combines the states of existing alarms.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "query results",
+        "metric",
+        "stream",
+        "composite alarm"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La palabra clave es el resultado requerido: investigar, alarmar, procesar eventos o reducir ruido entre alarmas.",
+        "testedPattern": "CloudWatch mechanism selection",
+        "correctChoiceWins": "Separar los cuatro resultados evita responder CloudWatch Logs de forma genérica.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        },
+        {
+          "bank": "verified",
+          "questionId": 11
+        },
+        {
+          "bank": "verified",
+          "questionId": 16
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "cloudwatch",
+        "logs-insights",
+        "metric-filter",
+        "subscription-filter"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-cloudwatch-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "cloudwatch_observability",
+      "domainId": "monitoring_logging",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Logs Insights or metric filter",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "An operator needs to search two weeks of application logs for a request ID and aggregate exceptions by service. No recurring alarm is required. Which solution is MOST appropriate?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Run a CloudWatch Logs Insights query across the relevant log groups."
+        },
+        {
+          "id": "B",
+          "label": "Create a metric filter for the request ID and wait for future events."
+        },
+        {
+          "id": "C",
+          "label": "Create an EventBridge scheduled rule that restarts all instances."
+        },
+        {
+          "id": "D",
+          "label": "Create a composite alarm without underlying alarms."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "search two weeks",
+        "aggregate",
+        "No recurring alarm"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "Metric filters operate on log patterns.",
+          "failure": "They publish metrics only for matching events after the filter exists and are not the best tool for ad hoc historical investigation."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "EventBridge can schedule automation.",
+          "failure": "The task is log analysis, not remediation."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "knowledge_gap",
+          "attraction": "Composite alarms reduce alert noise.",
+          "failure": "They require underlying alarms and do not query logs."
+        }
+      ],
+      "explanation": {
+        "concise": "Search, aggregate y datos históricos apuntan a Logs Insights.",
+        "testedPattern": "Interactive log analysis",
+        "correctChoiceWins": "A consulta directamente los logs existentes sin crear una métrica o automatización innecesaria.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "cloudwatch",
+        "logs-insights",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-cloudwatch-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "cloudwatch_observability",
+      "domainId": "monitoring_logging",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a multi-account observability rollout",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A company wants one operations account to troubleshoot metrics, logs, and traces from current and future organization accounts.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "monitoring",
+          "label": "Designate the regional monitoring account and create the observability sink."
+        },
+        {
+          "id": "telemetry",
+          "label": "Choose which telemetry types the monitoring account will accept."
+        },
+        {
+          "id": "organization",
+          "label": "Configure organization or OU onboarding for source accounts."
+        },
+        {
+          "id": "links",
+          "label": "Create source-account links that share the selected telemetry."
+        },
+        {
+          "id": "validate",
+          "label": "Validate central queries, dashboards, traces, and automatic onboarding for a new test account."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "monitoring",
+          "telemetry",
+          "organization",
+          "links",
+          "validate"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "monitoring account",
+        "source accounts",
+        "Organizations",
+        "future accounts"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La cuenta central no recibe telemetría por existir; necesita sink, links y tipos de datos compatibles.",
+        "testedPattern": "CloudWatch cross-account observability workflow",
+        "correctChoiceWins": "El orden configura primero el punto de recepción, después el alcance organizacional y finalmente verifica el onboarding.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "cloudwatch",
+        "cross-account-observability",
+        "workflow"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-cloudwatch-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "cloudwatch_observability",
+      "domainId": "monitoring_logging",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map CloudWatch observability components",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each component to the responsibility it owns.",
+      "answerOptions": [
+        {
+          "id": "interactive-query",
+          "label": "Interactively searches and aggregates stored log events"
+        },
+        {
+          "id": "numeric-signal",
+          "label": "Publishes a numeric metric from matching incoming log events"
+        },
+        {
+          "id": "real-time-feed",
+          "label": "Delivers matching log events to Lambda, Kinesis, or Firehose"
+        },
+        {
+          "id": "alarm-logic",
+          "label": "Combines existing alarm states with logical operators"
+        },
+        {
+          "id": "central-view",
+          "label": "Views linked-account metrics, logs, and traces"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "logs-insights",
+          "label": "CloudWatch Logs Insights"
+        },
+        {
+          "id": "metric-filter",
+          "label": "CloudWatch Logs metric filter"
+        },
+        {
+          "id": "subscription-filter",
+          "label": "CloudWatch Logs subscription filter"
+        },
+        {
+          "id": "composite-alarm",
+          "label": "CloudWatch composite alarm"
+        },
+        {
+          "id": "monitoring-account",
+          "label": "Cross-account monitoring account"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "logs-insights": "interactive-query",
+          "metric-filter": "numeric-signal",
+          "subscription-filter": "real-time-feed",
+          "composite-alarm": "alarm-logic",
+          "monitoring-account": "central-view"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "query",
+        "metric",
+        "feed",
+        "alarm states",
+        "central"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Cada componente produce un artefacto distinto: resultado de consulta, métrica, flujo, estado compuesto o vista central.",
+        "testedPattern": "CloudWatch component ownership",
+        "correctChoiceWins": "El mapeo correcto permite eliminar opciones que usan un mecanismo válido para una salida equivocada.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "cloudwatch",
+        "architecture-mapping",
+        "observability"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-cloudwatch-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "cloudwatch_observability",
+      "domainId": "monitoring_logging",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate unnecessary custom log alerting",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "Firewall logs already arrive in CloudWatch Logs. Security must receive an SNS notification whenever at least one event with severity Critical is ingested during a five-minute period. Which solution has the LOWEST operational overhead?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create a metric filter that publishes a CriticalEventCount metric, create a CloudWatch alarm on the metric, and configure SNS as the alarm action."
+        },
+        {
+          "id": "B",
+          "label": "Run a continuously polling EC2 instance that queries Logs Insights every minute and publishes to SNS."
+        },
+        {
+          "id": "C",
+          "label": "Export all logs to S3 once per day and query them with Athena."
+        },
+        {
+          "id": "D",
+          "label": "Create a CloudWatch dashboard and require the security team to watch it continuously."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "already arrive",
+        "at least one",
+        "five-minute period",
+        "LOWEST operational overhead"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Logs Insights can detect the matching messages.",
+          "failure": "A polling server duplicates managed metric and alarm capabilities."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "missed_keyword",
+          "attraction": "Athena can query large log archives.",
+          "failure": "Daily export cannot provide the required near-real-time alert."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "A dashboard visualizes signals.",
+          "failure": "Visualization is not automated notification."
+        }
+      ],
+      "explanation": {
+        "concise": "Metric filter convierte el patrón del log en una métrica y la alarma entrega la notificación.",
+        "testedPattern": "Log-derived alarm pattern",
+        "correctChoiceWins": "A usa servicios administrados sin polling, servidores ni revisión humana continua.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 16
+        },
+        {
+          "bank": "verified",
+          "questionId": 78
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "cloudwatch",
+        "metric-filter",
+        "alarm",
+        "sns"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-cloudwatch-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "cloudwatch_observability",
+      "domainId": "monitoring_logging",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Central observability with future-account onboarding",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "An enterprise has hundreds of AWS accounts in AWS Organizations. A central operations account must search logs, visualize metrics, and inspect traces from member accounts. New accounts must be included automatically. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Configure CloudWatch cross-account observability with the operations account as the monitoring account and use Organizations or OU onboarding for source accounts."
+        },
+        {
+          "id": "B",
+          "label": "Create one IAM user in every account and manually switch roles for each dashboard."
+        },
+        {
+          "id": "C",
+          "label": "Create an S3 bucket in the operations account and copy only CloudTrail logs to it."
+        },
+        {
+          "id": "D",
+          "label": "Create one SNS topic per account and aggregate email notifications."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "metrics",
+        "logs",
+        "traces",
+        "New accounts",
+        "automatically"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Cross-account roles can provide access.",
+          "failure": "Manual account switching does not provide the unified observability experience or automatic onboarding."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "missed_keyword",
+          "attraction": "Centralized logs are useful.",
+          "failure": "The requirement includes metrics and traces, not only CloudTrail logs."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "SNS centralizes notifications.",
+          "failure": "Notifications do not provide searchable telemetry or traces."
+        }
+      ],
+      "explanation": {
+        "concise": "La pista decisiva es metrics + logs + traces + automatic onboarding.",
+        "testedPattern": "Organization-scale CloudWatch observability",
+        "correctChoiceWins": "A es el servicio administrado diseñado para linked source accounts y una monitoring account.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 44
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "cloudwatch",
+        "cross-account",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-cloudwatch-bank-04",
+      "version": "drill-definition-v1",
+      "topicId": "cloudwatch_observability",
+      "domainId": "monitoring_logging",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: query application and API activity logs",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive operational pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "query",
+        "application logs",
+        "API activity",
+        "CloudWatch Logs Insights"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno exige llevar ambos conjuntos al mismo plano de consulta y usar Logs Insights, no inventar un pipeline analítico mayor.",
+        "testedPattern": "Unified log-query plane",
+        "correctChoiceWins": "La respuesta correcta entrega CloudTrail y logs de aplicación a CloudWatch Logs y consulta ambos con Logs Insights.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 4
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "cloudwatch",
+        "logs-insights"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-eventbridge-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "eventbridge_incident_automation",
+      "domainId": "incident_event_response",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Event pattern before custom code",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the event-routing decision.",
+      "prompt": "First use an EventBridge event pattern to select the smallest relevant event set. Send directly to the target when the target can complete the action. Add Lambda or Step Functions only when enrichment, correlation, unsupported transformation, approval, or multi-step orchestration is required.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "event pattern",
+        "direct target",
+        "Lambda",
+        "Step Functions"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El patrón filtra; el target actúa. Código y orquestación son escalones posteriores, no requisitos automáticos.",
+        "testedPattern": "EventBridge least-complexity routing",
+        "correctChoiceWins": "La secuencia evita agregar Lambda cuando SNS, SQS o un target administrado ya satisface el escenario.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 8
+        },
+        {
+          "bank": "verified",
+          "questionId": 100
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "eventbridge",
+        "event-pattern",
+        "direct-target"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-eventbridge-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "eventbridge_incident_automation",
+      "domainId": "incident_event_response",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Direct SNS target or Lambda",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A team needs an SNS notification whenever CloudTrail records a DynamoDB DeleteTable API call. No enrichment or extra business logic is required. Which design is MOST efficient?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use an EventBridge rule that matches the CloudTrail API event and targets SNS directly."
+        },
+        {
+          "id": "B",
+          "label": "Use EventBridge to invoke Lambda, have Lambda copy the unchanged event, and then publish to SNS."
+        },
+        {
+          "id": "C",
+          "label": "Enable DynamoDB Streams and detect deleted items."
+        },
+        {
+          "id": "D",
+          "label": "Run a scheduled EC2 script that searches CloudTrail once per day."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "CloudTrail",
+        "DeleteTable",
+        "No enrichment",
+        "MOST efficient"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Lambda can publish to SNS.",
+          "failure": "It adds code and runtime operations without adding required behavior."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "DynamoDB Streams records item-level changes.",
+          "failure": "DeleteTable is a control-plane API event captured through CloudTrail."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "missed_keyword",
+          "attraction": "CloudTrail logs can be searched later.",
+          "failure": "Daily polling is not near-real-time and adds infrastructure."
+        }
+      ],
+      "explanation": {
+        "concise": "Cuando el patrón puede identificar el evento y SNS puede actuar directamente, Lambda es overhead.",
+        "testedPattern": "EventBridge direct-target selection",
+        "correctChoiceWins": "A satisface filtrado y notificación con el menor número de componentes.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 100
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "eventbridge",
+        "cloudtrail",
+        "sns",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-eventbridge-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "eventbridge_incident_automation",
+      "domainId": "incident_event_response",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a safe event-driven remediation",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A rule will detect a risky API call and start automated remediation.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "sample",
+          "label": "Capture a representative event and identify the exact source, detail-type, and detail fields."
+        },
+        {
+          "id": "pattern",
+          "label": "Build and test the narrow event pattern against matching and non-matching samples."
+        },
+        {
+          "id": "target",
+          "label": "Choose the simplest target that can perform the required action."
+        },
+        {
+          "id": "failure",
+          "label": "Configure retry behavior, a dead-letter queue where supported, and observability for failed delivery."
+        },
+        {
+          "id": "idempotency",
+          "label": "Make the remediation idempotent and prevent the remediation event from recursively matching the rule."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "sample",
+          "pattern",
+          "target",
+          "failure",
+          "idempotency"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "exact fields",
+        "test pattern",
+        "DLQ",
+        "idempotent",
+        "recursive"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La seguridad del flujo depende tanto del match correcto como de tolerar retries y evitar loops.",
+        "testedPattern": "Safe EventBridge automation workflow",
+        "correctChoiceWins": "El orden valida primero la señal y después protege la ejecución contra fallos y duplicados.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "eventbridge",
+        "workflow",
+        "remediation"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-eventbridge-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "eventbridge_incident_automation",
+      "domainId": "incident_event_response",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map EventBridge components to responsibilities",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each component to the responsibility it owns.",
+      "answerOptions": [
+        {
+          "id": "selection",
+          "label": "Selects events by source, metadata, and detail values"
+        },
+        {
+          "id": "routing-plane",
+          "label": "Receives events and evaluates rules"
+        },
+        {
+          "id": "simple-action",
+          "label": "Performs a supported action without custom code"
+        },
+        {
+          "id": "custom-logic",
+          "label": "Adds enrichment, correlation, or unsupported business logic"
+        },
+        {
+          "id": "failed-delivery",
+          "label": "Retains events that could not be delivered after retry handling"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "event-pattern",
+          "label": "Event pattern"
+        },
+        {
+          "id": "event-bus",
+          "label": "Event bus"
+        },
+        {
+          "id": "direct-target",
+          "label": "Direct target"
+        },
+        {
+          "id": "lambda",
+          "label": "Lambda target"
+        },
+        {
+          "id": "dlq",
+          "label": "Dead-letter queue"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "event-pattern": "selection",
+          "event-bus": "routing-plane",
+          "direct-target": "simple-action",
+          "lambda": "custom-logic",
+          "dlq": "failed-delivery"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "pattern",
+        "bus",
+        "target",
+        "custom logic",
+        "failed delivery"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Filtrar, transportar, actuar, transformar y capturar fallos son responsabilidades separadas.",
+        "testedPattern": "EventBridge component ownership",
+        "correctChoiceWins": "El mapeo evita usar Lambda como sustituto de un patrón o DLQ como sustituto de retry.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "eventbridge",
+        "architecture-mapping",
+        "event-driven"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-eventbridge-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "eventbridge_incident_automation",
+      "domainId": "incident_event_response",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate the recursive remediation loop",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "An EventBridge rule detects public S3 bucket ACL changes and invokes a remediation function that updates the ACL. The remediation update also matches the same rule, causing repeated invocations. Which change BEST prevents the loop while retaining automation?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Refine the event pattern and remediation design so events created by the approved remediation path do not match again, and keep the function idempotent."
+        },
+        {
+          "id": "B",
+          "label": "Increase the Lambda reserved concurrency so the loop completes faster."
+        },
+        {
+          "id": "C",
+          "label": "Remove CloudTrail so the ACL changes are no longer recorded."
+        },
+        {
+          "id": "D",
+          "label": "Send every event to two additional EventBridge buses before remediation."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "same rule",
+        "repeated invocations",
+        "BEST prevents",
+        "retaining automation"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "incorrect_assumption",
+          "attraction": "More concurrency can reduce backlog.",
+          "failure": "It accelerates the runaway loop and cost."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "Without the event, the loop stops.",
+          "failure": "It also removes the required detection and audit signal."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "Event buses can route across domains.",
+          "failure": "Additional buses do not change the recursive match condition."
+        }
+      ],
+      "explanation": {
+        "concise": "La solución debe romper la condición de match y tolerar duplicados, no aumentar capacidad.",
+        "testedPattern": "Recursive EventBridge loop prevention",
+        "correctChoiceWins": "A corrige el patrón causal sin deshabilitar detección ni auditoría.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "eventbridge",
+        "loop-prevention",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-eventbridge-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "eventbridge_incident_automation",
+      "domainId": "incident_event_response",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Choose direct routing, Lambda, or orchestration",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A Glue job emits a failure event. The support team must be notified only when the job has exhausted a retry policy, and the solution must enrich the notification with owner information from DynamoDB before publishing to SNS. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use an EventBridge rule for Glue failure events, invoke Lambda to evaluate retry context and retrieve owner data, then publish the enriched message to SNS."
+        },
+        {
+          "id": "B",
+          "label": "Send every Glue event directly to SNS without filtering or enrichment."
+        },
+        {
+          "id": "C",
+          "label": "Create a CloudWatch dashboard and ask the team to check it after every job run."
+        },
+        {
+          "id": "D",
+          "label": "Use an S3 lifecycle rule on the Glue output bucket."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "only when",
+        "exhausted retry",
+        "enrich",
+        "DynamoDB",
+        "before publishing"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "SNS is the required notification channel.",
+          "failure": "Direct routing cannot perform the stated retry-context evaluation and DynamoDB enrichment."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "Dashboards provide operational visibility.",
+          "failure": "The requirement is automated conditional notification."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Lifecycle rules automate S3 storage management.",
+          "failure": "They do not process Glue state-change events."
+        }
+      ],
+      "explanation": {
+        "concise": "Aquí Lambda sí está justificada porque la regla no solo enruta: debe correlacionar retry context y enriquecer con DynamoDB.",
+        "testedPattern": "When custom EventBridge processing is justified",
+        "correctChoiceWins": "A usa EventBridge para seleccionar el evento y código únicamente para la lógica que falta.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 8
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "eventbridge",
+        "lambda",
+        "enrichment",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-eventbridge-bank-100",
+      "version": "drill-definition-v1",
+      "topicId": "eventbridge_incident_automation",
+      "domainId": "incident_event_response",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: near-real-time DeleteTable notification",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive operational pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "DeleteTable",
+        "CloudTrail",
+        "near real time",
+        "lowest cost",
+        "SNS target"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno entrena el patrón CloudTrail API event → EventBridge rule → direct SNS target.",
+        "testedPattern": "Control-plane event automation",
+        "correctChoiceWins": "La respuesta correcta evita DynamoDB Streams y Lambda innecesaria para una llamada API que EventBridge puede enrutar directamente.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 100
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "eventbridge",
+        "cloudtrail"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-ssm-incident-change-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "systems_manager_incident_change",
+      "domainId": "incident_event_response",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Incident response versus governed change",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the operational distinction and current availability note.",
+      "prompt": "Incident Manager coordinates response to unplanned service impact through response plans, engagement, runbooks, timelines, and analysis. Change Manager governs planned operational changes through templates, approvals, calendars, runbooks, and audit history. Both remain usable for existing customers but are no longer open to new customers.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "unplanned incident",
+        "planned change",
+        "response plan",
+        "change template",
+        "existing customers"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Incident Manager responde a impacto no planeado; Change Manager controla una modificación planeada.",
+        "testedPattern": "Incident versus change-management intent",
+        "correctChoiceWins": "La distinción por intención operativa es más fuerte que memorizar listas de funciones.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "systems-manager",
+        "incident-manager",
+        "change-manager",
+        "current-awareness"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-ssm-incident-change-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "systems_manager_incident_change",
+      "domainId": "incident_event_response",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Response plan or change request",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "An existing Incident Manager customer needs to automatically engage the on-call team, open a collaboration channel, and start a mitigation runbook when a high-severity alarm fires. Which construct should the team configure?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "An Incident Manager response plan"
+        },
+        {
+          "id": "B",
+          "label": "A Change Manager change template"
+        },
+        {
+          "id": "C",
+          "label": "A CloudFormation change set"
+        },
+        {
+          "id": "D",
+          "label": "A CodeDeploy deployment configuration"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "existing Incident Manager customer",
+        "on-call",
+        "collaboration",
+        "mitigation",
+        "alarm fires"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "service_confusion",
+          "attraction": "Change templates can start Automation runbooks after approval.",
+          "failure": "The scenario is an unplanned incident requiring responder engagement and escalation."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Change sets preview CloudFormation updates.",
+          "failure": "They do not engage responders or coordinate incident response."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Deployment configurations control release traffic.",
+          "failure": "No deployment is described."
+        }
+      ],
+      "explanation": {
+        "concise": "Engagement + collaboration + mitigation runbook son componentes de un response plan.",
+        "testedPattern": "Incident Manager response-plan selection",
+        "correctChoiceWins": "A reúne personas, comunicación y automatización alrededor de una interrupción no planeada.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "incident-manager",
+        "response-plan",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-ssm-incident-change-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "systems_manager_incident_change",
+      "domainId": "incident_event_response",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a governed operational change",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "An existing Change Manager customer must apply a high-risk configuration change across accounts.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "template",
+          "label": "Define or select a change template with allowed Automation runbooks, approvers, alarms, and notifications."
+        },
+        {
+          "id": "request",
+          "label": "Create a change request with scope, reason, schedule, and runbook parameters."
+        },
+        {
+          "id": "approval",
+          "label": "Complete the required approval levels."
+        },
+        {
+          "id": "calendar",
+          "label": "Verify the Change Calendar permits the operation or complete the required freeze exception process."
+        },
+        {
+          "id": "execute",
+          "label": "Run the approved Automation workflow with concurrency and error thresholds, then review the audit history."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "template",
+          "request",
+          "approval",
+          "calendar",
+          "execute"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "change template",
+        "change request",
+        "approval",
+        "Change Calendar",
+        "Automation"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La aprobación no ejecuta por sí sola; todavía debe respetarse la ventana y el runbook autorizado.",
+        "testedPattern": "Governed operational change workflow",
+        "correctChoiceWins": "El orden conserva solicitud, revisión, restricción temporal, ejecución y evidencia.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "change-manager",
+        "workflow",
+        "approval"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-ssm-incident-change-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "systems_manager_incident_change",
+      "domainId": "incident_event_response",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map incident and change components",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each component to the responsibility it owns.",
+      "answerOptions": [
+        {
+          "id": "incident-template",
+          "label": "Defines incident responders, communication, and automated mitigation"
+        },
+        {
+          "id": "notify-escalate",
+          "label": "Determines who is contacted and in what escalation order"
+        },
+        {
+          "id": "execute-steps",
+          "label": "Performs predefined operational actions and approval steps"
+        },
+        {
+          "id": "approved-change-shape",
+          "label": "Defines allowed runbooks, approvers, alarms, and notification behavior"
+        },
+        {
+          "id": "time-guardrail",
+          "label": "Allows or blocks changes according to business windows and freeze periods"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "response-plan",
+          "label": "Incident Manager response plan"
+        },
+        {
+          "id": "engagement-plan",
+          "label": "Engagement and escalation plan"
+        },
+        {
+          "id": "automation-runbook",
+          "label": "Systems Manager Automation runbook"
+        },
+        {
+          "id": "change-template",
+          "label": "Change Manager change template"
+        },
+        {
+          "id": "change-calendar",
+          "label": "Systems Manager Change Calendar"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "response-plan": "incident-template",
+          "engagement-plan": "notify-escalate",
+          "automation-runbook": "execute-steps",
+          "change-template": "approved-change-shape",
+          "change-calendar": "time-guardrail"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "response plan",
+        "engagement",
+        "Automation",
+        "change template",
+        "calendar"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Response plan, engagement, runbook, template y calendar son piezas complementarias con dueños distintos.",
+        "testedPattern": "Incident and change component ownership",
+        "correctChoiceWins": "El mapeo evita atribuir aprobaciones al response plan o notificaciones on-call al Change Calendar.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "systems-manager",
+        "architecture-mapping",
+        "incident-response"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-ssm-incident-change-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "systems_manager_incident_change",
+      "domainId": "incident_event_response",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate Change Manager from normal CI/CD",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company deploys routine application releases through a fully automated CodePipeline several times per day. No exceptional approval is required. Which statement about Change Manager is MOST accurate?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "It should replace every normal pipeline stage because Change Manager is the primary service for automated software delivery."
+        },
+        {
+          "id": "B",
+          "label": "It is designed for governed operational changes and is not intended to wrap ordinary automated CI/CD releases unless an exception or approval is required."
+        },
+        {
+          "id": "C",
+          "label": "It is a log-query service that analyzes deployment logs."
+        },
+        {
+          "id": "D",
+          "label": "It is required to create every CloudFormation change set."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "B"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "routine",
+        "fully automated",
+        "No exceptional approval",
+        "MOST accurate"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "A",
+          "errorCause": "service_confusion",
+          "attraction": "Change Manager can execute runbooks and approvals.",
+          "failure": "Its purpose is operational change governance, not replacing the normal CD pipeline."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Change Manager provides audit history.",
+          "failure": "Audit history is not interactive log analytics."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Both features contain the word change.",
+          "failure": "CloudFormation change sets are independent preview objects."
+        }
+      ],
+      "explanation": {
+        "concise": "Change Manager complementa CI/CD cuando existe una excepción o aprobación, no sustituye el pipeline normal.",
+        "testedPattern": "Change Manager service boundary",
+        "correctChoiceWins": "B respeta la intención documentada y elimina respuestas basadas solo en la palabra change.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "change-manager",
+        "cicd",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-ssm-incident-change-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "systems_manager_incident_change",
+      "domainId": "incident_event_response",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Manual approval before destructive automation",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A cost-optimization signal identifies an underutilized EC2 instance. An operator must review the recommendation before the instance can be terminated. The company wants the LOWEST development effort. Which pattern is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Trigger a Systems Manager Automation runbook that contains an approval step before the termination action."
+        },
+        {
+          "id": "B",
+          "label": "Write a custom approval web application, custom workflow database, and custom termination service."
+        },
+        {
+          "id": "C",
+          "label": "Terminate the instance directly from the monitoring event and send a notification afterward."
+        },
+        {
+          "id": "D",
+          "label": "Create a dashboard and rely on an operator to remember to terminate the instance manually."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "must review",
+        "before",
+        "termination",
+        "LOWEST development effort"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "A custom portal can model approval.",
+          "failure": "It duplicates the managed Automation approval capability and increases development effort."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "missed_keyword",
+          "attraction": "The desired final action is termination.",
+          "failure": "It violates the required human validation before execution."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Manual operation preserves review.",
+          "failure": "It does not provide a controlled automated workflow after approval."
+        }
+      ],
+      "explanation": {
+        "concise": "Systems Manager Automation puede combinar aprobación manual y acción destructiva en un mismo runbook auditable.",
+        "testedPattern": "Human-in-the-loop Automation",
+        "correctChoiceWins": "A satisface approval-before-action con menos código que una plataforma propia.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 85
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "systems-manager",
+        "automation",
+        "approval",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-ssm-incident-change-bank-85",
+      "version": "drill-definition-v1",
+      "topicId": "systems_manager_incident_change",
+      "domainId": "incident_event_response",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: approval-gated cost remediation",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive operational pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "D"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "underutilized",
+        "24 hours",
+        "manual approval",
+        "LOWEST development effort",
+        "SSM Automation"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno combina una señal administrada con EventBridge y un runbook de Automation que exige aprobación antes de terminar.",
+        "testedPattern": "Approval-gated operational remediation",
+        "correctChoiceWins": "La respuesta correcta minimiza código y mantiene el control humano requerido.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 85
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "systems-manager",
+        "automation",
+        "approval"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-synthetics-contributor-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "synthetics_contributor_insights",
+      "domainId": "monitoring_logging",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Canary failure versus top contributor",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the two questions each service answers.",
+      "prompt": "CloudWatch Synthetics asks: does this known user journey or API transaction work now, even without real users? Contributor Insights asks: which users, IPs, hosts, keys, or URLs contribute the most to incoming log volume, errors, or resource usage?",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "known journey",
+        "without real users",
+        "which contributors",
+        "top-N"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Synthetics produce tráfico de prueba; Contributor Insights analiza cardinalidad y dominancia dentro de datos entrantes.",
+        "testedPattern": "Synthetics versus Contributor Insights",
+        "correctChoiceWins": "Formular primero la pregunta operacional evita confundir prueba proactiva con análisis de top talkers.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "synthetics",
+        "contributor-insights",
+        "mechanism"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-synthetics-contributor-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "synthetics_contributor_insights",
+      "domainId": "monitoring_logging",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Synthetic monitoring or real-user monitoring",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company wants to verify every five minutes that login, search, and checkout succeed, including during periods with no customer traffic. Which service directly matches the requirement?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "CloudWatch Synthetics canary"
+        },
+        {
+          "id": "B",
+          "label": "CloudWatch RUM only"
+        },
+        {
+          "id": "C",
+          "label": "CloudTrail Lake"
+        },
+        {
+          "id": "D",
+          "label": "AWS Config conformance pack"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "every five minutes",
+        "login, search, checkout",
+        "no customer traffic"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "RUM observes customer browser experience.",
+          "failure": "Without customer sessions it cannot continually execute the required journey."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "CloudTrail Lake queries account activity.",
+          "failure": "It does not run browser or API transactions."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Conformance packs assess configuration compliance.",
+          "failure": "They do not test application journeys."
+        }
+      ],
+      "explanation": {
+        "concise": "No customer traffic y scheduled journey apuntan a un canary.",
+        "testedPattern": "Proactive journey monitoring",
+        "correctChoiceWins": "A ejecuta el flujo conocido en un horario y produce métricas aunque ningún usuario real esté activo.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "synthetics",
+        "rum",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-synthetics-contributor-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "synthetics_contributor_insights",
+      "domainId": "monitoring_logging",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a proactive customer-journey monitor",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A team must detect checkout failures before customers report them.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "journey",
+          "label": "Define the exact API calls or browser steps that represent a successful checkout."
+        },
+        {
+          "id": "script",
+          "label": "Implement the canary script with secure credentials and explicit assertions."
+        },
+        {
+          "id": "schedule",
+          "label": "Run the canary on the required schedule and from the required network location."
+        },
+        {
+          "id": "telemetry",
+          "label": "Publish canary metrics and retain logs, screenshots, and optional X-Ray traces."
+        },
+        {
+          "id": "alarm",
+          "label": "Alarm on failed steps or unacceptable latency and route the signal into the response workflow."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "journey",
+          "script",
+          "schedule",
+          "telemetry",
+          "alarm"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "customer journey",
+        "assertions",
+        "schedule",
+        "screenshots",
+        "alarm"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Un canary útil valida un resultado de negocio, no solo que la URL responda 200.",
+        "testedPattern": "CloudWatch Synthetics implementation workflow",
+        "correctChoiceWins": "El orden define éxito, ejecuta, captura evidencia y conecta la señal con respuesta.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "synthetics",
+        "workflow",
+        "customer-journey"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-synthetics-contributor-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "synthetics_contributor_insights",
+      "domainId": "monitoring_logging",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map proactive and contributor-analysis components",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each component to the responsibility it owns.",
+      "answerOptions": [
+        {
+          "id": "execute-journey",
+          "label": "Executes the API or browser journey and assertions"
+        },
+        {
+          "id": "availability-latency",
+          "label": "Reports success, failure, duration, and step signals"
+        },
+        {
+          "id": "failure-evidence",
+          "label": "Provides visual and textual evidence for troubleshooting"
+        },
+        {
+          "id": "define-identity",
+          "label": "Defines contributor keys, values, filters, and aggregation"
+        },
+        {
+          "id": "top-n",
+          "label": "Shows top-N and unique contributors over time"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "canary-script",
+          "label": "Synthetics canary script"
+        },
+        {
+          "id": "canary-metrics",
+          "label": "Synthetics CloudWatch metrics"
+        },
+        {
+          "id": "canary-artifacts",
+          "label": "Canary screenshots and logs"
+        },
+        {
+          "id": "contributor-rule",
+          "label": "Contributor Insights rule"
+        },
+        {
+          "id": "contributor-report",
+          "label": "Contributor Insights report"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "canary-script": "execute-journey",
+          "canary-metrics": "availability-latency",
+          "canary-artifacts": "failure-evidence",
+          "contributor-rule": "define-identity",
+          "contributor-report": "top-n"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "script",
+        "metrics",
+        "screenshots",
+        "rule",
+        "top-N"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El script genera la prueba; métricas y artifacts describen el resultado; la rule y report analizan contribuyentes.",
+        "testedPattern": "Synthetics and Contributor Insights ownership",
+        "correctChoiceWins": "El mapeo separa ejecución, señal, evidencia, definición y reporte.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "synthetics",
+        "contributor-insights",
+        "architecture-mapping"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-synthetics-contributor-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "synthetics_contributor_insights",
+      "domainId": "monitoring_logging",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate the average-only diagnosis",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "An API's average latency is normal, but a small number of tenant IDs generate most throttling errors and request volume. Operations needs a continuously updated view of the top offending tenants. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create a Contributor Insights rule over structured logs using tenantId as a contributor and graph the top-N contributors."
+        },
+        {
+          "id": "B",
+          "label": "Create one undimensioned average-latency alarm."
+        },
+        {
+          "id": "C",
+          "label": "Run a browser canary that never records tenant IDs."
+        },
+        {
+          "id": "D",
+          "label": "Create a CloudFormation drift-detection schedule."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "small number",
+        "tenant IDs",
+        "most",
+        "continuously updated",
+        "top"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "Latency alarms detect performance degradation.",
+          "failure": "An average hides the high-cardinality concentration the team must identify."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "A canary can detect a failing synthetic transaction.",
+          "failure": "It does not rank real tenant contributors unless those contributor fields exist in analyzed logs."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Drift detection identifies infrastructure changes.",
+          "failure": "It does not analyze request contributors."
+        }
+      ],
+      "explanation": {
+        "concise": "Top offending tenants es exactamente una pregunta de Contributor Insights.",
+        "testedPattern": "High-cardinality top-contributor analysis",
+        "correctChoiceWins": "A conserva tenantId como contributor y produce top-N en tiempo real.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "contributor-insights",
+        "high-cardinality",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-synthetics-contributor-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "synthetics_contributor_insights",
+      "domainId": "monitoring_logging",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Detect failure and identify dominant impact",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A retail application must detect checkout failure before customers report it. When an incident occurs, responders also need to identify which URL paths and client IP addresses produce the most errors. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Create a CloudWatch Synthetics canary for the checkout journey and alarm on failures; create Contributor Insights rules over structured access logs for URL path and client IP contributors."
+        },
+        {
+          "id": "B",
+          "label": "Use only an EC2 CPU alarm."
+        },
+        {
+          "id": "C",
+          "label": "Use only CloudTrail event history."
+        },
+        {
+          "id": "D",
+          "label": "Use only a daily manual browser test."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "before customers report",
+        "checkout journey",
+        "which URL paths",
+        "client IP",
+        "most errors"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "CPU can correlate with incidents.",
+          "failure": "It neither executes checkout nor identifies error contributors."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "CloudTrail records AWS API activity.",
+          "failure": "It does not provide customer-journey execution or application access-log top talkers."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "missed_keyword",
+          "attraction": "A manual test can verify checkout.",
+          "failure": "Daily human execution does not provide continuous proactive detection."
+        }
+      ],
+      "explanation": {
+        "concise": "Se requieren dos respuestas: Synthetics detecta el fallo del journey; Contributor Insights identifica los mayores contribuyentes.",
+        "testedPattern": "Combined proactive monitoring and contributor diagnosis",
+        "correctChoiceWins": "A usa cada servicio para la pregunta que resuelve, sin forzar uno a cubrir ambos objetivos.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "synthetics",
+        "contributor-insights",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-synthetics-contributor-review-01",
+      "version": "drill-definition-v1",
+      "topicId": "synthetics_contributor_insights",
+      "domainId": "monitoring_logging",
+      "activityType": "spaced_review",
+      "drillForm": "spaced_review",
+      "title": "Spaced review: choose the observability tool",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "Which pairing is correct?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Scheduled login test with no users → CloudWatch Synthetics; top source IPs causing errors → Contributor Insights"
+        },
+        {
+          "id": "B",
+          "label": "Scheduled login test with no users → Contributor Insights; top source IPs causing errors → CloudWatch Synthetics"
+        },
+        {
+          "id": "C",
+          "label": "Both requirements → CloudFormation drift detection"
+        },
+        {
+          "id": "D",
+          "label": "Both requirements → Route 53 hosted-zone query logging only"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "scheduled",
+        "no users",
+        "top source IPs"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "service_confusion",
+          "attraction": "Both services are part of CloudWatch.",
+          "failure": "Their data sources and questions are reversed."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Drift detection is operationally useful.",
+          "failure": "It assesses infrastructure configuration, not runtime journeys or contributors."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "DNS query logs include source behavior.",
+          "failure": "They do not execute a login journey and are not a general top-error analysis solution."
+        }
+      ],
+      "explanation": {
+        "concise": "Canary ejecuta; Contributor Insights clasifica contribuyentes.",
+        "testedPattern": "Observability tool recall",
+        "correctChoiceWins": "A mantiene la separación funcional correcta.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "spaced-review",
+        "synthetics",
+        "contributor-insights"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "mei-cloudwatch-bank-44",
+      "version": "drill-definition-v1",
+      "topicId": "cloudwatch_observability",
+      "domainId": "monitoring_logging",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: organization-wide observability",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive operational pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "hundreds of accounts",
+        "metrics",
+        "logs",
+        "traces",
+        "automatically new accounts"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno consolida monitoring account, source accounts y onboarding mediante Organizations.",
+        "testedPattern": "CloudWatch cross-account observability",
+        "correctChoiceWins": "La opción correcta centraliza telemetría completa sin conexiones manuales cuenta por cuenta.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 44
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "cloudwatch",
+        "organizations"
+      ],
+      "active": true
+    }
+  ],
+  "sourceQuestionRefs": [
+    {
+      "bank": "verified",
+      "questionId": 4
+    },
+    {
+      "bank": "verified",
+      "questionId": 8
+    },
+    {
+      "bank": "verified",
+      "questionId": 11
+    },
+    {
+      "bank": "verified",
+      "questionId": 16
+    },
+    {
+      "bank": "verified",
+      "questionId": 30
+    },
+    {
+      "bank": "verified",
+      "questionId": 44
+    },
+    {
+      "bank": "verified",
+      "questionId": 78
+    },
+    {
+      "bank": "verified",
+      "questionId": 85
+    },
+    {
+      "bank": "verified",
+      "questionId": 100
+    }
+  ],
+  "prerequisiteRelationships": [
+    {
+      "topicId": "cloudwatch_observability",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "eventbridge_incident_automation",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "systems_manager_incident_change",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "synthetics_contributor_insights",
+      "prerequisiteTopicIds": []
+    }
+  ],
+  "tags": [
+    "dop-c02",
+    "cloudwatch",
+    "logs-insights",
+    "cross-account-observability",
+    "eventbridge",
+    "incident-response",
+    "systems-manager",
+    "change-manager",
+    "incident-manager",
+    "synthetics",
+    "contributor-insights",
+    "personalized"
+  ]
+}

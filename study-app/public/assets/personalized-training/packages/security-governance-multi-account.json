@@ -1,0 +1,2745 @@
+{
+  "schemaVersion": "1.0",
+  "packageId": "security-governance-multi-account",
+  "version": "1.0.0",
+  "title": "Security Governance and Multi-Account Controls",
+  "description": "Personalized DOP-C02 training for Organizations policy scope, Control Tower control behavior, IAM Access Analyzer and ABAC, Service Catalog governed self-service, and current AWS Proton lifecycle awareness.",
+  "topicDescriptors": [
+    {
+      "topicId": "organizations_governance",
+      "title": "AWS Organizations Guardrails, Delegation, and Multi-Account Deployment",
+      "domainId": "security_compliance",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "developing",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "scp_guardrail",
+        "permissions_boundary",
+        "identity_policy",
+        "resource_policy",
+        "management_account_exception",
+        "delegated_administrator",
+        "service_managed_stacksets",
+        "organizational_units",
+        "all_features"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 1
+        },
+        {
+          "bank": "verified",
+          "questionId": 23
+        },
+        {
+          "bank": "verified",
+          "questionId": 32
+        },
+        {
+          "bank": "verified",
+          "questionId": 65
+        }
+      ]
+    },
+    {
+      "topicId": "control_tower_governance",
+      "title": "AWS Control Tower Landing Zones, OUs, Controls, and Account Governance",
+      "domainId": "security_compliance",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [
+        "organizations_governance"
+      ],
+      "relatedPatternIds": [
+        "landing_zone",
+        "account_factory",
+        "organizational_units",
+        "preventive_control",
+        "detective_control",
+        "proactive_control",
+        "scp",
+        "aws_config_rule",
+        "cloudformation_hook",
+        "control_drift"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        }
+      ]
+    },
+    {
+      "topicId": "access_analyzer_abac",
+      "title": "IAM Access Analyzer and Attribute-Based Access Control",
+      "domainId": "security_compliance",
+      "blueprintRelevance": 1.0,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "external_access_analyzer",
+        "internal_access_analyzer",
+        "unused_access_analyzer",
+        "policy_validation",
+        "policy_generation",
+        "zone_of_trust",
+        "abac",
+        "principal_tags",
+        "resource_tags",
+        "session_tags"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 24
+        }
+      ]
+    },
+    {
+      "topicId": "service_catalog_proton",
+      "title": "Service Catalog Self-Service Governance and AWS Proton Legacy Patterns",
+      "domainId": "security_compliance",
+      "blueprintRelevance": 0.9,
+      "currentStatus": "untested",
+      "prerequisiteTopicIds": [],
+      "relatedPatternIds": [
+        "service_catalog_product",
+        "portfolio",
+        "provisioned_product",
+        "launch_constraint",
+        "tag_option",
+        "approved_templates",
+        "self_service",
+        "proton_environment_template",
+        "proton_service_template",
+        "proton_end_of_support"
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 99
+        }
+      ]
+    }
+  ],
+  "conceptMaps": [
+    {
+      "id": "map-org-policy-evaluation",
+      "schemaVersion": "1.0",
+      "topicId": "organizations_governance",
+      "title": "Effective permissions across organization and account layers",
+      "steps": [
+        {
+          "id": "scp",
+          "label": "1. SCP defines the organization-level maximum",
+          "detail": "An SCP never grants permissions. It limits principals in member accounts and does not restrict principals in the management account.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 23
+            }
+          ]
+        },
+        {
+          "id": "boundary",
+          "label": "2. Permissions boundary limits one IAM user or role",
+          "detail": "The boundary is the maximum that identity-based policies can grant to that entity. It also does not grant permissions by itself.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "identity",
+          "label": "3. Identity policy grants actions to the principal",
+          "detail": "The user or role still needs an allow for the requested action.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "resource",
+          "label": "4. Resource policy may be another required gate",
+          "detail": "Services such as S3 and KMS can require authorization from the resource-owning side.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 23
+            }
+          ]
+        },
+        {
+          "id": "deny",
+          "label": "5. Any applicable explicit deny wins",
+          "detail": "Effective access is the intersection of applicable limits and grants, with explicit deny overriding allows.",
+          "sourceQuestions": []
+        }
+      ]
+    },
+    {
+      "id": "map-org-account-baseline",
+      "schemaVersion": "1.0",
+      "topicId": "organizations_governance",
+      "title": "Automatic account and OU baseline deployment",
+      "steps": [
+        {
+          "id": "template",
+          "label": "1. Define repeatable resources in CloudFormation",
+          "detail": "Roles, logging, Config, and other baseline resources are modeled as infrastructure as code.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 1
+            }
+          ]
+        },
+        {
+          "id": "stackset",
+          "label": "2. Create a service-managed StackSet",
+          "detail": "Service-managed permissions integrate StackSets with AWS Organizations.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 1
+            }
+          ]
+        },
+        {
+          "id": "target",
+          "label": "3. Target the required root or OUs and Regions",
+          "detail": "Deployment scope follows the organization structure rather than a hand-maintained account list.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 1
+            }
+          ]
+        },
+        {
+          "id": "auto",
+          "label": "4. Enable automatic deployment",
+          "detail": "New accounts added to the target OUs receive stack instances automatically.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 1
+            }
+          ]
+        },
+        {
+          "id": "remove",
+          "label": "5. Define account-removal behavior",
+          "detail": "Choose whether stack instances and their resources are retained or removed when accounts leave the target scope.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-control-tower-controls",
+      "schemaVersion": "1.0",
+      "topicId": "control_tower_governance",
+      "title": "Control Tower control behavior",
+      "steps": [
+        {
+          "id": "preventive",
+          "label": "1. Preventive control blocks prohibited actions",
+          "detail": "Preventive controls are implemented through AWS Organizations policies such as SCPs, RCPs, or declarative policies.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "detective",
+          "label": "2. Detective control evaluates deployed resources",
+          "detail": "Detective controls use AWS Config rules and report clear or violation status.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "proactive",
+          "label": "3. Proactive control checks before provisioning",
+          "detail": "Proactive controls use CloudFormation hooks and can prevent noncompliant CloudFormation resources from being provisioned.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "ou",
+          "label": "4. Enable controls at the correct OU scope",
+          "detail": "Controls govern accounts in the selected OU; account placement is therefore part of the governance design.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "evidence",
+          "label": "5. Interpret status according to control behavior",
+          "detail": "Preventive, detective, and proactive controls expose different status models because they act at different lifecycle points.",
+          "sourceQuestions": []
+        }
+      ]
+    },
+    {
+      "id": "map-access-analyzer-abac",
+      "schemaVersion": "1.0",
+      "topicId": "access_analyzer_abac",
+      "title": "Analyze access, then scale authorization with attributes",
+      "steps": [
+        {
+          "id": "external",
+          "label": "1. External analyzer finds access outside the zone of trust",
+          "detail": "It reasons over supported resource policies to identify public or cross-account access.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "internal",
+          "label": "2. Internal analyzer shows which trusted principals can reach critical resources",
+          "detail": "It helps verify internal access paths and least privilege for selected resources.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "unused",
+          "label": "3. Unused access analyzer finds stale identities and permissions",
+          "detail": "It surfaces unused roles, access keys, passwords, services, and actions.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "validate",
+          "label": "4. Policy validation catches grammar and best-practice issues",
+          "detail": "Custom policy checks can also compare a proposed policy with organization security standards.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "abac",
+          "label": "5. ABAC grants dynamically when attributes match",
+          "detail": "Principal tags, resource tags, and session tags allow a smaller policy set to cover new projects and resources.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 24
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map-service-catalog-provisioning",
+      "schemaVersion": "1.0",
+      "topicId": "service_catalog_proton",
+      "title": "Service Catalog governed self-service flow",
+      "steps": [
+        {
+          "id": "product",
+          "label": "1. Package an approved architecture as a product",
+          "detail": "A product commonly references versioned infrastructure templates and documentation.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 99
+            }
+          ]
+        },
+        {
+          "id": "portfolio",
+          "label": "2. Add products to portfolios",
+          "detail": "Portfolios organize approved products for teams, business units, and environments.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 99
+            }
+          ]
+        },
+        {
+          "id": "constraints",
+          "label": "3. Apply launch constraints and TagOptions",
+          "detail": "Constraints control provisioning behavior; TagOptions standardize selectable tags.",
+          "sourceQuestions": []
+        },
+        {
+          "id": "access",
+          "label": "4. Grant users access to the portfolio",
+          "detail": "Users can provision approved products without broad write access to underlying services.",
+          "sourceQuestions": [
+            {
+              "bank": "verified",
+              "questionId": 99
+            }
+          ]
+        },
+        {
+          "id": "operate",
+          "label": "5. Manage provisioned products and versions",
+          "detail": "Administrators can update product versions while users operate within the curated self-service boundary.",
+          "sourceQuestions": []
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "id": "cmp-scp-vs-boundary",
+      "topicId": "organizations_governance",
+      "leftService": "Service control policy",
+      "rightService": "Permissions boundary",
+      "dimensions": [
+        {
+          "id": "scope",
+          "label": "Scope",
+          "leftValue": "Organization root, OU, or member account",
+          "rightValue": "One IAM user or role"
+        },
+        {
+          "id": "purpose",
+          "label": "Purpose",
+          "leftValue": "Maximum available permissions across accounts",
+          "rightValue": "Maximum identity permissions within one account"
+        },
+        {
+          "id": "grant",
+          "label": "Grants permissions",
+          "leftValue": "No",
+          "rightValue": "No"
+        },
+        {
+          "id": "use",
+          "label": "Typical exam use",
+          "leftValue": "Central guardrail for member accounts",
+          "rightValue": "Delegate IAM administration without privilege escalation"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 23
+        }
+      ]
+    },
+    {
+      "id": "cmp-preventive-detective-proactive",
+      "topicId": "control_tower_governance",
+      "leftService": "Preventive / detective controls",
+      "rightService": "Proactive controls",
+      "dimensions": [
+        {
+          "id": "timing",
+          "label": "Lifecycle timing",
+          "leftValue": "Prevent actions or detect already-deployed noncompliance",
+          "rightValue": "Evaluate CloudFormation resources before provisioning"
+        },
+        {
+          "id": "implementation",
+          "label": "Implementation",
+          "leftValue": "Organizations policies or AWS Config rules",
+          "rightValue": "CloudFormation hooks"
+        },
+        {
+          "id": "result",
+          "label": "Result",
+          "leftValue": "Block API action or report violation",
+          "rightValue": "PASS, FAIL, or SKIP before resource creation"
+        },
+        {
+          "id": "trap",
+          "label": "Exam trap",
+          "leftValue": "Detective is not preventive",
+          "rightValue": "Proactive applies to supported CloudFormation provisioning paths"
+        }
+      ],
+      "sourceQuestions": []
+    },
+    {
+      "id": "cmp-access-analyzer-types",
+      "topicId": "access_analyzer_abac",
+      "leftService": "External / internal access analyzers",
+      "rightService": "Unused access analyzer",
+      "dimensions": [
+        {
+          "id": "question",
+          "label": "Question answered",
+          "leftValue": "Who can access these resources?",
+          "rightValue": "Which identities or permissions have not been used?"
+        },
+        {
+          "id": "evidence",
+          "label": "Evidence",
+          "leftValue": "Policy reasoning and access paths",
+          "rightValue": "Last-accessed activity"
+        },
+        {
+          "id": "external",
+          "label": "External boundary",
+          "leftValue": "External analyzer uses an account or organization zone of trust",
+          "rightValue": "Not a zone-of-trust analysis"
+        },
+        {
+          "id": "result",
+          "label": "Operational action",
+          "leftValue": "Remove unintended public, cross-account, or internal access",
+          "rightValue": "Delete stale credentials and reduce unused permissions"
+        }
+      ],
+      "sourceQuestions": []
+    },
+    {
+      "id": "cmp-rbac-vs-abac",
+      "topicId": "access_analyzer_abac",
+      "leftService": "Role-based access control",
+      "rightService": "Attribute-based access control",
+      "dimensions": [
+        {
+          "id": "basis",
+          "label": "Authorization basis",
+          "leftValue": "Job function and explicitly scoped policies",
+          "rightValue": "Principal, resource, and session attributes such as tags"
+        },
+        {
+          "id": "scale",
+          "label": "Scaling behavior",
+          "leftValue": "New resources often require policy updates",
+          "rightValue": "New correctly tagged resources can be covered automatically"
+        },
+        {
+          "id": "policy-count",
+          "label": "Policy count",
+          "leftValue": "Often grows with roles and projects",
+          "rightValue": "Can use a smaller reusable policy set"
+        },
+        {
+          "id": "risk",
+          "label": "Primary risk",
+          "leftValue": "Policy sprawl",
+          "rightValue": "Weak tag governance or unauthorized tag changes"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 24
+        }
+      ]
+    },
+    {
+      "id": "cmp-service-catalog-vs-proton",
+      "topicId": "service_catalog_proton",
+      "leftService": "AWS Service Catalog",
+      "rightService": "AWS Proton",
+      "dimensions": [
+        {
+          "id": "goal",
+          "label": "Primary goal",
+          "leftValue": "Curated catalog of approved IT products for governed self-service",
+          "rightValue": "Platform templates for infrastructure and application-service deployment"
+        },
+        {
+          "id": "user",
+          "label": "Primary user",
+          "leftValue": "Broad enterprise end users and administrators",
+          "rightValue": "Platform engineering and application-development teams"
+        },
+        {
+          "id": "control",
+          "label": "Core objects",
+          "leftValue": "Products, portfolios, constraints, TagOptions, provisioned products",
+          "rightValue": "Environment templates, service templates, environments, services, components"
+        },
+        {
+          "id": "current",
+          "label": "Current planning note",
+          "leftValue": "Active governance service",
+          "rightValue": "AWS will discontinue support on October 7, 2026; deployed infrastructure remains intact"
+        }
+      ],
+      "sourceQuestions": [
+        {
+          "bank": "verified",
+          "questionId": 99
+        }
+      ]
+    }
+  ],
+  "drillDefinitions": [
+    {
+      "drillId": "sgm-org-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "organizations_governance",
+      "domainId": "security_compliance",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "SCP and boundary control sentence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the permission model before selecting a policy type.",
+      "prompt": "An SCP limits principals across member accounts. A permissions boundary limits one IAM user or role. Neither grants permissions. The identity or resource policy must still allow the action, and any applicable explicit deny wins.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "member accounts",
+        "one IAM user or role",
+        "does not grant",
+        "explicit deny"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "SCP y boundary son techos, no permisos. La diferencia decisiva es el alcance: organización/cuenta versus entidad IAM.",
+        "testedPattern": "SCP versus permissions boundary",
+        "correctChoiceWins": "Separar alcance y función evita elegir un SCP para delegar IAM dentro de una cuenta o una boundary para gobernar OUs.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "organizations",
+        "scp",
+        "permissions-boundary"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-org-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "organizations_governance",
+      "domainId": "security_compliance",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Organization guardrail or delegated IAM ceiling",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A central security team must prevent every principal in production member accounts, including the account root user, from disabling CloudTrail. Which control is MOST appropriate?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Attach a deny SCP to the production OU."
+        },
+        {
+          "id": "B",
+          "label": "Attach a permissions boundary to one deployment role."
+        },
+        {
+          "id": "C",
+          "label": "Add an allow statement to the CloudTrail trail policy."
+        },
+        {
+          "id": "D",
+          "label": "Create an IAM group in the management account."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "every principal",
+        "member accounts",
+        "including root",
+        "production OU"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "A boundary can cap a role's permissions.",
+          "failure": "It applies only to selected IAM entities, not every principal in all accounts in the OU."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "A resource-side policy can authorize service access.",
+          "failure": "An allow cannot enforce an organization-wide deny on principals."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "The management account centrally administers the organization.",
+          "failure": "An IAM group does not impose a guardrail on member-account principals."
+        }
+      ],
+      "explanation": {
+        "concise": "Every principal + member accounts + OU apunta a SCP.",
+        "testedPattern": "Organization-wide preventive permission guardrail",
+        "correctChoiceWins": "A aplica el deny central al alcance correcto; las demás opciones son de identidad o recurso local.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "organizations",
+        "scp",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-org-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "organizations_governance",
+      "domainId": "security_compliance",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a safe SCP rollout",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A company will introduce a restrictive SCP without locking out production workloads.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "inventory",
+          "label": "Review service last-accessed data and CloudTrail usage to identify required actions."
+        },
+        {
+          "id": "test-ou",
+          "label": "Create a test OU and attach the proposed SCP there."
+        },
+        {
+          "id": "pilot",
+          "label": "Move noncritical accounts into the test OU in small batches."
+        },
+        {
+          "id": "observe",
+          "label": "Monitor denied actions and adjust the policy."
+        },
+        {
+          "id": "expand",
+          "label": "Roll out the validated SCP to broader production OUs."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "inventory",
+          "test-ou",
+          "pilot",
+          "observe",
+          "expand"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "last accessed",
+        "test OU",
+        "small batches",
+        "denied actions"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Un SCP mal probado puede bloquear incluso administradores de cuentas miembro.",
+        "testedPattern": "Safe SCP deployment",
+        "correctChoiceWins": "El orden usa evidencia, aislamiento y expansión gradual antes de afectar toda la organización.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "organizations",
+        "scp",
+        "workflow"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-org-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "organizations_governance",
+      "domainId": "security_compliance",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map permission controls to their scope",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each control to the responsibility it owns.",
+      "answerOptions": [
+        {
+          "id": "org-maximum",
+          "label": "Sets maximum available permissions for member-account principals"
+        },
+        {
+          "id": "entity-maximum",
+          "label": "Caps one IAM user or role"
+        },
+        {
+          "id": "principal-grant",
+          "label": "Grants actions to a user or role"
+        },
+        {
+          "id": "resource-owner",
+          "label": "Authorizes access from the resource-owning side"
+        },
+        {
+          "id": "baseline-deploy",
+          "label": "Deploys repeatable resources across organization accounts and Regions"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "scp",
+          "label": "Service control policy"
+        },
+        {
+          "id": "boundary",
+          "label": "Permissions boundary"
+        },
+        {
+          "id": "identity-policy",
+          "label": "Identity-based policy"
+        },
+        {
+          "id": "resource-policy",
+          "label": "Resource-based policy"
+        },
+        {
+          "id": "stackset",
+          "label": "Service-managed CloudFormation StackSet"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "scp": "org-maximum",
+          "boundary": "entity-maximum",
+          "identity-policy": "principal-grant",
+          "resource-policy": "resource-owner",
+          "stackset": "baseline-deploy"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "scope",
+        "member account",
+        "IAM entity",
+        "resource owner",
+        "StackSet"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La mayoría de distractores usa un mecanismo real en el alcance equivocado.",
+        "testedPattern": "Multi-account governance ownership",
+        "correctChoiceWins": "El mapeo conecta cada control con su unidad de gobierno correcta.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "organizations",
+        "architecture-mapping",
+        "policy-scope"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-org-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "organizations_governance",
+      "domainId": "security_compliance",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate the SCP-grants-access assumption",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A member account has an SCP that allows Amazon S3 actions. A developer role has no identity policy granting S3 access. The developer cannot list a bucket. What is the correct explanation?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "The SCP allows S3 only as a maximum; the role still needs an applicable permission grant."
+        },
+        {
+          "id": "B",
+          "label": "The SCP should be attached directly to the IAM role."
+        },
+        {
+          "id": "C",
+          "label": "The developer must sign in as the member-account root user because SCPs grant only root access."
+        },
+        {
+          "id": "D",
+          "label": "The organization must disable all features before the SCP can grant access."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "SCP allows",
+        "no identity policy",
+        "cannot list"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Policies are often attached directly to IAM identities.",
+          "failure": "SCPs attach to organization entities, not directly to a role."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "knowledge_gap",
+          "attraction": "Root has broad account authority.",
+          "failure": "SCPs do not grant root access and can restrict the member-account root user."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "SCP availability depends on Organizations features.",
+          "failure": "Disabling all features would remove SCP functionality rather than grant permissions."
+        }
+      ],
+      "explanation": {
+        "concise": "Allow en un SCP no equivale a grant.",
+        "testedPattern": "SCP as permission ceiling",
+        "correctChoiceWins": "A preserva la intersección correcta entre guardrail y permisos IAM.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "organizations",
+        "scp",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-org-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "organizations_governance",
+      "domainId": "security_compliance",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Automatic baseline for new organization accounts",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company must deploy mandatory IAM roles and centralized logging resources to every current and future account in selected OUs. Resources should be removed automatically when an account leaves the target OU. Which solution has the LOWEST operational overhead?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use a service-managed CloudFormation StackSet targeted to the OUs with automatic deployment and the required account-removal behavior."
+        },
+        {
+          "id": "B",
+          "label": "Maintain a spreadsheet of account IDs and run the CloudFormation CLI manually for each account."
+        },
+        {
+          "id": "C",
+          "label": "Create one IAM user in every account and use its long-term credentials from a central script."
+        },
+        {
+          "id": "D",
+          "label": "Use an SCP to create the IAM roles and logging resources."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "current and future accounts",
+        "selected OUs",
+        "automatically",
+        "LOWEST operational overhead"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Manual CLI deployment can create the resources.",
+          "failure": "It does not auto-onboard future accounts or handle OU removal reliably."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "A central script can automate provisioning.",
+          "failure": "Long-term per-account credentials add security and lifecycle overhead."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "SCPs govern accounts centrally.",
+          "failure": "An SCP limits permissions; it does not provision resources."
+        }
+      ],
+      "explanation": {
+        "concise": "OU targeting + future accounts + automatic removal es el patrón de service-managed StackSets.",
+        "testedPattern": "Organization-aware baseline deployment",
+        "correctChoiceWins": "A usa integración nativa con Organizations sin inventarios manuales ni credenciales permanentes.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 1
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "organizations",
+        "stacksets",
+        "exam-scenario"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-org-bank-01",
+      "version": "drill-definition-v1",
+      "topicId": "organizations_governance",
+      "domainId": "security_compliance",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: organization account baseline",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive governance pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "hundreds of accounts",
+        "new accounts",
+        "automatic",
+        "remove when account leaves",
+        "lowest overhead"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno consolida StackSets con service-managed permissions y automatic deployment.",
+        "testedPattern": "Organization-scale baseline deployment",
+        "correctChoiceWins": "La opción correcta modela recursos repetibles y deja que Organizations controle el ciclo de cuentas.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 1
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "organizations",
+        "stacksets"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-controltower-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "control_tower_governance",
+      "domainId": "security_compliance",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Preventive, detective, and proactive controls",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read when each control acts.",
+      "prompt": "Preventive controls block prohibited actions through Organizations policies. Detective controls use AWS Config rules to report deployed noncompliance. Proactive controls use CloudFormation hooks to reject noncompliant resources before supported CloudFormation provisioning.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "block actions",
+        "report noncompliance",
+        "before provisioning",
+        "CloudFormation hooks"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Preventive bloquea, detective encuentra después y proactive valida antes del provisioning de CloudFormation.",
+        "testedPattern": "Control Tower control behavior",
+        "correctChoiceWins": "La etapa del ciclo de vida es la pista más fiable para elegir el tipo de control.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "control-tower",
+        "controls",
+        "mechanism"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-controltower-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "control_tower_governance",
+      "domainId": "security_compliance",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Detective or proactive control",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company wants CloudFormation deployments to fail before creating an S3 bucket that lacks required encryption settings. Which Control Tower control behavior directly matches this requirement?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Proactive control implemented with a CloudFormation hook"
+        },
+        {
+          "id": "B",
+          "label": "Detective control implemented with an AWS Config rule only"
+        },
+        {
+          "id": "C",
+          "label": "A dashboard-only elective control"
+        },
+        {
+          "id": "D",
+          "label": "A permissions boundary on the bucket"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "fail before creating",
+        "CloudFormation deployments",
+        "required settings"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "AWS Config detects noncompliant resources.",
+          "failure": "Detective evaluation occurs after a resource exists; the requirement is pre-provisioning failure."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "Dashboards expose governance status.",
+          "failure": "Visibility does not reject the deployment."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Permissions boundaries are IAM controls.",
+          "failure": "They attach to IAM users or roles, not S3 buckets."
+        }
+      ],
+      "explanation": {
+        "concise": "Before creating + CloudFormation apunta a proactive control.",
+        "testedPattern": "Pre-provisioning governance",
+        "correctChoiceWins": "A usa el mecanismo diseñado para bloquear recursos no conformes antes de crearlos.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "control-tower",
+        "proactive-control",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-controltower-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "control_tower_governance",
+      "domainId": "security_compliance",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order an OU control rollout",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A security team will apply a new strongly recommended control to production accounts.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "classify",
+          "label": "Confirm the control behavior, guidance, supported Regions, and affected resource paths."
+        },
+        {
+          "id": "sandbox",
+          "label": "Enable the control on a sandbox OU."
+        },
+        {
+          "id": "test",
+          "label": "Run compliant and noncompliant test cases and verify expected statuses or blocks."
+        },
+        {
+          "id": "remediate",
+          "label": "Remediate existing violations and prepare exception handling."
+        },
+        {
+          "id": "production",
+          "label": "Enable the control on the production OU and monitor control drift and violations."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "classify",
+          "sandbox",
+          "test",
+          "remediate",
+          "production"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "behavior",
+        "supported Regions",
+        "sandbox OU",
+        "violations",
+        "drift"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El mismo nombre de control puede ocultar comportamientos distintos; primero se valida cómo y dónde actúa.",
+        "testedPattern": "Safe Control Tower control rollout",
+        "correctChoiceWins": "El orden reduce bloqueos inesperados y separa habilitación de remediación.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "control-tower",
+        "workflow",
+        "ou"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-controltower-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "control_tower_governance",
+      "domainId": "security_compliance",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map Control Tower components",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each component to the responsibility it owns.",
+      "answerOptions": [
+        {
+          "id": "governed-foundation",
+          "label": "Establishes the multi-account governance foundation"
+        },
+        {
+          "id": "account-grouping",
+          "label": "Groups accounts for policy and control scope"
+        },
+        {
+          "id": "account-provisioning",
+          "label": "Creates governed accounts from approved account configurations"
+        },
+        {
+          "id": "block-api",
+          "label": "Disallows actions that cause policy violations"
+        },
+        {
+          "id": "config-evaluate",
+          "label": "Reports deployed resource noncompliance"
+        },
+        {
+          "id": "pre-cfn",
+          "label": "Rejects unsupported configuration before CloudFormation provisions the resource"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "landing-zone",
+          "label": "Landing zone"
+        },
+        {
+          "id": "ou",
+          "label": "Organizational unit"
+        },
+        {
+          "id": "account-factory",
+          "label": "Account Factory"
+        },
+        {
+          "id": "preventive",
+          "label": "Preventive control"
+        },
+        {
+          "id": "detective",
+          "label": "Detective control"
+        },
+        {
+          "id": "proactive",
+          "label": "Proactive control"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "landing-zone": "governed-foundation",
+          "ou": "account-grouping",
+          "account-factory": "account-provisioning",
+          "preventive": "block-api",
+          "detective": "config-evaluate",
+          "proactive": "pre-cfn"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "landing zone",
+        "OU",
+        "Account Factory",
+        "preventive",
+        "detective",
+        "proactive"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Control Tower organiza fundación, cuentas, alcance y controles; no reemplaza IAM local ni despliega aplicaciones por sí solo.",
+        "testedPattern": "Control Tower component ownership",
+        "correctChoiceWins": "El mapeo evita confundir creación de cuenta con aplicación de controls o detección con prevención.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "control-tower",
+        "architecture-mapping",
+        "governance"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-controltower-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "control_tower_governance",
+      "domainId": "security_compliance",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate Control Tower as a permission grant",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A workload team cannot deploy to an EKS cluster in its member account from a centralized DevOps account. The organization is governed by Control Tower. Which statement is MOST accurate?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Control Tower governance does not itself grant cluster deployment access; the pipeline still needs a target-account role trust path and EKS authorization."
+        },
+        {
+          "id": "B",
+          "label": "The Control Tower landing zone automatically grants every central pipeline administrator access to every EKS cluster."
+        },
+        {
+          "id": "C",
+          "label": "A detective control can replace sts:AssumeRole and Kubernetes authorization."
+        },
+        {
+          "id": "D",
+          "label": "Moving the account to another OU automatically creates the required EKS role mapping."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "cannot deploy",
+        "member account",
+        "centralized DevOps",
+        "Control Tower"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Control Tower centralizes multi-account governance.",
+          "failure": "Governance does not automatically grant workload-specific deployment permissions."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Detective controls identify violations.",
+          "failure": "They do not create STS trust or Kubernetes permissions."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "OU placement changes inherited governance.",
+          "failure": "It does not create application-specific IAM and EKS authorization."
+        }
+      ],
+      "explanation": {
+        "concise": "Control Tower es contexto de gobierno, no un sustituto de trust policy, IAM permissions y EKS access.",
+        "testedPattern": "Governance versus workload authorization",
+        "correctChoiceWins": "A separa correctamente cuenta/OU de la ruta real de acceso al cluster.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "control-tower",
+        "eks",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-controltower-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "control_tower_governance",
+      "domainId": "security_compliance",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Choose the control behavior from the lifecycle point",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company wants three governance outcomes: prevent member accounts from leaving the organization, report existing unencrypted EBS volumes, and reject new noncompliant CloudFormation resources before creation. Which mapping is correct?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Preventive control for leaving the organization; detective control for existing EBS volumes; proactive control for pre-provisioning CloudFormation validation"
+        },
+        {
+          "id": "B",
+          "label": "Detective control for all three outcomes"
+        },
+        {
+          "id": "C",
+          "label": "Proactive control for leaving the organization; preventive control for existing EBS volumes; detective control before CloudFormation creation"
+        },
+        {
+          "id": "D",
+          "label": "Permissions boundaries for all three outcomes"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "prevent",
+        "report existing",
+        "reject before creation"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "Detective controls report violations.",
+          "failure": "They cannot satisfy explicit preventive and pre-provisioning requirements."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "All three control behaviors are real.",
+          "failure": "The lifecycle mapping is reversed."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Boundaries cap IAM entities.",
+          "failure": "They are not the Control Tower mechanisms for account and resource governance."
+        }
+      ],
+      "explanation": {
+        "concise": "Las tres palabras del escenario mapean uno a uno: prevent, report existing, reject before creation.",
+        "testedPattern": "Control behavior lifecycle mapping",
+        "correctChoiceWins": "A asigna cada resultado al comportamiento correcto.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "control-tower",
+        "exam-scenario",
+        "controls"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-controltower-bank-20",
+      "version": "drill-definition-v1",
+      "topicId": "control_tower_governance",
+      "domainId": "security_compliance",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: Control Tower context versus actual authorization",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive governance pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "central DevOps account",
+        "application account",
+        "sts:AssumeRole",
+        "EKS access"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "La pregunta menciona Control Tower, pero el mecanismo decisivo es un rol en la cuenta destino y autorización de EKS. En implementaciones actuales se prefieren EKS access entries; aws-auth es legado.",
+        "testedPattern": "Do not confuse governance context with workload authorization",
+        "correctChoiceWins": "La respuesta correcta coloca trust y permisos en la cuenta que posee el cluster.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 20
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "control-tower",
+        "eks",
+        "cross-account"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-access-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "access_analyzer_abac",
+      "domainId": "security_compliance",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Analyzer type and ABAC control sentence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the four distinct access questions.",
+      "prompt": "External analyzers find access outside a zone of trust. Internal analyzers show trusted principals that can reach selected critical resources. Unused analyzers find stale identities and permissions. ABAC grants dynamically when principal and resource attributes match.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "outside zone of trust",
+        "internal access",
+        "unused",
+        "attributes match"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Access Analyzer diagnostica quién puede o no usa acceso; ABAC diseña autorización escalable.",
+        "testedPattern": "Access analysis versus authorization design",
+        "correctChoiceWins": "Separar análisis de granting evita usar Access Analyzer como si aplicara permisos.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "access-analyzer",
+        "abac",
+        "mechanism"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-access-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "access_analyzer_abac",
+      "domainId": "security_compliance",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "External access or unused access",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "Security must identify S3 buckets and IAM roles that are accessible by principals outside the AWS organization. Which analyzer should be created?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "An organization-level external access analyzer"
+        },
+        {
+          "id": "B",
+          "label": "An unused access analyzer"
+        },
+        {
+          "id": "C",
+          "label": "A CloudFormation drift detector"
+        },
+        {
+          "id": "D",
+          "label": "A permissions boundary"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "outside the AWS organization",
+        "S3 buckets",
+        "IAM roles"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "service_confusion",
+          "attraction": "Unused analyzers inspect IAM access patterns.",
+          "failure": "They find stale credentials and unused permissions, not external resource sharing."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "wrong_resource_scope",
+          "attraction": "Drift detection compares stack resources with templates.",
+          "failure": "It does not reason over external principals."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "A boundary can constrain an IAM identity.",
+          "failure": "It does not discover existing public or cross-account access."
+        }
+      ],
+      "explanation": {
+        "concise": "Outside the organization define la zone of trust del external analyzer.",
+        "testedPattern": "External access discovery",
+        "correctChoiceWins": "A analiza políticas de recursos soportados y genera findings para principals externos.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "access-analyzer",
+        "external-access",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-access-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "access_analyzer_abac",
+      "domainId": "security_compliance",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order an ABAC rollout",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A company will replace project-specific IAM policy sprawl with tag-based access.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "model",
+          "label": "Define controlled attribute keys, values, ownership, and supported services."
+        },
+        {
+          "id": "govern",
+          "label": "Restrict who can set or modify principal and resource tags."
+        },
+        {
+          "id": "policy",
+          "label": "Create policies that compare principal or session tags with resource tags and constrain tag-on-create behavior."
+        },
+        {
+          "id": "pilot",
+          "label": "Pilot with one project and test allowed, denied, and tag-tampering paths."
+        },
+        {
+          "id": "scale",
+          "label": "Expand to new projects and monitor authorization and tagging compliance."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "model",
+          "govern",
+          "policy",
+          "pilot",
+          "scale"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "attribute keys",
+        "restrict tag changes",
+        "principal tag",
+        "resource tag",
+        "tampering"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "ABAC escala solo si las etiquetas usadas para autorizar están gobernadas.",
+        "testedPattern": "Safe ABAC implementation",
+        "correctChoiceWins": "El orden diseña primero el atributo y bloquea escalamiento por cambio de tags antes de expandir.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "abac",
+        "workflow",
+        "tag-governance"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-access-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "access_analyzer_abac",
+      "domainId": "security_compliance",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map access-analysis capabilities",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each capability to the question it answers.",
+      "answerOptions": [
+        {
+          "id": "outside-trust",
+          "label": "Which supported resources are shared outside the zone of trust?"
+        },
+        {
+          "id": "inside-path",
+          "label": "Which trusted principals can reach selected critical resources?"
+        },
+        {
+          "id": "stale",
+          "label": "Which identities, credentials, services, or actions are not being used?"
+        },
+        {
+          "id": "policy-quality",
+          "label": "Does the proposed policy contain errors, warnings, or newly granted access?"
+        },
+        {
+          "id": "cloudtrail-policy",
+          "label": "What least-privilege policy can be drafted from observed CloudTrail activity?"
+        },
+        {
+          "id": "dynamic-auth",
+          "label": "May this principal act on a resource whose attributes match?"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "external",
+          "label": "External access analyzer"
+        },
+        {
+          "id": "internal",
+          "label": "Internal access analyzer"
+        },
+        {
+          "id": "unused",
+          "label": "Unused access analyzer"
+        },
+        {
+          "id": "validation",
+          "label": "Policy validation and custom checks"
+        },
+        {
+          "id": "generation",
+          "label": "Policy generation"
+        },
+        {
+          "id": "abac",
+          "label": "ABAC policy"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "external": "outside-trust",
+          "internal": "inside-path",
+          "unused": "stale",
+          "validation": "policy-quality",
+          "generation": "cloudtrail-policy",
+          "abac": "dynamic-auth"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "external",
+        "internal",
+        "unused",
+        "validate",
+        "generate",
+        "ABAC"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Access Analyzer tiene varias capacidades; no todas producen el mismo tipo de evidencia.",
+        "testedPattern": "IAM Access Analyzer capability selection",
+        "correctChoiceWins": "El mapeo convierte nombres parecidos en preguntas operativas distintas.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "access-analyzer",
+        "architecture-mapping",
+        "abac"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-access-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "access_analyzer_abac",
+      "domainId": "security_compliance",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate the unmanaged-tag ABAC design",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "An ABAC policy allows developers to manage resources when aws:PrincipalTag/Project equals aws:ResourceTag/Project. Developers can also freely change the Project tag on any resource. What is the primary security flaw?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Developers can retag resources into a project they are allowed to access, creating privilege escalation."
+        },
+        {
+          "id": "B",
+          "label": "ABAC policies cannot compare principal and resource tags."
+        },
+        {
+          "id": "C",
+          "label": "Only SCPs can use condition keys."
+        },
+        {
+          "id": "D",
+          "label": "Access Analyzer automatically prevents every tag modification."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "freely change",
+        "Project tag",
+        "primary security flaw"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "knowledge_gap",
+          "attraction": "Tag compatibility varies by service and action.",
+          "failure": "ABAC explicitly supports principal-to-resource tag conditions where the service supports them."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "SCPs can contain conditions.",
+          "failure": "IAM identity policies also use condition keys."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Access Analyzer identifies access risks and validates policies.",
+          "failure": "It does not automatically block all tag changes."
+        }
+      ],
+      "explanation": {
+        "concise": "La etiqueta es parte de la autorización; quien puede alterarla puede alterar el resultado de autorización.",
+        "testedPattern": "ABAC tag-tampering risk",
+        "correctChoiceWins": "A identifica el camino real de escalamiento y la necesidad de gobernar tag-on-create y tag mutation.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "abac",
+        "tag-governance",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-access-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "access_analyzer_abac",
+      "domainId": "security_compliance",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Scalable project authorization",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company creates new projects and resources every week. Administrators currently update project-specific IAM policies whenever a resource is added. The company wants fewer policies and automatic access to correctly classified new resources. Which solution is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use ABAC policies that compare controlled project tags on principals or sessions with project tags on resources, and restrict who can set the authorization tags."
+        },
+        {
+          "id": "B",
+          "label": "Create one new IAM managed policy for every resource."
+        },
+        {
+          "id": "C",
+          "label": "Use an SCP to grant each project role access to its resources."
+        },
+        {
+          "id": "D",
+          "label": "Make all resources public and use naming conventions for separation."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "new projects",
+        "every week",
+        "fewer policies",
+        "automatic access",
+        "classified"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "Resource-specific policies can enforce least privilege.",
+          "failure": "They preserve the stated policy-sprawl problem."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "SCPs apply central limits.",
+          "failure": "They do not grant project access."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "Naming conventions simplify identification.",
+          "failure": "They are not an authorization boundary and public access violates security."
+        }
+      ],
+      "explanation": {
+        "concise": "Escala, menos políticas y recursos nuevos correctamente clasificados forman el patrón ABAC.",
+        "testedPattern": "Attribute-based authorization at scale",
+        "correctChoiceWins": "A reduce actualización manual sin omitir la gobernanza de tags que evita escalamiento.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 24
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "abac",
+        "exam-scenario",
+        "scalable-authorization"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-access-bank-24",
+      "version": "drill-definition-v1",
+      "topicId": "access_analyzer_abac",
+      "domainId": "security_compliance",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: dynamic authorization for new resources",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive governance pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "frequent policy updates",
+        "new resources",
+        "tags",
+        "ABAC"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno refuerza que ABAC cubre recursos nuevos cuando los atributos están gobernados y coinciden.",
+        "testedPattern": "ABAC scaling pattern",
+        "correctChoiceWins": "La respuesta correcta elimina la necesidad de editar una política por cada recurso nuevo.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 24
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "abac",
+        "tags"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-catalog-mechanism-01",
+      "version": "drill-definition-v1",
+      "topicId": "service_catalog_proton",
+      "domainId": "security_compliance",
+      "activityType": "mechanism_review",
+      "drillForm": "mechanism_review",
+      "title": "Governed self-service control sentence",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Read the Service Catalog object model and Proton status note.",
+      "prompt": "Service Catalog packages approved architectures as products, organizes them in portfolios, applies constraints and TagOptions, and lets users create provisioned products without broad service permissions. AWS Proton used platform templates for environments and services, but AWS will discontinue Proton support on October 7, 2026; deployed infrastructure remains intact.",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {},
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "product",
+        "portfolio",
+        "constraints",
+        "TagOptions",
+        "October 7, 2026"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Service Catalog sigue siendo la opción de self-service gobernado. Proton debe estudiarse como patrón legado y de migración, no como inversión futura.",
+        "testedPattern": "Governed self-service and current service lifecycle",
+        "correctChoiceWins": "La explicación conserva conocimiento de examen sin recomendar una plataforma con fin de soporte anunciado.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "service-catalog",
+        "proton",
+        "mechanism",
+        "current-awareness"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-catalog-binary-01",
+      "version": "drill-definition-v1",
+      "topicId": "service_catalog_proton",
+      "domainId": "security_compliance",
+      "activityType": "binary_comparison",
+      "drillForm": "binary_comparison",
+      "title": "Service Catalog or direct CloudFormation access",
+      "difficulty": "intro",
+      "estimatedMinutes": 3,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "Junior developers must launch approved multi-tier stacks with required tags, but they must not receive general write access to EC2, RDS, or IAM. Which solution is MOST appropriate?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Publish approved templates as Service Catalog products in portfolios, apply constraints and tags, and grant users access to the portfolios."
+        },
+        {
+          "id": "B",
+          "label": "Grant AdministratorAccess and provide a naming guide."
+        },
+        {
+          "id": "C",
+          "label": "Allow direct CloudFormation and unrestricted iam:PassRole to every role."
+        },
+        {
+          "id": "D",
+          "label": "Use AWS Config only after users create resources freely."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "approved",
+        "required tags",
+        "must not receive general write access",
+        "self-service"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "elimination_failure",
+          "attraction": "Documentation can guide users.",
+          "failure": "It does not enforce architecture, tagging, or least privilege."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "incorrect_assumption",
+          "attraction": "CloudFormation provides repeatable deployment.",
+          "failure": "Unrestricted direct access and PassRole undermine the governance requirement."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "missed_keyword",
+          "attraction": "Config can detect noncompliance.",
+          "failure": "The requirement is controlled self-service, not detection after unrestricted creation."
+        }
+      ],
+      "explanation": {
+        "concise": "Approved products + self-service + no direct write access es el patrón Service Catalog.",
+        "testedPattern": "Service Catalog service fit",
+        "correctChoiceWins": "A permite provisionar solo productos curados bajo constraints.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 99
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "service-catalog",
+        "self-service",
+        "binary-comparison"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-catalog-order-01",
+      "version": "drill-definition-v1",
+      "topicId": "service_catalog_proton",
+      "domainId": "security_compliance",
+      "activityType": "workflow_ordering",
+      "drillForm": "workflow_ordering",
+      "title": "Order a Service Catalog rollout",
+      "difficulty": "practice",
+      "estimatedMinutes": 4,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Place the operational steps in the correct order.",
+      "prompt": "A platform team will provide an approved database-backed application stack.",
+      "answerOptions": [],
+      "workflowItems": [
+        {
+          "id": "template",
+          "label": "Create and validate the versioned infrastructure template and documentation."
+        },
+        {
+          "id": "product",
+          "label": "Create a Service Catalog product and provisioning artifact version."
+        },
+        {
+          "id": "portfolio",
+          "label": "Add the product to the correct portfolio."
+        },
+        {
+          "id": "govern",
+          "label": "Configure launch constraints, TagOptions, and portfolio access."
+        },
+        {
+          "id": "provision",
+          "label": "Have a test user launch, update, and terminate a provisioned product."
+        }
+      ],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "workflowOrder": [
+          "template",
+          "product",
+          "portfolio",
+          "govern",
+          "provision"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "versioned template",
+        "product",
+        "portfolio",
+        "constraints",
+        "provisioned product"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El usuario final consume un provisioned product; no consume directamente la plantilla administrativa.",
+        "testedPattern": "Service Catalog publishing workflow",
+        "correctChoiceWins": "El orden conecta artefacto técnico, producto, distribución, guardrails y experiencia real del usuario.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "service-catalog",
+        "workflow",
+        "product"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-catalog-map-01",
+      "version": "drill-definition-v1",
+      "topicId": "service_catalog_proton",
+      "domainId": "security_compliance",
+      "activityType": "architecture_mapping",
+      "drillForm": "architecture_mapping",
+      "title": "Map Service Catalog and Proton objects",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Map each component to the responsibility it owns.",
+      "prompt": "Match each object to its responsibility.",
+      "answerOptions": [
+        {
+          "id": "approved-definition",
+          "label": "Represents an approved deployable IT service"
+        },
+        {
+          "id": "distribution",
+          "label": "Groups products and grants teams access"
+        },
+        {
+          "id": "provisioning-role",
+          "label": "Controls how the product is launched, including the role used"
+        },
+        {
+          "id": "standard-tags",
+          "label": "Provides governed selectable tags during provisioning"
+        },
+        {
+          "id": "running-instance",
+          "label": "Represents a user's deployed instance of a catalog product"
+        },
+        {
+          "id": "legacy-platform-pattern",
+          "label": "Defined standardized application-service infrastructure and pipeline patterns"
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [
+        {
+          "id": "product",
+          "label": "Service Catalog product"
+        },
+        {
+          "id": "portfolio",
+          "label": "Service Catalog portfolio"
+        },
+        {
+          "id": "launch-constraint",
+          "label": "Launch constraint"
+        },
+        {
+          "id": "tag-option",
+          "label": "TagOption"
+        },
+        {
+          "id": "provisioned-product",
+          "label": "Provisioned product"
+        },
+        {
+          "id": "proton-service-template",
+          "label": "Proton service template"
+        }
+      ],
+      "expectedAnswer": {
+        "mappings": {
+          "product": "approved-definition",
+          "portfolio": "distribution",
+          "launch-constraint": "provisioning-role",
+          "tag-option": "standard-tags",
+          "provisioned-product": "running-instance",
+          "proton-service-template": "legacy-platform-pattern"
+        }
+      },
+      "evaluationRules": {
+        "allowPartialCredit": true,
+        "partialMappingCredit": true
+      },
+      "decisiveKeywords": [
+        "product",
+        "portfolio",
+        "constraint",
+        "TagOption",
+        "provisioned product",
+        "Proton"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "Producto y provisioned product no son lo mismo; uno es definición aprobada y el otro una instancia desplegada.",
+        "testedPattern": "Self-service platform object ownership",
+        "correctChoiceWins": "El mapeo evita confundir catálogo, distribución, ejecución y patrón legado de Proton.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "service-catalog",
+        "proton",
+        "architecture-mapping"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-catalog-eliminate-01",
+      "version": "drill-definition-v1",
+      "topicId": "service_catalog_proton",
+      "domainId": "security_compliance",
+      "activityType": "distractor_elimination",
+      "drillForm": "distractor_elimination",
+      "title": "Eliminate detection-only governance",
+      "difficulty": "practice",
+      "estimatedMinutes": 5,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "A company wants inexperienced users to create only approved architectures. Which option fails because it detects problems after users already receive broad creation permissions?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Grant broad service permissions and rely only on AWS Config rules to report noncompliant resources."
+        },
+        {
+          "id": "B",
+          "label": "Allow users to launch approved Service Catalog products and restrict direct write access to underlying services."
+        },
+        {
+          "id": "C",
+          "label": "Use portfolio access and launch constraints."
+        },
+        {
+          "id": "D",
+          "label": "Use versioned products with required TagOptions."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "only approved architectures",
+        "fails",
+        "after",
+        "broad creation permissions"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "incorrect_assumption",
+          "attraction": "Restricting direct writes can feel limiting.",
+          "failure": "It is exactly the preventive self-service pattern requested."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "service_confusion",
+          "attraction": "Constraints may sound like optional metadata.",
+          "failure": "They are a core governance mechanism in Service Catalog."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "elimination_failure",
+          "attraction": "TagOptions alone do not define the full architecture.",
+          "failure": "Combined with approved products they support the requested control rather than fail it."
+        }
+      ],
+      "explanation": {
+        "concise": "AWS Config es detective; no sustituye un catálogo preventivo cuando usuarios no deben crear recursos arbitrarios.",
+        "testedPattern": "Preventive self-service versus detective compliance",
+        "correctChoiceWins": "A deja el riesgo abierto y solo lo observa después.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "service-catalog",
+        "aws-config",
+        "distractor-elimination"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-catalog-scenario-01",
+      "version": "drill-definition-v1",
+      "topicId": "service_catalog_proton",
+      "domainId": "security_compliance",
+      "activityType": "exam_scenario",
+      "drillForm": "exam_scenario",
+      "title": "Choose the current platform-governance direction",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Choose the BEST answer.",
+      "prompt": "In July 2026, a company is designing a new long-lived self-service platform. Requirements include approved infrastructure products, portfolio-based access, launch constraints, and standardized tags. Which choice is BEST?",
+      "answerOptions": [
+        {
+          "id": "A",
+          "label": "Use AWS Service Catalog for the governed product catalog and avoid introducing a new dependency on AWS Proton because its support ends on October 7, 2026."
+        },
+        {
+          "id": "B",
+          "label": "Build the new platform entirely on AWS Proton and ignore the announced end-of-support date."
+        },
+        {
+          "id": "C",
+          "label": "Give every developer AdministratorAccess and document preferred templates."
+        },
+        {
+          "id": "D",
+          "label": "Use only CloudTrail because it prevents unapproved provisioning."
+        }
+      ],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "A"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "July 2026",
+        "new long-lived",
+        "approved products",
+        "portfolios",
+        "launch constraints",
+        "standardized tags"
+      ],
+      "distractorMetadata": [
+        {
+          "optionId": "B",
+          "errorCause": "missed_keyword",
+          "attraction": "Proton historically addressed platform templates.",
+          "failure": "A new long-lived dependency conflicts with the announced support end date."
+        },
+        {
+          "optionId": "C",
+          "errorCause": "elimination_failure",
+          "attraction": "Documentation can preserve flexibility.",
+          "failure": "It does not enforce governed products or least privilege."
+        },
+        {
+          "optionId": "D",
+          "errorCause": "service_confusion",
+          "attraction": "CloudTrail records API activity.",
+          "failure": "It is not a preventive self-service provisioning system."
+        }
+      ],
+      "explanation": {
+        "concise": "Los objetos requeridos son los de Service Catalog y la fecha hace decisivo evitar una nueva dependencia de Proton.",
+        "testedPattern": "Current service lifecycle plus product fit",
+        "correctChoiceWins": "A satisface la arquitectura y considera el ciclo de soporte vigente.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "service-catalog",
+        "proton",
+        "exam-scenario",
+        "current-awareness"
+      ],
+      "active": true
+    },
+    {
+      "drillId": "sgm-catalog-bank-99",
+      "version": "drill-definition-v1",
+      "topicId": "service_catalog_proton",
+      "domainId": "security_compliance",
+      "activityType": "bank_return",
+      "drillForm": "bank_return",
+      "title": "Bank return: approved self-service for inexperienced users",
+      "difficulty": "exam_like",
+      "estimatedMinutes": 7,
+      "promptLanguage": "en",
+      "reviewLanguage": "es",
+      "instructions": "Answer the referenced verified bank question without hints, then review the decisive governance pattern.",
+      "prompt": "",
+      "answerOptions": [],
+      "workflowItems": [],
+      "mappingItems": [],
+      "expectedAnswer": {
+        "optionIds": [
+          "C"
+        ]
+      },
+      "evaluationRules": {
+        "allowPartialCredit": false,
+        "partialMappingCredit": false
+      },
+      "decisiveKeywords": [
+        "approved architectures",
+        "tagging",
+        "inexperienced users",
+        "create resources"
+      ],
+      "distractorMetadata": [],
+      "explanation": {
+        "concise": "El retorno entrena el patrón CloudFormation template → Service Catalog product → governed self-service.",
+        "testedPattern": "Service Catalog preventive governance",
+        "correctChoiceWins": "La respuesta correcta permite crear recursos sin entregar acceso de escritura general a servicios subyacentes.",
+        "distractorReview": []
+      },
+      "sourceQuestionRefs": [
+        {
+          "bank": "verified",
+          "questionId": 99
+        }
+      ],
+      "prerequisiteTopicIds": [],
+      "tags": [
+        "bank-return",
+        "service-catalog",
+        "self-service"
+      ],
+      "active": true
+    }
+  ],
+  "sourceQuestionRefs": [
+    {
+      "bank": "verified",
+      "questionId": 1
+    },
+    {
+      "bank": "verified",
+      "questionId": 20
+    },
+    {
+      "bank": "verified",
+      "questionId": 23
+    },
+    {
+      "bank": "verified",
+      "questionId": 24
+    },
+    {
+      "bank": "verified",
+      "questionId": 32
+    },
+    {
+      "bank": "verified",
+      "questionId": 65
+    },
+    {
+      "bank": "verified",
+      "questionId": 99
+    }
+  ],
+  "prerequisiteRelationships": [
+    {
+      "topicId": "organizations_governance",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "control_tower_governance",
+      "prerequisiteTopicIds": [
+        "organizations_governance"
+      ]
+    },
+    {
+      "topicId": "access_analyzer_abac",
+      "prerequisiteTopicIds": []
+    },
+    {
+      "topicId": "service_catalog_proton",
+      "prerequisiteTopicIds": []
+    }
+  ],
+  "tags": [
+    "dop-c02",
+    "organizations",
+    "scp",
+    "permissions-boundary",
+    "control-tower",
+    "access-analyzer",
+    "abac",
+    "service-catalog",
+    "proton",
+    "multi-account",
+    "governance",
+    "personalized"
+  ]
+}
