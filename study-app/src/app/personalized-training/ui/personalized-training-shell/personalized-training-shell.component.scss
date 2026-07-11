@@ -82,6 +82,84 @@
   margin-top: 0;
 }
 
+::ng-deep .primary,
+::ng-deep .secondary,
+::ng-deep .ghost,
+::ng-deep .back-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 14px 18px;
+  border: 1px solid rgba(241, 179, 86, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    box-shadow 160ms ease;
+}
+
+::ng-deep .primary {
+  background: #f1b356;
+  color: #1b1409;
+}
+
+::ng-deep .secondary,
+::ng-deep .back-link {
+  background: rgba(241, 179, 86, 0.14);
+  color: #fff3da;
+}
+
+::ng-deep .ghost {
+  background: transparent;
+  color: #f1b356;
+  border-color: rgba(241, 179, 86, 0.3);
+}
+
+::ng-deep .back-link::before {
+  content: '<-';
+  font-size: 1rem;
+}
+
+::ng-deep .primary:hover,
+::ng-deep .secondary:hover,
+::ng-deep .ghost:hover,
+::ng-deep .back-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(241, 179, 86, 0.62);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
+}
+
+::ng-deep .primary:focus-visible,
+::ng-deep .secondary:focus-visible,
+::ng-deep .ghost:focus-visible,
+::ng-deep .back-link:focus-visible {
+  outline: 3px solid rgba(159, 209, 255, 0.72);
+  outline-offset: 3px;
+}
+
+::ng-deep .primary:disabled,
+::ng-deep .secondary:disabled,
+::ng-deep .ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+::ng-deep .compact-button {
+  min-height: 36px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+}
+
 .pt-notice {
   width: min(100%, 960px);
   margin: 0 auto;
