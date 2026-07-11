@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PersonalizedTrainingShellComponent } from './personalized-training/ui/personalized-training-shell/personalized-training-shell.component';
+import { SimulatorTrainingBridgeService } from './personalized-training/adapters/simulator-training-bridge.service';
 
 type CardType = 'learn' | 'compare' | 'decision' | 'trap' | 'mini-quiz';
 type SessionMode = 'learn' | 'review';
@@ -228,6 +229,7 @@ interface RuntimeSnapshot {
 export class App {
   private readonly http = inject(HttpClient);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly simulatorTrainingBridge = inject(SimulatorTrainingBridgeService);
   private audioContext: AudioContext | null = null;
   private simulatorNavigationPending = false;
   readonly appVersion = 'v1.3.10';
@@ -2027,6 +2029,11 @@ export class App {
       localStorage.setItem(SIMULATOR_HISTORY_STORAGE_KEY, JSON.stringify(updated));
       return updated;
     });
+    try {
+      this.simulatorTrainingBridge.syncCompletedSimulatorSession(session);
+    } catch {
+      // Personalized Training sync is best-effort and must not block simulator results.
+    }
   }
 
   private buildSimulatorExportRecords(): SimulatorAnswerExportRecord[] {

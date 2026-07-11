@@ -44,6 +44,7 @@ export const OVERTRAINING_LIMITS = {
 
 export const ACTIVITY_MINUTES = {
   mechanism_review: 5,
+  component_identification: 5,
   binary_comparison: 5,
   workflow_ordering: 7,
   architecture_mapping: 8,

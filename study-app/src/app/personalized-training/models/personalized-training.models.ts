@@ -113,6 +113,7 @@ export type ReviewUrgency = 'none' | 'low' | 'medium' | 'high' | 'urgent';
 export type TrainingEnergyLevel = 'low' | 'normal' | 'high';
 export type PlannedActivityType =
   | 'mechanism_review'
+  | 'component_identification'
   | 'binary_comparison'
   | 'workflow_ordering'
   | 'architecture_mapping'

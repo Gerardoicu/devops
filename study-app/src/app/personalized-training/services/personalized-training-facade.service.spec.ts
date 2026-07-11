@@ -81,7 +81,7 @@ describe('PersonalizedTrainingFacadeService', () => {
     expect(facade.uiState().notice?.message).not.toContain('low confidence');
   });
 
-  it('generates priorities and a plan through the Phase 3 service within selected minutes', () => {
+  it('generates priorities through Phase 3 and refuses an unexecutable plan when no drills are loaded', () => {
     facade.previewImportText(JSON.stringify(currentSchemaImportFixture));
     facade.commitImport();
 
@@ -89,7 +89,8 @@ describe('PersonalizedTrainingFacadeService', () => {
     facade.generatePlan(10, 'low', priorityEngineNow);
 
     expect(facade.uiState().prioritySnapshot?.priorityEngineVersion).toContain('priority');
-    expect(facade.uiState().plan?.estimatedMinutes).toBeLessThanOrEqual(10);
+    expect(facade.uiState().mode).toBe('content_unavailable');
+    expect(facade.uiState().plan).toBeNull();
     expect(facade.reasonLabels(['known_bank_issue_excluded', 'rushed_evidence_discounted'])).toContain('Evidencia conocida');
   });
 

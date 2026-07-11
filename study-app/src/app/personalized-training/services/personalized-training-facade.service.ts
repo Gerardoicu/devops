@@ -33,8 +33,13 @@ import { PersonalizedTrainingRuntimeService } from './personalized-training-runt
 import { PersonalizedTrainingStateService } from './personalized-training-state.service';
 import { createDrillReviewView } from '../utils/drill-evidence-conversion';
 import { PersonalizedTrainingPackageService } from './personalized-training-package.service';
-import { resolveTrainingPlanContent } from '../utils/personalized-training-content-selection';
+import {
+  ContentSelectionReasonCode,
+  createExecutablePlanFromResolution,
+  resolveTrainingPlanContent
+} from '../utils/personalized-training-content-selection';
 import { VerifiedBankQuestionResolverService } from '../adapters/verified-bank-question-resolver.service';
+import { SimulatorTrainingBridgeService, SimulatorTrainingSyncResult } from '../adapters/simulator-training-bridge.service';
 
 export type PersonalizedTrainingUiMode =
   | 'loading'
@@ -70,6 +75,20 @@ export interface PersonalizedTrainingSessionSummary {
   stopReason: RuntimeStopReason | null;
 }
 
+export interface PersonalizedTrainingDiagnostics {
+  loadedPackageCount: number;
+  loadedTopicCount: number;
+  loadedDrillCount: number;
+  syncedSimulatorSessionCount: number;
+  skippedDuplicateSimulatorSessionCount: number;
+  generatedPriorityCount: number;
+  plannedActivityCount: number;
+  resolvedActivityCount: number;
+  unresolvedActivityCount: number;
+  activeRuntimeActivity: string | null;
+  contentResolutionReasonCodes: ContentSelectionReasonCode[];
+}
+
 export interface PersonalizedTrainingUiState {
   mode: PersonalizedTrainingUiMode;
   notice: PersonalizedTrainingNotice | null;
@@ -82,6 +101,7 @@ export interface PersonalizedTrainingUiState {
   currentReview: DrillReviewView | null;
   summary: PersonalizedTrainingSessionSummary | null;
   content: PersonalizedTrainingLoadedContent | null;
+  diagnostics: PersonalizedTrainingDiagnostics;
 }
 
 const FALLBACK_NOW = '2026-07-10T12:00:00.000Z';
@@ -99,7 +119,8 @@ export class PersonalizedTrainingFacadeService {
     currentDraft: cloneDraft(DEFAULT_DRILL_ATTEMPT_DRAFT),
     currentReview: null,
     summary: null,
-    content: null
+    content: null,
+    diagnostics: emptyDiagnostics()
   });
   private readonly availableDefinitions = signal<readonly DrillDefinition[]>([]);
   private readonly activeDefinition = signal<DrillDefinition | null>(null);
@@ -126,11 +147,13 @@ export class PersonalizedTrainingFacadeService {
     private readonly stateService: PersonalizedTrainingStateService,
     private readonly contentService: PersonalizedTrainingContentService,
     private readonly packageService: PersonalizedTrainingPackageService,
-    private readonly bankResolver: VerifiedBankQuestionResolverService
+    private readonly bankResolver: VerifiedBankQuestionResolverService,
+    private readonly simulatorBridge: SimulatorTrainingBridgeService
   ) {}
 
   initialize(): void {
     try {
+      const syncResult = this.simulatorBridge.syncExistingSimulatorHistory();
       const persisted = this.stateService.loadState();
       this.state.update((current) => ({
         ...current,
@@ -138,12 +161,28 @@ export class PersonalizedTrainingFacadeService {
         runtimeSession: persisted.activeRuntimeSession,
         prioritySnapshot: persisted.latestPrioritySnapshot,
         plan: persisted.latestTrainingSessionPlan,
-        notice: null
+        notice: syncNotice(syncResult),
+        diagnostics: {
+          ...current.diagnostics,
+          syncedSimulatorSessionCount: current.diagnostics.syncedSimulatorSessionCount + syncResult.syncedCount,
+          skippedDuplicateSimulatorSessionCount: current.diagnostics.skippedDuplicateSimulatorSessionCount + syncResult.duplicateCount,
+          generatedPriorityCount: persisted.latestPrioritySnapshot?.priorities.length ?? 0,
+          plannedActivityCount: persisted.latestTrainingSessionPlan?.plannedActivities.length ?? 0
+        }
       }));
       this.packageService.loadContent().subscribe((content) => {
         this.availableDefinitions.set(content.drills);
         this.descriptorCache.set(content.topics);
-        this.state.update((current) => ({ ...current, content }));
+        this.state.update((current) => ({
+          ...current,
+          content,
+          diagnostics: {
+            ...current.diagnostics,
+            loadedPackageCount: content.loadedPackageCount,
+            loadedTopicCount: content.topicCount,
+            loadedDrillCount: content.drillCount
+          }
+        }));
       });
       this.bankResolver.load().subscribe();
     } catch {
@@ -198,16 +237,18 @@ export class PersonalizedTrainingFacadeService {
   generatePriorities(now: Date = new Date(FALLBACK_NOW)): void {
     const descriptors = this.buildTopicDescriptors();
     if (descriptors.length === 0) {
-      this.setRecoverable('planning', 'Aun no hay metadatos suficientes para priorizar. Importa resultados del simulador primero.');
+      this.setRecoverable('planning', 'No hay temas cargados para priorizar. Agrega paquetes de contenido al manifest o revisa el perfil activo.');
       return;
     }
     const persisted = this.stateService.loadState();
+    const content = this.state().content;
     const snapshot = this.priorityService.generatePrioritySnapshot({
       importedSessions: persisted.importedExamSessions,
       topicDescriptors: descriptors,
       topicMastery: persisted.topicMastery,
       reviewSchedule: persisted.reviewSchedule,
       sessionHistory: persisted.sessions,
+      manualEvidence: content?.activeProfile?.manualCoachingEvidence ?? [],
       now
     });
     this.priorityService.savePrioritySnapshot(snapshot);
@@ -215,8 +256,12 @@ export class PersonalizedTrainingFacadeService {
       ...current,
       mode: snapshot.priorities.length ? 'planning' : 'dashboard',
       prioritySnapshot: snapshot,
+      diagnostics: {
+        ...current.diagnostics,
+        generatedPriorityCount: snapshot.priorities.length
+      },
       notice: snapshot.priorities.length
-        ? { tone: 'success', message: 'Prioridades generadas desde evidencia importada.' }
+        ? { tone: 'success', message: 'Prioridades generadas desde evidencia sincronizada, perfil y catalogo disponible.' }
         : { tone: 'info', message: 'No hay prioridades accionables por ahora.' }
     }));
   }
@@ -224,29 +269,52 @@ export class PersonalizedTrainingFacadeService {
   generatePlan(availableMinutes: number, energyLevel: TrainingEnergyLevel, now: Date = new Date(FALLBACK_NOW)): void {
     const descriptors = this.buildTopicDescriptors();
     if (descriptors.length === 0) {
-      this.setRecoverable('planning', 'No hay temas disponibles para planificar.');
+      this.setRecoverable('planning', 'No hay temas disponibles para planificar. Revisa el estado de paquetes de contenido.');
+      return;
+    }
+    const definitions = this.availableDefinitions();
+    if (definitions.length === 0) {
+      this.setRecoverable('content_unavailable', 'No hay drills cargados desde paquetes de contenido. No se puede iniciar una sesion ejecutable.');
       return;
     }
     const persisted = this.stateService.loadState();
-    const plan = this.priorityService.generateTrainingSessionPlan({
+    const content = this.state().content;
+    const abstractPlan = this.priorityService.generateTrainingSessionPlan({
       importedSessions: persisted.importedExamSessions,
       topicDescriptors: descriptors,
       topicMastery: persisted.topicMastery,
       reviewSchedule: persisted.reviewSchedule,
       sessionHistory: persisted.sessions,
+      manualEvidence: content?.activeProfile?.manualCoachingEvidence ?? [],
       availableMinutes,
       energyLevel,
       now
     });
+    const resolution = resolveTrainingPlanContent({
+      plan: abstractPlan,
+      drills: definitions,
+      recentAttempts: this.stateService.getDrillAttempts(),
+      availableTopicIds: descriptors.map((descriptor) => descriptor.topicId),
+      energyLevel
+    });
+    const plan = createExecutablePlanFromResolution(abstractPlan, resolution);
     this.priorityService.saveTrainingSessionPlan(plan);
     this.state.update((current) => ({
       ...current,
       mode: plan.plannedActivities.length ? 'plan_ready' : 'planning',
       prioritySnapshot: this.stateService.loadState().latestPrioritySnapshot ?? current.prioritySnapshot,
       plan,
+      diagnostics: {
+        ...current.diagnostics,
+        generatedPriorityCount: this.stateService.loadState().latestPrioritySnapshot?.priorities.length ?? current.diagnostics.generatedPriorityCount,
+        plannedActivityCount: abstractPlan.plannedActivities.length,
+        resolvedActivityCount: resolution.resolvedActivities.length,
+        unresolvedActivityCount: resolution.unresolvedActivities.length,
+        contentResolutionReasonCodes: resolutionReasonCodes(resolution)
+      },
       notice: plan.plannedActivities.length
-        ? { tone: 'success', message: 'Plan adaptativo generado.' }
-        : { tone: 'warning', message: 'No se pudo crear un plan valido con esos controles.' }
+        ? { tone: 'success', message: 'Plan ejecutable generado con contenido disponible.' }
+        : { tone: 'warning', message: resolution.unresolvedActivities.length ? 'Todas las actividades quedaron sin contenido disponible para esos controles.' : 'No se pudo crear un plan valido con esos controles.' }
     }));
   }
 
@@ -276,12 +344,22 @@ export class PersonalizedTrainingFacadeService {
       this.state.update((current) => ({
         ...current,
         mode: 'content_unavailable',
-        notice: { tone: 'warning', message: 'Hay actividades del plan sin contenido disponible. No se genero evidencia negativa.' }
+        diagnostics: {
+          ...current.diagnostics,
+          plannedActivityCount: plan.plannedActivities.length,
+          resolvedActivityCount: 0,
+          unresolvedActivityCount: resolution.unresolvedActivities.length,
+          activeRuntimeActivity: null,
+          contentResolutionReasonCodes: resolutionReasonCodes(resolution)
+        },
+        notice: { tone: 'warning', message: missingContentMessage(resolution.unresolvedActivities[0]?.reasonCodes ?? ['unresolved_no_active_drill']) }
       }));
       return;
     }
+    const executablePlan = createExecutablePlanFromResolution(plan, resolution);
+    this.priorityService.saveTrainingSessionPlan(executablePlan);
     const resolvedDefinitions = resolution.resolvedActivities.map((item) => item.drill);
-    const session = this.runtimeService.createRuntimeSession(plan, resolvedDefinitions, new Date());
+    const session = this.runtimeService.createRuntimeSession(executablePlan, resolvedDefinitions, new Date());
     const started = this.runtimeService.startRuntimeSession(session, new Date());
     this.enterNextActivity(started, resolvedDefinitions);
   }
@@ -307,6 +385,10 @@ export class PersonalizedTrainingFacadeService {
       ...current,
       runtimeSession: saved,
       currentDraft: cloneDraft(draft),
+      diagnostics: {
+        ...current.diagnostics,
+        activeRuntimeActivity: activity.activityId
+      },
       notice: { tone: 'info', message: 'Borrador guardado.' }
     }));
   }
@@ -476,6 +558,7 @@ export class PersonalizedTrainingFacadeService {
   activityLabel(type: PlannedActivityType): string {
     const labels: Record<PlannedActivityType, string> = {
       mechanism_review: 'Repaso de mecanismo',
+      component_identification: 'Identificacion de componente',
       binary_comparison: 'Comparacion binaria',
       workflow_ordering: 'Orden de flujo',
       architecture_mapping: 'Mapa de arquitectura',
@@ -528,8 +611,12 @@ export class PersonalizedTrainingFacadeService {
       this.state.update((current) => ({
         ...current,
         mode: 'content_unavailable',
-        runtimeSession: session,
-        currentActivityView: null,
+      runtimeSession: session,
+      currentActivityView: null,
+        diagnostics: {
+          ...current.diagnostics,
+          activeRuntimeActivity: activity.activityId
+        },
         notice: { tone: 'warning', message: 'El contenido de esta actividad todavia no existe. No se genero evidencia negativa.' }
       }));
       return;
@@ -545,6 +632,10 @@ export class PersonalizedTrainingFacadeService {
       currentActivityView: this.drillService.createPreAnswerView(definition, activity.activityId, `${active.currentActivityIndex + 1} de ${active.activities.length}`),
       currentDraft: draft,
       currentReview: null,
+      diagnostics: {
+        ...current.diagnostics,
+        activeRuntimeActivity: activeActivity?.activityId ?? activity.activityId
+      },
       notice: null
     }));
   }
@@ -638,6 +729,57 @@ function importNotice(result: PersonalizedTrainingImportResult): PersonalizedTra
     return { tone: 'warning', message: 'Importacion valida con advertencias posibles.' };
   }
   return { tone: 'success', message: 'Importacion valida. Confirma para guardar.' };
+}
+
+function emptyDiagnostics(): PersonalizedTrainingDiagnostics {
+  return {
+    loadedPackageCount: 0,
+    loadedTopicCount: 0,
+    loadedDrillCount: 0,
+    syncedSimulatorSessionCount: 0,
+    skippedDuplicateSimulatorSessionCount: 0,
+    generatedPriorityCount: 0,
+    plannedActivityCount: 0,
+    resolvedActivityCount: 0,
+    unresolvedActivityCount: 0,
+    activeRuntimeActivity: null,
+    contentResolutionReasonCodes: []
+  };
+}
+
+function syncNotice(result: SimulatorTrainingSyncResult): PersonalizedTrainingNotice | null {
+  if (result.syncedCount > 0) {
+    return {
+      tone: 'success',
+      message: `${result.syncedCount} sesion(es) del simulador sincronizada(s) automaticamente.`
+    };
+  }
+  if (result.failedCount > 0 || result.invalidCount > 0) {
+    return {
+      tone: 'warning',
+      message: 'No todas las sesiones historicas del simulador se pudieron sincronizar automaticamente.'
+    };
+  }
+  return null;
+}
+
+function resolutionReasonCodes(resolution: ReturnType<typeof resolveTrainingPlanContent>): ContentSelectionReasonCode[] {
+  return [
+    ...new Set([
+      ...resolution.resolvedActivities.flatMap((activity) => activity.reasonCodes),
+      ...resolution.unresolvedActivities.flatMap((activity) => activity.reasonCodes)
+    ])
+  ].sort();
+}
+
+function missingContentMessage(reasonCodes: readonly ContentSelectionReasonCode[]): string {
+  if (reasonCodes.includes('unresolved_prerequisite_missing')) {
+    return 'El tema tiene drills, pero falta un prerequisito de contenido para resolver esta actividad.';
+  }
+  if (reasonCodes.includes('unresolved_time_budget')) {
+    return 'Hay drills disponibles para el tema, pero ninguno cabe en el tiempo seleccionado.';
+  }
+  return 'No hay drills activos para el tema seleccionado. No se genero evidencia negativa.';
 }
 
 function cloneDraft(draft: Readonly<DrillAttemptDraft>): DrillAttemptDraft {

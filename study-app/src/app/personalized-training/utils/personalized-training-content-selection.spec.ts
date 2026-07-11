@@ -53,6 +53,46 @@ describe('personalized training content selection', () => {
     expect(result.resolvedActivities).toEqual([]);
     expect(result.unresolvedActivities[0].reasonCodes).toContain('unresolved_no_active_drill');
   });
+
+  it('selects a deterministic same-topic fallback when the requested activity type is unavailable', () => {
+    const plan = oneActivityPlan('topic-cross-account', 'exam_scenario');
+    const result = resolveTrainingPlanContent({
+      plan,
+      drills: [
+        drill('drill-z', 'topic-cross-account', 'mechanism_review'),
+        drill('drill-a', 'topic-cross-account', 'mechanism_review')
+      ],
+      energyLevel: 'low'
+    });
+
+    expect(result.selectedDrillIds).toEqual(['drill-a']);
+    expect(result.resolvedActivities[0].activity.type).toBe('mechanism_review');
+    expect(result.resolvedActivities[0].reasonCodes).toContain('selected_activity_type_fallback');
+  });
+
+  it('does not use demanding fallback content for low energy', () => {
+    const plan = oneActivityPlan('topic-cross-account', 'workflow_ordering');
+    const result = resolveTrainingPlanContent({
+      plan,
+      drills: [drill('drill-exam', 'topic-cross-account', 'exam_scenario')],
+      energyLevel: 'low'
+    });
+
+    expect(result.resolvedActivities).toEqual([]);
+    expect(result.unresolvedActivities[0].reasonCodes).toContain('unresolved_no_active_drill');
+  });
+
+  it('respects the available time budget during fallback', () => {
+    const plan = { ...oneActivityPlan('topic-cross-account', 'workflow_ordering'), availableMinutes: 5 };
+    const result = resolveTrainingPlanContent({
+      plan,
+      drills: [{ ...drill('drill-map', 'topic-cross-account', 'architecture_mapping'), estimatedMinutes: 8 }],
+      energyLevel: 'normal'
+    });
+
+    expect(result.resolvedActivities).toEqual([]);
+    expect(result.unresolvedActivities[0].reasonCodes).toContain('unresolved_time_budget');
+  });
 });
 
 function oneActivityPlan(topicId: string, type: TrainingSessionPlan['plannedActivities'][number]['type']): TrainingSessionPlan {

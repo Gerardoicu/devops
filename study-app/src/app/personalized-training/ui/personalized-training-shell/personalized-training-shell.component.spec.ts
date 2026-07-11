@@ -18,7 +18,7 @@ describe('PersonalizedTrainingShellComponent', () => {
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
 
     expect(text).toContain('Estado actual');
-    expect(text).toContain('Aun no hay resultados importados');
+    expect(text).toContain('Aun no hay resultados sincronizados');
     expect(text).not.toContain('ready');
   });
 
