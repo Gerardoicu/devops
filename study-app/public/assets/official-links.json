@@ -21,6 +21,13 @@
     "url": "https://docs.aws.amazon.com/es_es/aws-certification/latest/devops-engineer-professional-02/eses-dop-02-in-scope-services.html"
   },
   {
+    "id": "aws-developer-study-table",
+    "title": "Tabla dinamica de servicios AWS",
+    "category": "Material de apoyo",
+    "description": "Material interactivo para aprender y comparar servicios AWS de forma dinamica.",
+    "url": "https://gerardoicu.github.io/study-table-aws-developer/"
+  },
+  {
     "id": "dop-c02-domain6",
     "title": "Dominio 6: Security and Compliance",
     "category": "Examen",
