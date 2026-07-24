@@ -17,8 +17,10 @@ type AppPhase =
   | 'visual-scenarios'
   | 'glossary'
   | 'personalized-training';
-type SimulatorBankType = 'verified' | 'public';
+type SimulatorBankType = 'verified' | 'public' | 'updated';
 type AssessmentMode = 'quick-quiz' | 'exam' | 'training';
+type SimulatorScope = 'full' | 'module';
+type AppLanguage = 'es' | 'en';
 
 interface CardOption {
   id: string;
@@ -49,6 +51,12 @@ interface SimulatorQuestion {
   explanation: string;
   domainName: string | null;
   topic: string | null;
+}
+
+interface ModuleStudyOption {
+  name: string;
+  verifiedCount: number;
+  updatedCount: number;
 }
 
 interface CardProgress {
@@ -186,7 +194,16 @@ const STORAGE_KEY = 'dop-c02-study-state-v1';
 const RUNTIME_STORAGE_KEY = 'dop-c02-runtime-state-v1';
 const REPORTS_STORAGE_KEY = 'dop-c02-content-reports-v1';
 const SIMULATOR_HISTORY_STORAGE_KEY = 'dop-c02-simulator-session-history-v1';
+const LANGUAGE_STORAGE_KEY = 'dop-c02-language-v1';
 const SIMULATOR_DURATION_SECONDS = 210 * 60;
+const MODULE_STUDY_ORDER = [
+  'SDLC Automation',
+  'Configuration Management and IaC',
+  'Resilient Cloud Solutions',
+  'Monitoring and Logging',
+  'Incident and Event Response',
+  'Security and Compliance'
+];
 
 interface RuntimeSnapshot {
   phase: AppPhase;
@@ -209,6 +226,7 @@ interface RuntimeSnapshot {
   simulatorNotes: Record<number, string>;
   simulatorQuestionTimeSeconds: Record<number, number>;
   simulatorQuestionStartedAt: number | null;
+  simulatorScope: SimulatorScope;
   activeNoteId: string | null;
   activeGlossaryId: string | null;
   glossaryReturnPhase: AppPhase | null;
@@ -232,7 +250,7 @@ export class App {
   private readonly simulatorTrainingBridge = inject(SimulatorTrainingBridgeService);
   private audioContext: AudioContext | null = null;
   private simulatorNavigationPending = false;
-  readonly appVersion = 'v1.3.10';
+  readonly appVersion = 'v1.3.13';
   readonly confidenceOptions = [
     { value: 1, label: 'Guessing' },
     { value: 2, label: 'Low' },
@@ -245,7 +263,10 @@ export class App {
   readonly conceptCards = signal<StudyCard[]>([]);
   readonly quickQuizBank = signal<SimulatorQuestion[]>([]);
   readonly simulatorBank = signal<SimulatorQuestion[]>([]);
+  readonly simulatorBankEn = signal<SimulatorQuestion[]>([]);
   readonly publicSimulatorBank = signal<SimulatorQuestion[]>([]);
+  readonly updatedSimulatorBank = signal<SimulatorQuestion[]>([]);
+  readonly updatedSimulatorBankEn = signal<SimulatorQuestion[]>([]);
   readonly notes = signal<StudyNote[]>([]);
   readonly officialLinks = signal<OfficialLink[]>([]);
   readonly visualScenarios = signal<VisualScenario[]>([]);
@@ -259,6 +280,8 @@ export class App {
   readonly glossaryReturnPhase = signal<AppPhase | null>(null);
   readonly visualReturnPhase = signal<AppPhase | null>(null);
   readonly simulatorBankType = signal<SimulatorBankType>('verified');
+  readonly simulatorScope = signal<SimulatorScope>('full');
+  readonly appLanguage = signal<AppLanguage>(this.loadLanguage());
   readonly assessmentMode = signal<AssessmentMode>('exam');
   readonly phase = signal<AppPhase>('home');
   readonly sessionMode = signal<SessionMode>('learn');
@@ -421,6 +444,32 @@ export class App {
   readonly publicExamHistory = computed(
     () => this.state().examHistory.public ?? { attempts: 0, lastScorePercent: null }
   );
+  readonly updatedExamHistory = computed(
+    () => this.state().examHistory.updated ?? { attempts: 0, lastScorePercent: null }
+  );
+  readonly moduleStudyOptions = computed<ModuleStudyOption[]>(() => {
+    const verifiedCounts = this.countQuestionsByModule(this.simulatorBank());
+    const updatedCounts = this.countQuestionsByModule(this.updatedSimulatorBank());
+    const moduleNames = new Set([...verifiedCounts.keys(), ...updatedCounts.keys()]);
+
+    return [...moduleNames]
+      .map((name) => ({
+        name,
+        verifiedCount: verifiedCounts.get(name) ?? 0,
+        updatedCount: updatedCounts.get(name) ?? 0
+      }))
+      .sort((left, right) => {
+        const leftIndex = MODULE_STUDY_ORDER.indexOf(left.name);
+        const rightIndex = MODULE_STUDY_ORDER.indexOf(right.name);
+
+        if (leftIndex !== -1 || rightIndex !== -1) {
+          return (leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex) -
+            (rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex);
+        }
+
+        return left.name.localeCompare(right.name);
+      });
+  });
   readonly reviewCount = computed(
     () => Object.values(this.progressByCard()).filter((entry) => entry.needsReview).length
   );
@@ -595,8 +644,20 @@ export class App {
       this.simulatorBank.set(questions);
       this.tryRestoreRuntime();
     });
+    this.http.get<SimulatorQuestion[]>('assets/simulator-bank.en.json').subscribe((questions) => {
+      this.simulatorBankEn.set(questions);
+      this.tryRestoreRuntime();
+    });
     this.http.get<SimulatorQuestion[]>('assets/simulator-bank-public.json').subscribe((questions) => {
       this.publicSimulatorBank.set(questions);
+      this.tryRestoreRuntime();
+    });
+    this.http.get<SimulatorQuestion[]>('assets/simulator-bank-updated.json').subscribe((questions) => {
+      this.updatedSimulatorBank.set(questions);
+      this.tryRestoreRuntime();
+    });
+    this.http.get<SimulatorQuestion[]>('assets/simulator-bank-updated.en.json').subscribe((questions) => {
+      this.updatedSimulatorBankEn.set(questions);
       this.tryRestoreRuntime();
     });
     this.http.get<StudyNote[]>('assets/notes-index.json').subscribe((notes) => {
@@ -663,6 +724,7 @@ export class App {
   startQuickQuiz(): void {
     this.closeReportPanel();
     this.assessmentMode.set('quick-quiz');
+    this.simulatorScope.set('full');
     const queue = this.buildWeightedQuickQuizQueue();
     this.simulatorBankType.set('verified');
     this.simulatorQueue.set(queue);
@@ -700,6 +762,7 @@ export class App {
   startTraining(bankType: SimulatorBankType = 'verified'): void {
     this.closeReportPanel();
     this.assessmentMode.set('training');
+    this.simulatorScope.set('full');
     this.simulatorBankType.set(bankType);
     this.simulatorQueue.set([...this.getSimulatorBank(bankType)]);
     this.simulatorIndex.set(0);
@@ -717,6 +780,26 @@ export class App {
     this.phase.set('simulator');
     this.beginCurrentSimulatorQuestionTimer();
     this.playTone('start');
+  }
+
+  setLanguage(language: string): void {
+    const normalized: AppLanguage = language === 'en' ? 'en' : 'es';
+    if (this.appLanguage() === normalized) {
+      return;
+    }
+
+    this.appLanguage.set(normalized);
+    localStorage.setItem(LANGUAGE_STORAGE_KEY, normalized);
+    this.remapActiveSimulatorQueueForLanguage();
+  }
+
+  startModuleSimulator(moduleName: string, bankType: Extract<SimulatorBankType, 'verified' | 'updated'>): void {
+    const queue = this.buildModuleQueue(moduleName, bankType);
+    if (!queue.length) {
+      return;
+    }
+
+    this.startSimulatorWithQueue(queue, 'exam', bankType, true, 'module');
   }
 
   continueSimulator(): void {
@@ -758,6 +841,7 @@ export class App {
       this.quickQuizLastCorrect.set(null);
       this.examChecked.set({});
       this.trainingChecked.set({});
+      this.simulatorScope.set('full');
       this.resetSimulatorResponseTracking();
     }
     this.activeGlossaryEntry.set(null);
@@ -817,7 +901,7 @@ export class App {
 
   openVerifiedQuestion(questionId: number): void {
     this.closeReportPanel();
-    const question = this.simulatorBank().find((item) => item.id === questionId);
+    const question = this.getSimulatorBank('verified').find((item) => item.id === questionId);
     if (!question) {
       return;
     }
@@ -982,27 +1066,9 @@ export class App {
   }
 
   startSimulator(bankType: SimulatorBankType = 'verified'): void {
-    this.closeReportPanel();
-    this.assessmentMode.set('exam');
-    this.simulatorBankType.set(bankType);
     const sourceBank = this.getSimulatorBank(bankType);
     const queue = this.shuffle(sourceBank).slice(0, Math.min(75, sourceBank.length));
-    this.simulatorQueue.set(queue);
-    this.simulatorIndex.set(0);
-    this.simulatorAnswers.set({});
-    this.simulatorSummary.set(null);
-    this.showSimulatorReview.set(false);
-    this.remainingSeconds.set(SIMULATOR_DURATION_SECONDS);
-    const startedAt = Date.now();
-    this.simulatorStartedAt.set(startedAt);
-    this.simulatorDeadlineAt.set(startedAt + SIMULATOR_DURATION_SECONDS * 1000);
-    this.resetSimulatorResponseTracking();
-    this.phase.set('simulator');
-    this.examChecked.set({});
-    this.trainingChecked.set({});
-    this.beginCurrentSimulatorQuestionTimer();
-    this.startSimulatorTimer();
-    this.playTone('start');
+    this.startSimulatorWithQueue(queue, 'exam', bankType, true, 'full');
   }
 
   simulatorOptionKeys(question: SimulatorQuestion | null): string[] {
@@ -1027,6 +1093,18 @@ export class App {
 
   simulatorNotesValue(questionId: number): string {
     return this.simulatorNotes()[questionId] ?? '';
+  }
+
+  simulatorBankLabel(bankType: SimulatorBankType = this.simulatorBankType()): string {
+    if (bankType === 'verified') {
+      return 'Banco verificado';
+    }
+
+    if (bankType === 'updated') {
+      return 'Examen verificado(actualizado)';
+    }
+
+    return 'Banco publico suplementario';
   }
 
   isSimulatorNotesOpen(questionId: number): boolean {
@@ -1242,7 +1320,7 @@ export class App {
 
     this.simulatorSummary.set(summary);
     this.saveSimulatorSessionHistory(summary);
-    if (this.assessmentMode() === 'exam') {
+    if (this.assessmentMode() === 'exam' && this.simulatorScope() === 'full') {
       this.state.update((current) => {
         const bankType = this.simulatorBankType();
         const previous = current.examHistory?.[bankType] ?? { attempts: 0, lastScorePercent: null };
@@ -1251,6 +1329,7 @@ export class App {
           examHistory: {
             verified: current.examHistory?.verified ?? { attempts: 0, lastScorePercent: null },
             public: current.examHistory?.public ?? { attempts: 0, lastScorePercent: null },
+            updated: current.examHistory?.updated ?? { attempts: 0, lastScorePercent: null },
             [bankType]: {
               attempts: previous.attempts + 1,
               lastScorePercent: total ? Math.round((correct / total) * 100) : 0
@@ -1695,7 +1774,8 @@ export class App {
         progress: {},
         examHistory: {
           verified: { attempts: 0, lastScorePercent: null },
-          public: { attempts: 0, lastScorePercent: null }
+          public: { attempts: 0, lastScorePercent: null },
+          updated: { attempts: 0, lastScorePercent: null }
         },
         quickQuizHistory: {},
         trainingBookmarks: {}
@@ -1708,7 +1788,8 @@ export class App {
         progress: parsed.progress ?? {},
         examHistory: {
           verified: parsed.examHistory?.verified ?? { attempts: 0, lastScorePercent: null },
-          public: parsed.examHistory?.public ?? { attempts: 0, lastScorePercent: null }
+          public: parsed.examHistory?.public ?? { attempts: 0, lastScorePercent: null },
+          updated: parsed.examHistory?.updated ?? { attempts: 0, lastScorePercent: null }
         },
         quickQuizHistory: parsed.quickQuizHistory ?? {},
         trainingBookmarks: parsed.trainingBookmarks ?? {}
@@ -1718,7 +1799,8 @@ export class App {
         progress: {},
         examHistory: {
           verified: { attempts: 0, lastScorePercent: null },
-          public: { attempts: 0, lastScorePercent: null }
+          public: { attempts: 0, lastScorePercent: null },
+          updated: { attempts: 0, lastScorePercent: null }
         },
         quickQuizHistory: {},
         trainingBookmarks: {}
@@ -1740,6 +1822,10 @@ export class App {
     }
   }
 
+  private loadLanguage(): AppLanguage {
+    return localStorage.getItem(LANGUAGE_STORAGE_KEY) === 'en' ? 'en' : 'es';
+  }
+
   private loadSimulatorHistory(): SimulatorSessionExport[] {
     const raw = localStorage.getItem(SIMULATOR_HISTORY_STORAGE_KEY);
     if (!raw) {
@@ -1759,7 +1845,7 @@ export class App {
       return;
     }
 
-    if (!this.cards().length || !this.conceptCards().length || !this.quickQuizBank().length || !this.simulatorBank().length || !this.publicSimulatorBank().length || !this.notes().length || !this.visualScenarios().length || !this.glossaryEntries().length) {
+    if (!this.cards().length || !this.conceptCards().length || !this.quickQuizBank().length || !this.simulatorBank().length || !this.simulatorBankEn().length || !this.publicSimulatorBank().length || !this.updatedSimulatorBank().length || !this.updatedSimulatorBankEn().length || !this.notes().length || !this.visualScenarios().length || !this.glossaryEntries().length) {
       return;
     }
 
@@ -1804,6 +1890,7 @@ export class App {
       simulatorNotes: this.simulatorNotes(),
       simulatorQuestionTimeSeconds: this.simulatorQuestionTimeSeconds(),
       simulatorQuestionStartedAt: this.simulatorQuestionStartedAt(),
+      simulatorScope: this.simulatorScope(),
       activeNoteId: this.activeNote()?.id ?? null,
       activeGlossaryId: this.activeGlossaryEntry()?.id ?? null,
       glossaryReturnPhase: this.glossaryReturnPhase(),
@@ -1835,6 +1922,7 @@ export class App {
     this.simulatorNotes.set(snapshot.simulatorNotes ?? {});
     this.simulatorQuestionTimeSeconds.set(snapshot.simulatorQuestionTimeSeconds ?? {});
     this.simulatorQuestionStartedAt.set(snapshot.simulatorQuestionStartedAt ?? null);
+    this.simulatorScope.set(snapshot.simulatorScope ?? 'full');
     this.assessmentMode.set(restoredAssessmentMode);
     this.glossaryReturnPhase.set(snapshot.glossaryReturnPhase ?? null);
     this.visualReturnPhase.set(snapshot.visualReturnPhase ?? null);
@@ -1854,8 +1942,7 @@ export class App {
         : 0
     );
 
-    const simulatorSource =
-      restoredBankType === 'verified' ? this.simulatorBank() : this.publicSimulatorBank();
+    const simulatorSource = this.getSimulatorBank(restoredBankType);
     const simulatorById = new Map(simulatorSource.map((question) => [question.id, question]));
     const restoredSimulatorQueue = (snapshot.simulatorQueueIds ?? [])
       .map((id) => simulatorById.get(id))
@@ -2129,7 +2216,85 @@ export class App {
   }
 
   private getSimulatorBank(bankType: SimulatorBankType): SimulatorQuestion[] {
-    return bankType === 'verified' ? this.simulatorBank() : this.publicSimulatorBank();
+    if (bankType === 'verified') {
+      return this.appLanguage() === 'en' ? this.simulatorBankEn() : this.simulatorBank();
+    }
+
+    if (bankType === 'updated') {
+      return this.appLanguage() === 'en' ? this.updatedSimulatorBankEn() : this.updatedSimulatorBank();
+    }
+
+    return this.publicSimulatorBank();
+  }
+
+  private remapActiveSimulatorQueueForLanguage(): void {
+    if (this.isQuickQuiz() || !this.simulatorQueue().length) {
+      return;
+    }
+
+    const bank = this.getSimulatorBank(this.simulatorBankType());
+    const byId = new Map(bank.map((question) => [question.id, question]));
+    const remapped = this.simulatorQueue()
+      .map((question) => byId.get(question.id))
+      .filter((question): question is SimulatorQuestion => !!question);
+
+    if (remapped.length === this.simulatorQueue().length) {
+      this.simulatorQueue.set(remapped);
+    }
+  }
+
+  private countQuestionsByModule(questions: SimulatorQuestion[]): Map<string, number> {
+    const counts = new Map<string, number>();
+
+    for (const question of questions) {
+      const moduleName = this.normalizeSystemName(question.domainName);
+      counts.set(moduleName, (counts.get(moduleName) ?? 0) + 1);
+    }
+
+    return counts;
+  }
+
+  private buildModuleQueue(
+    moduleName: string,
+    bankType: Extract<SimulatorBankType, 'verified' | 'updated'>
+  ): SimulatorQuestion[] {
+    return this.shuffle(
+      this.getSimulatorBank(bankType).filter((question) => this.normalizeSystemName(question.domainName) === moduleName)
+    );
+  }
+
+  private startSimulatorWithQueue(
+    queue: SimulatorQuestion[],
+    assessmentMode: AssessmentMode,
+    bankType: SimulatorBankType,
+    timed: boolean,
+    scope: SimulatorScope
+  ): void {
+    this.closeReportPanel();
+    this.clearSimulatorTimer();
+    this.assessmentMode.set(assessmentMode);
+    this.simulatorScope.set(scope);
+    this.simulatorBankType.set(bankType);
+    this.simulatorQueue.set(queue);
+    this.simulatorIndex.set(0);
+    this.simulatorAnswers.set({});
+    this.simulatorSummary.set(null);
+    this.showSimulatorReview.set(false);
+    this.remainingSeconds.set(timed ? SIMULATOR_DURATION_SECONDS : 0);
+    const startedAt = timed ? Date.now() : null;
+    this.simulatorStartedAt.set(startedAt);
+    this.simulatorDeadlineAt.set(startedAt ? startedAt + SIMULATOR_DURATION_SECONDS * 1000 : null);
+    this.resetSimulatorResponseTracking();
+    this.phase.set('simulator');
+    this.quickQuizRevealed.set(false);
+    this.quickQuizLastCorrect.set(null);
+    this.examChecked.set({});
+    this.trainingChecked.set({});
+    this.beginCurrentSimulatorQuestionTimer();
+    if (timed) {
+      this.startSimulatorTimer();
+    }
+    this.playTone('start');
   }
 
   private glossarySearchTerms(entry: GlossaryEntry): string[] {

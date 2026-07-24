@@ -1,4 +1,14 @@
 ﻿<main class="shell">
+  <div class="top-controls">
+    <label class="language-selector">
+      <span>Idioma</span>
+      <select [value]="appLanguage()" (change)="setLanguage($any($event.target).value)">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+      </select>
+    </label>
+  </div>
+
   <section class="hero">
     <div>
       <p class="eyebrow">DOP-C02 microaprendizaje</p>
@@ -15,9 +25,9 @@
     <section class="home-grid">
       <article class="mode-card mode-card-simulator">
         <p class="mode-kicker">Simulador AWS</p>
-        <h2>Simulador y entrenamiento</h2>
+        <h2>Simuladores</h2>
         <p>
-          Ejecuta examen cronometrado o entrenamiento con correccion inmediata. El banco verificado queda como opcion principal.
+          Ejecuta examenes cronometrados con el banco verificado original o el banco verificado actualizado.
         </p>
         <div class="simulator-home-stats">
           <div class="simulator-home-stat">
@@ -32,15 +42,15 @@
             <span class="meta">Intentos: {{ verifiedExamHistory().attempts }}</span>
           </div>
           <div class="simulator-home-stat">
-            <span class="label">Publico</span>
+            <span class="label">Verificado(actualizado)</span>
             <strong>
-              @if (publicExamHistory().lastScorePercent !== null) {
-                {{ publicExamHistory().lastScorePercent }}%
+              @if (updatedExamHistory().lastScorePercent !== null) {
+                {{ updatedExamHistory().lastScorePercent }}%
               } @else {
                 Sin intento
               }
             </strong>
-            <span class="meta">Intentos: {{ publicExamHistory().attempts }}</span>
+            <span class="meta">Intentos: {{ updatedExamHistory().attempts }}</span>
           </div>
         </div>
         <div class="simulator-bank-actions">
@@ -51,28 +61,41 @@
             <button type="button" class="secondary" (click)="startSimulator('verified')">
               Examen verificado
             </button>
-            <button type="button" class="ghost" (click)="startSimulator('public')">
-              Examen publico
-            </button>
-            <button type="button" class="secondary" (click)="startTraining('verified')">
-              Entrenamiento verificado
-            </button>
-            <button type="button" class="ghost" (click)="startTraining('public')">
-              Entrenamiento publico
+            <button type="button" class="secondary" (click)="startSimulator('updated')">
+              Examen verificado(actualizado)
             </button>
           } @else {
             <button type="button" class="primary" (click)="startSimulator('verified')">
               Examen verificado
             </button>
-            <button type="button" class="secondary" (click)="startSimulator('public')">
-              Examen publico
+            <button type="button" class="secondary" (click)="startSimulator('updated')">
+              Examen verificado(actualizado)
             </button>
-            <button type="button" class="ghost" (click)="startTraining('verified')">
-              Entrenamiento verificado
-            </button>
-            <button type="button" class="ghost" (click)="startTraining('public')">
-              Entrenamiento publico
-            </button>
+          }
+        </div>
+      </article>
+
+      <article class="mode-card">
+        <p class="mode-kicker">Estudia por modulo</p>
+        <h2>Simuladores por modulo</h2>
+        <p>
+          Practica solo preguntas del dominio que quieres reforzar. Usa examen para simular presion o entrenamiento para ver correccion inmediata.
+        </p>
+        <div class="simulator-home-stats">
+          @for (module of moduleStudyOptions(); track module.name) {
+            <div class="simulator-home-stat">
+              <span class="label">{{ module.name }}</span>
+              <strong>{{ module.verifiedCount + module.updatedCount }} preguntas</strong>
+              <span class="meta">Verificado: {{ module.verifiedCount }} · Actualizado: {{ module.updatedCount }}</span>
+              <div class="simulator-bank-actions">
+                <button type="button" class="secondary" [disabled]="!module.verifiedCount" (click)="startModuleSimulator(module.name, 'verified')">
+                  Examen verificado
+                </button>
+                <button type="button" class="ghost" [disabled]="!module.updatedCount" (click)="startModuleSimulator(module.name, 'updated')">
+                  Examen verificado(actualizado)
+                </button>
+              </div>
+            </div>
           }
         </div>
       </article>
@@ -509,9 +532,9 @@
               @if (isQuickQuiz()) {
                 Banco rapido derivado
               } @else if (isTraining()) {
-                Banco verificado en orden
+                {{ simulatorBankLabel() }} en orden
               } @else {
-                {{ simulatorBankType() === 'verified' ? 'Banco verificado' : 'Banco publico suplementario' }}
+                {{ simulatorBankLabel() }}
               }
             </p>
             <p class="body">ID {{ question.id }}</p>
@@ -755,7 +778,7 @@
           Entrenamiento con el banco verificado completo, en orden y con correccion inmediata por pregunta.
         } @else {
           Banco usado:
-          {{ simSummary.bankType === 'verified' ? 'verificado' : 'publico suplementario' }}.
+          {{ simulatorBankLabel(simSummary.bankType) }}.
           Este resultado es una referencia de entrenamiento y no equivale al score escalado oficial
           de AWS.
         }
