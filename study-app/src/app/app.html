@@ -542,7 +542,7 @@
               <p class="body">{{ question.topic }}</p>
             }
         </div>
-        @if (!isQuickQuiz() && !isTraining()) {
+        @if (!isQuickQuiz() && (!isTraining() || isModuleSimulator())) {
           <div class="timer-box">
             <span class="label">Tiempo restante</span>
             <strong>{{ formattedRemainingTime() }}</strong>
@@ -712,7 +712,7 @@
         } @else if (isTraining()) {
           <span class="feed-hint">Pregunta {{ simulatorPosition() }} de {{ simulatorTotal() }} en orden.</span>
           <div class="simulator-actions">
-            @if (question.questionType === 'multi') {
+            @if (isModuleSimulator() || question.questionType === 'multi') {
               <button type="button" class="secondary" [disabled]="isTrainingQuestionChecked(question.id) || !hasCurrentTrainingSelection()" (click)="verifyCurrentTrainingAnswer()">
                 Verificar respuesta
               </button>

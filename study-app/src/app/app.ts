@@ -548,6 +548,7 @@ export class App {
   });
   readonly isQuickQuiz = computed(() => this.assessmentMode() === 'quick-quiz');
   readonly isTraining = computed(() => this.assessmentMode() === 'training');
+  readonly isModuleSimulator = computed(() => this.simulatorScope() === 'module');
   readonly reportCount = computed(() => this.reports().length);
   readonly filteredGlossaryEntries = computed(() => {
     const query = this.glossaryQuery().trim().toLowerCase();
@@ -800,7 +801,7 @@ export class App {
       return;
     }
 
-    this.startSimulatorWithQueue(queue, 'exam', bankType, true, 'module');
+    this.startSimulatorWithQueue(queue, 'training', bankType, true, 'module');
   }
 
   continueSimulator(): void {
@@ -812,7 +813,7 @@ export class App {
     this.closeReportPanel();
     this.phase.set('simulator');
     this.beginCurrentSimulatorQuestionTimer();
-    if (this.assessmentMode() === 'exam' && this.simulatorDeadlineAt()) {
+    if (this.simulatorDeadlineAt()) {
       this.syncRemainingSecondsFromDeadline();
       if (this.remainingSeconds() > 0) {
         this.startSimulatorTimer();
@@ -1172,7 +1173,7 @@ export class App {
         };
       });
 
-      if (question.questionType === 'single') {
+      if (question.questionType === 'single' && !this.isModuleSimulator()) {
         this.trainingChecked.update((current) => ({
           ...current,
           [question.id]: true

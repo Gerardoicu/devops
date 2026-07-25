@@ -143,7 +143,7 @@ describe('App', () => {
     })).toBe('Selecciona una opcion.');
   });
 
-  it('uses proportional time for module simulator sessions', () => {
+  it('uses proportional timed training for module simulator sessions', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
     const questions = Array.from({ length: 10 }, (_, index) => ({
@@ -160,8 +160,20 @@ describe('App', () => {
     app.simulatorBank.set(questions);
     app.startModuleSimulator('Monitoring and Logging', 'verified');
 
+    expect(app.assessmentMode()).toBe('training');
+    expect(app.isModuleSimulator()).toBe(true);
     expect(app.remainingSeconds()).toBe(28 * 60);
     expect(app.simulatorDeadlineAt()).toBeGreaterThan(Date.now());
+
+    const question = app.currentSimulatorQuestion();
+    expect(question).not.toBeNull();
+    app.selectSimulatorOption(question!, 'A');
+    expect(app.hasCurrentTrainingSelection()).toBe(true);
+    expect(app.isTrainingQuestionChecked(question!.id)).toBe(false);
+
+    app.verifyCurrentTrainingAnswer();
+
+    expect(app.isTrainingQuestionChecked(question!.id)).toBe(true);
 
     app.remainingSeconds.set(60);
     app.finishSimulator();
