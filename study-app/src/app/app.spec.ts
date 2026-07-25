@@ -117,6 +117,58 @@ describe('App', () => {
     expect(app.simulatorConfidence()).toEqual({ 1: 5, 2: 1, 3: 4 });
   });
 
+  it('shows the exact number of options required for multi-select questions', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+
+    expect(app.simulatorSelectionInstruction({
+      id: 1,
+      questionType: 'multi',
+      question: 'Choose safeguards.',
+      options: { A: 'A', B: 'B', C: 'C' },
+      correctAnswers: ['A', 'C'],
+      explanation: '',
+      domainName: null,
+      topic: null
+    })).toBe('Selecciona 2 opciones.');
+    expect(app.simulatorSelectionInstruction({
+      id: 2,
+      questionType: 'single',
+      question: 'Choose one.',
+      options: { A: 'A' },
+      correctAnswers: ['A'],
+      explanation: '',
+      domainName: null,
+      topic: null
+    })).toBe('Selecciona una opcion.');
+  });
+
+  it('uses proportional time for module simulator sessions', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    const questions = Array.from({ length: 10 }, (_, index) => ({
+      id: index + 1,
+      questionType: 'single' as const,
+      question: `Question ${index + 1}?`,
+      options: { A: 'A' },
+      correctAnswers: ['A'],
+      explanation: '',
+      domainName: 'Monitoring and Logging',
+      topic: null
+    }));
+
+    app.simulatorBank.set(questions);
+    app.startModuleSimulator('Monitoring and Logging', 'verified');
+
+    expect(app.remainingSeconds()).toBe(28 * 60);
+    expect(app.simulatorDeadlineAt()).toBeGreaterThan(Date.now());
+
+    app.remainingSeconds.set(60);
+    app.finishSimulator();
+
+    expect(app.simulatorSummary()?.elapsedSeconds).toBe(27 * 60);
+  });
+
   it('opens optional notes without changing saved note text', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;

@@ -603,13 +603,7 @@
             }
           </div>
         }
-        <p class="body">
-          @if (question.questionType === 'multi') {
-            Selecciona todas las que apliquen.
-          } @else {
-            Selecciona una opcion.
-          }
-        </p>
+        <p class="body">{{ simulatorSelectionInstruction(question) }}</p>
       </div>
 
       <div class="options">

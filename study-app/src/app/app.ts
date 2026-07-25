@@ -196,6 +196,7 @@ const REPORTS_STORAGE_KEY = 'dop-c02-content-reports-v1';
 const SIMULATOR_HISTORY_STORAGE_KEY = 'dop-c02-simulator-session-history-v1';
 const LANGUAGE_STORAGE_KEY = 'dop-c02-language-v1';
 const SIMULATOR_DURATION_SECONDS = 210 * 60;
+const SIMULATOR_FULL_EXAM_QUESTION_COUNT = 75;
 const MODULE_STUDY_ORDER = [
   'SDLC Automation',
   'Configuration Management and IaC',
@@ -1247,6 +1248,15 @@ export class App {
     return this.simulatorConfidenceValue(questionId) !== null;
   }
 
+  simulatorSelectionInstruction(question: SimulatorQuestion): string {
+    const expectedCount = question.correctAnswers.length;
+    if (question.questionType === 'multi' || expectedCount > 1) {
+      return `Selecciona ${expectedCount} opciones.`;
+    }
+
+    return 'Selecciona una opcion.';
+  }
+
   finishSimulator(): void {
     this.clearSimulatorTimer();
     this.captureCurrentSimulatorQuestionTime();
@@ -1291,7 +1301,7 @@ export class App {
     const incorrect = answered - correct;
     const unanswered = total - answered;
     const elapsedSeconds = this.simulatorStartedAt()
-      ? Math.max(0, SIMULATOR_DURATION_SECONDS - this.remainingSeconds())
+      ? Math.max(0, this.currentSimulatorDurationSeconds() - this.remainingSeconds())
       : 0;
 
     const bySystem = [...bySystemMap.values()]
@@ -2280,10 +2290,11 @@ export class App {
     this.simulatorAnswers.set({});
     this.simulatorSummary.set(null);
     this.showSimulatorReview.set(false);
-    this.remainingSeconds.set(timed ? SIMULATOR_DURATION_SECONDS : 0);
+    const durationSeconds = timed ? this.simulatorDurationSecondsForQueue(queue, scope) : 0;
+    this.remainingSeconds.set(durationSeconds);
     const startedAt = timed ? Date.now() : null;
     this.simulatorStartedAt.set(startedAt);
-    this.simulatorDeadlineAt.set(startedAt ? startedAt + SIMULATOR_DURATION_SECONDS * 1000 : null);
+    this.simulatorDeadlineAt.set(startedAt ? startedAt + durationSeconds * 1000 : null);
     this.resetSimulatorResponseTracking();
     this.phase.set('simulator');
     this.quickQuizRevealed.set(false);
@@ -2331,6 +2342,18 @@ export class App {
       .replace(/\s+/g, ' ')
       .trim()
       .toLowerCase();
+  }
+
+  private currentSimulatorDurationSeconds(): number {
+    return this.simulatorDurationSecondsForQueue(this.simulatorQueue(), this.simulatorScope());
+  }
+
+  private simulatorDurationSecondsForQueue(queue: SimulatorQuestion[], scope: SimulatorScope): number {
+    if (scope !== 'module') {
+      return SIMULATOR_DURATION_SECONDS;
+    }
+
+    return Math.ceil((SIMULATOR_DURATION_SECONDS * queue.length) / SIMULATOR_FULL_EXAM_QUESTION_COUNT);
   }
 
   private normalizeOfficialCategory(category: string): string {
