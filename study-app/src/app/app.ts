@@ -73,6 +73,7 @@ interface DeckState {
   examHistory: Record<SimulatorBankType, { attempts: number; lastScorePercent: number | null }>;
   quickQuizHistory: Record<number, { answered: number; correct: number; incorrect: number }>;
   trainingBookmarks: Record<number, boolean>;
+  persistentSimulatorAnswers: Record<number, string[]>;
 }
 
 interface SessionSummary {
@@ -203,7 +204,7 @@ const MODULE_STUDY_ORDER = [
   'Resilient Cloud Solutions',
   'Monitoring and Logging',
   'Incident and Event Response',
-  'Security and Compliance'
+  'Security and Compliance',
 ];
 
 interface RuntimeSnapshot {
@@ -218,6 +219,7 @@ interface RuntimeSnapshot {
   simulatorQueueIds: number[];
   simulatorIndex: number;
   simulatorAnswers: Record<number, string[]>;
+  simulatorOptionOrders: Record<number, string[]>;
   simulatorSummary: SimulatorSummary | null;
   showSimulatorReview: boolean;
   remainingSeconds: number;
@@ -243,7 +245,7 @@ interface RuntimeSnapshot {
   selector: 'app-root',
   imports: [PersonalizedTrainingShellComponent],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
 export class App {
   private readonly http = inject(HttpClient);
@@ -251,13 +253,13 @@ export class App {
   private readonly simulatorTrainingBridge = inject(SimulatorTrainingBridgeService);
   private audioContext: AudioContext | null = null;
   private simulatorNavigationPending = false;
-  readonly appVersion = 'v1.3.14';
+  readonly appVersion = 'v1.3.15';
   readonly confidenceOptions = [
     { value: 1, label: 'Guessing' },
     { value: 2, label: 'Low' },
     { value: 3, label: 'Moderate' },
     { value: 4, label: 'High' },
-    { value: 5, label: 'Very high' }
+    { value: 5, label: 'Very high' },
   ];
 
   readonly cards = signal<StudyCard[]>([]);
@@ -295,6 +297,7 @@ export class App {
   readonly simulatorQueue = signal<SimulatorQuestion[]>([]);
   readonly simulatorIndex = signal(0);
   readonly simulatorAnswers = signal<Record<number, string[]>>({});
+  readonly simulatorOptionOrders = signal<Record<number, string[]>>({});
   readonly simulatorSummary = signal<SimulatorSummary | null>(null);
   readonly showSimulatorReview = signal(false);
   readonly remainingSeconds = signal(SIMULATOR_DURATION_SECONDS);
@@ -316,7 +319,7 @@ export class App {
 
   readonly currentCard = computed(() => this.sessionQueue()[this.currentIndex()] ?? null);
   readonly currentSimulatorQuestion = computed(
-    () => this.simulatorQueue()[this.simulatorIndex()] ?? null
+    () => this.simulatorQueue()[this.simulatorIndex()] ?? null,
   );
   readonly currentCardSystemTags = computed(() => {
     const card = this.currentCard();
@@ -324,7 +327,7 @@ export class App {
       return [];
     }
     return card.tags.filter((tag) =>
-      ['ci-cd', 'iac', 'resilience', 'observability', 'operations', 'security'].includes(tag)
+      ['ci-cd', 'iac', 'resilience', 'observability', 'operations', 'security'].includes(tag),
     );
   });
   readonly currentCardConceptTags = computed(() => {
@@ -333,7 +336,10 @@ export class App {
       return [];
     }
     return card.tags
-      .filter((tag) => !['ci-cd', 'iac', 'resilience', 'observability', 'operations', 'security'].includes(tag))
+      .filter(
+        (tag) =>
+          !['ci-cd', 'iac', 'resilience', 'observability', 'operations', 'security'].includes(tag),
+      )
       .slice(0, 4);
   });
   readonly sessionProgress = computed(() => {
@@ -346,7 +352,7 @@ export class App {
   readonly totalCards = computed(() => this.conceptCards().length);
   readonly simulatorTotal = computed(() => this.simulatorQueue().length);
   readonly simulatorPosition = computed(() =>
-    this.simulatorQueue().length ? this.simulatorIndex() + 1 : 0
+    this.simulatorQueue().length ? this.simulatorIndex() + 1 : 0,
   );
   readonly simulatorProgress = computed(() => {
     const total = this.simulatorQueue().length;
@@ -355,11 +361,11 @@ export class App {
     }
     return Math.round((this.simulatorPosition() / total) * 100);
   });
-  readonly simulatorAnsweredCount = computed(() =>
-    Object.values(this.simulatorAnswers()).filter((answers) => answers.length > 0).length
+  readonly simulatorAnsweredCount = computed(
+    () => Object.values(this.simulatorAnswers()).filter((answers) => answers.length > 0).length,
   );
   readonly simulatorUnansweredCount = computed(() =>
-    Math.max(0, this.simulatorTotal() - this.simulatorAnsweredCount())
+    Math.max(0, this.simulatorTotal() - this.simulatorAnsweredCount()),
   );
   readonly quickQuizCorrectCount = computed(() =>
     this.simulatorQueue().reduce((sum, question) => {
@@ -370,10 +376,10 @@ export class App {
         selected.length === expected.length &&
         selected.every((value, index) => value === expected[index]);
       return sum + (isCorrect ? 1 : 0);
-    }, 0)
+    }, 0),
   );
-  readonly quickQuizIncorrectCount = computed(() =>
-    this.simulatorAnsweredCount() - this.quickQuizCorrectCount()
+  readonly quickQuizIncorrectCount = computed(
+    () => this.simulatorAnsweredCount() - this.quickQuizCorrectCount(),
   );
   readonly hasQuickQuizInProgress = computed(() => {
     if (this.assessmentMode() !== 'quick-quiz' || this.simulatorSummary() !== null) {
@@ -397,7 +403,7 @@ export class App {
     return this.simulatorQueue().length > 0;
   });
   readonly hasAnySimulatorInProgress = computed(
-    () => this.hasExamInProgress() || this.hasTrainingInProgress()
+    () => this.hasExamInProgress() || this.hasTrainingInProgress(),
   );
   readonly currentTrainingBookmarked = computed(() => {
     const question = this.currentSimulatorQuestion();
@@ -431,22 +437,22 @@ export class App {
         question,
         selected,
         expected,
-        isCorrect
+        isCorrect,
       };
-    })
+    }),
   );
   readonly simulatorExportRecords = computed(() => this.buildSimulatorExportRecords());
   readonly simulatorHistoryCount = computed(() => this.simulatorHistory().length);
   readonly latestSimulatorSession = computed(() => this.simulatorHistory().at(-1) ?? null);
   readonly progressByCard = computed(() => this.state().progress);
   readonly verifiedExamHistory = computed(
-    () => this.state().examHistory.verified ?? { attempts: 0, lastScorePercent: null }
+    () => this.state().examHistory.verified ?? { attempts: 0, lastScorePercent: null },
   );
   readonly publicExamHistory = computed(
-    () => this.state().examHistory.public ?? { attempts: 0, lastScorePercent: null }
+    () => this.state().examHistory.public ?? { attempts: 0, lastScorePercent: null },
   );
   readonly updatedExamHistory = computed(
-    () => this.state().examHistory.updated ?? { attempts: 0, lastScorePercent: null }
+    () => this.state().examHistory.updated ?? { attempts: 0, lastScorePercent: null },
   );
   readonly moduleStudyOptions = computed<ModuleStudyOption[]>(() => {
     const verifiedCounts = this.countQuestionsByModule(this.simulatorBank());
@@ -457,25 +463,27 @@ export class App {
       .map((name) => ({
         name,
         verifiedCount: verifiedCounts.get(name) ?? 0,
-        updatedCount: updatedCounts.get(name) ?? 0
+        updatedCount: updatedCounts.get(name) ?? 0,
       }))
       .sort((left, right) => {
         const leftIndex = MODULE_STUDY_ORDER.indexOf(left.name);
         const rightIndex = MODULE_STUDY_ORDER.indexOf(right.name);
 
         if (leftIndex !== -1 || rightIndex !== -1) {
-          return (leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex) -
-            (rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex);
+          return (
+            (leftIndex === -1 ? Number.MAX_SAFE_INTEGER : leftIndex) -
+            (rightIndex === -1 ? Number.MAX_SAFE_INTEGER : rightIndex)
+          );
         }
 
         return left.name.localeCompare(right.name);
       });
   });
   readonly reviewCount = computed(
-    () => Object.values(this.progressByCard()).filter((entry) => entry.needsReview).length
+    () => Object.values(this.progressByCard()).filter((entry) => entry.needsReview).length,
   );
   readonly seenCount = computed(
-    () => Object.values(this.progressByCard()).filter((entry) => entry.seen > 0).length
+    () => Object.values(this.progressByCard()).filter((entry) => entry.seen > 0).length,
   );
   readonly quizCorrect = computed(() =>
     this.conceptCards().reduce((sum, card) => {
@@ -483,7 +491,7 @@ export class App {
         return sum;
       }
       return sum + (this.progressByCard()[card.id]?.correct ?? 0);
-    }, 0)
+    }, 0),
   );
   readonly quizIncorrect = computed(() =>
     this.conceptCards().reduce((sum, card) => {
@@ -491,7 +499,7 @@ export class App {
         return sum;
       }
       return sum + (this.progressByCard()[card.id]?.incorrect ?? 0);
-    }, 0)
+    }, 0),
   );
   readonly learnConfirmed = computed(() =>
     this.conceptCards().reduce((sum, card) => {
@@ -499,7 +507,7 @@ export class App {
         return sum;
       }
       return sum + (this.progressByCard()[card.id]?.correct ?? 0);
-    }, 0)
+    }, 0),
   );
   readonly learnReviewMarked = computed(() =>
     this.conceptCards().reduce((sum, card) => {
@@ -507,10 +515,10 @@ export class App {
         return sum;
       }
       return sum + (this.progressByCard()[card.id]?.review ?? 0);
-    }, 0)
+    }, 0),
   );
   readonly sessionPosition = computed(() =>
-    this.sessionQueue().length ? this.currentIndex() + 1 : 0
+    this.sessionQueue().length ? this.currentIndex() + 1 : 0,
   );
   readonly quizAccuracy = computed(() => {
     const correct = this.quizCorrect();
@@ -521,7 +529,7 @@ export class App {
   readonly isAnswerCard = computed(() => !!this.currentCard()?.options?.length);
   readonly currentResult = computed<'correct' | 'incorrect' | 'review' | null>(() => {
     const card = this.currentCard();
-    return card ? this.progressByCard()[card.id]?.lastResult ?? null : null;
+    return card ? (this.progressByCard()[card.id]?.lastResult ?? null) : null;
   });
   readonly sessionModes: SessionMode[] = ['learn'];
   readonly currentSimulatorGlossaryEntries = computed(() => {
@@ -544,7 +552,11 @@ export class App {
   });
   readonly currentCardGlossaryEntries = computed(() => {
     const card = this.currentCard();
-    return card ? this.findGlossaryEntries(`${card.title}\n${card.prompt}\n${card.body ?? ''}\n${card.explanation}`) : [];
+    return card
+      ? this.findGlossaryEntries(
+          `${card.title}\n${card.prompt}\n${card.body ?? ''}\n${card.explanation}`,
+        )
+      : [];
   });
   readonly isQuickQuiz = computed(() => this.assessmentMode() === 'quick-quiz');
   readonly isTraining = computed(() => this.assessmentMode() === 'training');
@@ -556,10 +568,11 @@ export class App {
     if (!query) {
       return entries;
     }
-    return entries.filter((entry) =>
-      entry.title.toLowerCase().includes(query) ||
-      entry.aliases.some((alias) => alias.toLowerCase().includes(query)) ||
-      entry.summary.toLowerCase().includes(query)
+    return entries.filter(
+      (entry) =>
+        entry.title.toLowerCase().includes(query) ||
+        entry.aliases.some((alias) => alias.toLowerCase().includes(query)) ||
+        entry.summary.toLowerCase().includes(query),
     );
   });
   readonly officialLinksByCategory = computed(() => {
@@ -574,7 +587,7 @@ export class App {
       'Resiliencia',
       'Datos',
       'Red',
-      'Otros'
+      'Otros',
     ];
     const grouped = new Map<string, OfficialLink[]>();
 
@@ -598,7 +611,9 @@ export class App {
       })
       .map(([category, links]) => ({
         category,
-        links: [...links].sort((a, b) => a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }))
+        links: [...links].sort((a, b) =>
+          a.title.localeCompare(b.title, 'es', { sensitivity: 'base' }),
+        ),
       }));
   });
   readonly canGoNext = computed(() => this.revealed());
@@ -615,15 +630,15 @@ export class App {
       subtitle: 'Lectura guiada',
       cta: 'Abrir lectura completa',
       description:
-        'Lectura secuencial de patrones, trampas y mapas mentales sacados de tus apuntes. No es glosario.'
+        'Lectura secuencial de patrones, trampas y mapas mentales sacados de tus apuntes. No es glosario.',
     },
     review: {
       title: 'Repasar errores',
       subtitle: 'Ataca tus fallos',
       cta: 'Empezar repaso',
       description:
-        'Prioriza cards marcadas para repaso para cerrar huecos antes de seguir avanzando.'
-    }
+        'Prioriza cards marcadas para repaso para cerrar huecos antes de seguir avanzando.',
+    },
   };
   private simulatorTimerId: ReturnType<typeof setInterval> | null = null;
   private runtimeRestored = false;
@@ -650,18 +665,24 @@ export class App {
       this.simulatorBankEn.set(questions);
       this.tryRestoreRuntime();
     });
-    this.http.get<SimulatorQuestion[]>('assets/simulator-bank-public.json').subscribe((questions) => {
-      this.publicSimulatorBank.set(questions);
-      this.tryRestoreRuntime();
-    });
-    this.http.get<SimulatorQuestion[]>('assets/simulator-bank-updated.json').subscribe((questions) => {
-      this.updatedSimulatorBank.set(questions);
-      this.tryRestoreRuntime();
-    });
-    this.http.get<SimulatorQuestion[]>('assets/simulator-bank-updated.en.json').subscribe((questions) => {
-      this.updatedSimulatorBankEn.set(questions);
-      this.tryRestoreRuntime();
-    });
+    this.http
+      .get<SimulatorQuestion[]>('assets/simulator-bank-public.json')
+      .subscribe((questions) => {
+        this.publicSimulatorBank.set(questions);
+        this.tryRestoreRuntime();
+      });
+    this.http
+      .get<SimulatorQuestion[]>('assets/simulator-bank-updated.json')
+      .subscribe((questions) => {
+        this.updatedSimulatorBank.set(questions);
+        this.tryRestoreRuntime();
+      });
+    this.http
+      .get<SimulatorQuestion[]>('assets/simulator-bank-updated.en.json')
+      .subscribe((questions) => {
+        this.updatedSimulatorBankEn.set(questions);
+        this.tryRestoreRuntime();
+      });
     this.http.get<StudyNote[]>('assets/notes-index.json').subscribe((notes) => {
       this.notes.set(notes);
       this.tryRestoreRuntime();
@@ -731,7 +752,8 @@ export class App {
     this.simulatorBankType.set('verified');
     this.simulatorQueue.set(queue);
     this.simulatorIndex.set(0);
-    this.simulatorAnswers.set({});
+    this.resetSimulatorAnswersForQueue(queue);
+    this.prepareSimulatorOptionOrders(queue);
     this.simulatorSummary.set(null);
     this.showSimulatorReview.set(false);
     this.remainingSeconds.set(0);
@@ -766,9 +788,11 @@ export class App {
     this.assessmentMode.set('training');
     this.simulatorScope.set('full');
     this.simulatorBankType.set(bankType);
-    this.simulatorQueue.set([...this.getSimulatorBank(bankType)]);
+    const queue = [...this.getSimulatorBank(bankType)];
+    this.simulatorQueue.set(queue);
     this.simulatorIndex.set(0);
-    this.simulatorAnswers.set({});
+    this.resetSimulatorAnswersForQueue(queue);
+    this.prepareSimulatorOptionOrders(queue);
     this.simulatorSummary.set(null);
     this.showSimulatorReview.set(false);
     this.remainingSeconds.set(0);
@@ -795,7 +819,10 @@ export class App {
     this.remapActiveSimulatorQueueForLanguage();
   }
 
-  startModuleSimulator(moduleName: string, bankType: Extract<SimulatorBankType, 'verified' | 'updated'>): void {
+  startModuleSimulator(
+    moduleName: string,
+    bankType: Extract<SimulatorBankType, 'verified' | 'updated'>,
+  ): void {
     const queue = this.buildModuleQueue(moduleName, bankType);
     if (!queue.length) {
       return;
@@ -912,7 +939,8 @@ export class App {
     this.simulatorBankType.set('verified');
     this.simulatorQueue.set([question]);
     this.simulatorIndex.set(0);
-    this.simulatorAnswers.set({});
+    this.resetSimulatorAnswersForQueue([question]);
+    this.prepareSimulatorOptionOrders([question]);
     this.simulatorSummary.set(null);
     this.showSimulatorReview.set(false);
     this.remainingSeconds.set(0);
@@ -982,7 +1010,7 @@ export class App {
       meta: context.meta ?? null,
       comment,
       createdAt: new Date().toISOString(),
-      appVersion: this.appVersion
+      appVersion: this.appVersion,
     };
 
     this.reports.update((current) => {
@@ -1005,7 +1033,7 @@ export class App {
       exportedAt: new Date().toISOString(),
       appVersion: this.appVersion,
       total: reports.length,
-      reports
+      reports,
     };
 
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -1043,7 +1071,7 @@ export class App {
       exportedAt: new Date().toISOString(),
       appVersion: this.appVersion,
       totalSessions: sessions.length,
-      sessions
+      sessions,
     };
 
     const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -1074,7 +1102,34 @@ export class App {
   }
 
   simulatorOptionKeys(question: SimulatorQuestion | null): string[] {
-    return question ? Object.keys(question.options) : [];
+    if (!question) {
+      return [];
+    }
+
+    const optionKeys = Object.keys(question.options);
+    const savedOrder = this.simulatorOptionOrders()[question.id] ?? [];
+    const validOrder = savedOrder.filter((key) => optionKeys.includes(key));
+    const missingKeys = optionKeys.filter((key) => !validOrder.includes(key));
+    return [...validOrder, ...missingKeys];
+  }
+
+  simulatorOptionLabel(question: SimulatorQuestion, optionId: string): string {
+    const visualIndex = this.simulatorOptionKeys(question).indexOf(optionId);
+    return visualIndex >= 0 ? String.fromCharCode(65 + visualIndex) : optionId;
+  }
+
+  simulatorCorrectAnswerLabels(question: SimulatorQuestion): string {
+    return question.correctAnswers
+      .map((optionId) => this.simulatorOptionLabel(question, optionId))
+      .sort()
+      .join(', ');
+  }
+
+  simulatorAnswerLabels(question: SimulatorQuestion, optionIds: string[]): string {
+    return optionIds
+      .map((optionId) => this.simulatorOptionLabel(question, optionId))
+      .sort()
+      .join(', ');
   }
 
   isSimulatorSelected(questionId: number, optionId: string): boolean {
@@ -1089,7 +1144,7 @@ export class App {
     const normalized = Math.min(5, Math.max(1, Math.round(confidence)));
     this.simulatorConfidence.update((current) => ({
       ...current,
-      [questionId]: normalized
+      [questionId]: normalized,
     }));
   }
 
@@ -1110,20 +1165,23 @@ export class App {
   }
 
   isSimulatorNotesOpen(questionId: number): boolean {
-    return !!this.simulatorNotesOpen()[questionId] || this.simulatorNotesValue(questionId).trim().length > 0;
+    return (
+      !!this.simulatorNotesOpen()[questionId] ||
+      this.simulatorNotesValue(questionId).trim().length > 0
+    );
   }
 
   openSimulatorNotes(questionId: number): void {
     this.simulatorNotesOpen.update((current) => ({
       ...current,
-      [questionId]: true
+      [questionId]: true,
     }));
   }
 
   setSimulatorNotes(questionId: number, notes: string): void {
     this.simulatorNotes.update((current) => ({
       ...current,
-      [questionId]: notes
+      [questionId]: notes,
     }));
   }
 
@@ -1142,8 +1200,9 @@ export class App {
             : [...existing, optionId].sort();
       this.simulatorAnswers.update((current) => ({
         ...current,
-        [question.id]: next
+        [question.id]: next,
       }));
+      this.persistSimulatorAnswer(question.id, next);
 
       if (question.questionType === 'single') {
         this.submitQuickQuizAnswer(question, next);
@@ -1158,25 +1217,26 @@ export class App {
         return;
       }
 
-      this.simulatorAnswers.update((current) => {
-        const existing = current[question.id] ?? [];
-        const next =
-          question.questionType === 'single'
-            ? [optionId]
-            : existing.includes(optionId)
-              ? existing.filter((value) => value !== optionId)
-              : [...existing, optionId].sort();
+      const existing = this.simulatorAnswers()[question.id] ?? [];
+      const next =
+        question.questionType === 'single'
+          ? existing.includes(optionId)
+            ? []
+            : [optionId]
+          : existing.includes(optionId)
+            ? existing.filter((value) => value !== optionId)
+            : [...existing, optionId].sort();
 
-        return {
-          ...current,
-          [question.id]: next
-        };
-      });
+      this.simulatorAnswers.update((current) => ({
+        ...current,
+        [question.id]: next,
+      }));
+      this.persistSimulatorAnswer(question.id, next);
 
-      if (question.questionType === 'single' && !this.isModuleSimulator()) {
+      if (question.questionType === 'single' && !this.isModuleSimulator() && next.length) {
         this.trainingChecked.update((current) => ({
           ...current,
-          [question.id]: true
+          [question.id]: true,
         }));
         this.captureCurrentSimulatorQuestionTime();
       }
@@ -1189,20 +1249,21 @@ export class App {
       return;
     }
 
-    this.simulatorAnswers.update((current) => {
-      const existing = current[question.id] ?? [];
-      const next =
-        question.questionType === 'single'
-          ? [optionId]
-          : existing.includes(optionId)
-            ? existing.filter((value) => value !== optionId)
-            : [...existing, optionId].sort();
+    const existing = this.simulatorAnswers()[question.id] ?? [];
+    const next =
+      question.questionType === 'single'
+        ? existing.includes(optionId)
+          ? []
+          : [optionId]
+        : existing.includes(optionId)
+          ? existing.filter((value) => value !== optionId)
+          : [...existing, optionId].sort();
 
-      return {
-        ...current,
-        [question.id]: next
-      };
-    });
+    this.simulatorAnswers.update((current) => ({
+      ...current,
+      [question.id]: next,
+    }));
+    this.persistSimulatorAnswer(question.id, next);
     this.playTone('soft');
   }
 
@@ -1233,12 +1294,12 @@ export class App {
     }
   }
 
-  simulatorQuestionState(index: number): 'current' | 'answered' | 'unanswered' {
+  simulatorQuestionState(index: number): 'current' | 'correct' | 'incorrect' | 'unanswered' {
     if (index === this.simulatorIndex()) {
       return 'current';
     }
     const question = this.simulatorQueue()[index];
-    return (this.simulatorAnswers()[question.id] ?? []).length ? 'answered' : 'unanswered';
+    return this.simulatorQuestionResult(question);
   }
 
   simulatorQuestionHasNote(questionId: number): boolean {
@@ -1267,16 +1328,28 @@ export class App {
     let correct = 0;
     const bySystemMap = new Map<
       string,
-      { system: string; total: number; correct: number; incorrect: number; unanswered: number; scorePercent: number }
+      {
+        system: string;
+        total: number;
+        correct: number;
+        incorrect: number;
+        unanswered: number;
+        scorePercent: number;
+      }
     >();
 
     for (const question of queue) {
       const selected = [...(answers[question.id] ?? [])].sort();
       const expected = [...question.correctAnswers].sort();
       const system = this.normalizeSystemName(question.domainName);
-      const currentSystem =
-        bySystemMap.get(system) ??
-        { system, total: 0, correct: 0, incorrect: 0, unanswered: 0, scorePercent: 0 };
+      const currentSystem = bySystemMap.get(system) ?? {
+        system,
+        total: 0,
+        correct: 0,
+        incorrect: 0,
+        unanswered: 0,
+        scorePercent: 0,
+      };
       currentSystem.total += 1;
 
       if (selected.length) {
@@ -1308,7 +1381,7 @@ export class App {
     const bySystem = [...bySystemMap.values()]
       .map((entry) => ({
         ...entry,
-        scorePercent: entry.total ? Math.round((entry.correct / entry.total) * 100) : 0
+        scorePercent: entry.total ? Math.round((entry.correct / entry.total) * 100) : 0,
       }))
       .sort((a, b) => {
         if (a.scorePercent !== b.scorePercent) {
@@ -1326,7 +1399,7 @@ export class App {
       incorrect,
       scorePercent: total ? Math.round((correct / total) * 100) : 0,
       elapsedSeconds,
-      bySystem
+      bySystem,
     };
 
     this.simulatorSummary.set(summary);
@@ -1343,9 +1416,9 @@ export class App {
             updated: current.examHistory?.updated ?? { attempts: 0, lastScorePercent: null },
             [bankType]: {
               attempts: previous.attempts + 1,
-              lastScorePercent: total ? Math.round((correct / total) * 100) : 0
-            }
-          }
+              lastScorePercent: total ? Math.round((correct / total) * 100) : 0,
+            },
+          },
         };
       });
     }
@@ -1433,7 +1506,7 @@ export class App {
 
     this.examChecked.update((current) => ({
       ...current,
-      [question.id]: true
+      [question.id]: true,
     }));
     this.captureCurrentSimulatorQuestionTime();
     this.playTone(this.isCurrentExamAnswerCorrect() ? 'correct' : 'incorrect');
@@ -1452,7 +1525,7 @@ export class App {
 
     this.trainingChecked.update((current) => ({
       ...current,
-      [question.id]: true
+      [question.id]: true,
     }));
     this.captureCurrentSimulatorQuestionTime();
     this.playTone(this.isCurrentTrainingAnswerCorrect() ? 'correct' : 'incorrect');
@@ -1469,7 +1542,7 @@ export class App {
 
       return {
         ...current,
-        trainingBookmarks: next
+        trainingBookmarks: next,
       };
     });
     this.playTone('soft');
@@ -1640,7 +1713,7 @@ export class App {
         incorrect: 0,
         review: 0,
         needsReview: false,
-        lastResult: null
+        lastResult: null,
       };
 
       const next: CardProgress = {
@@ -1649,15 +1722,15 @@ export class App {
         incorrect: existing.incorrect + (result === 'incorrect' ? 1 : 0),
         review: existing.review + (result === 'review' ? 1 : 0),
         needsReview: result !== 'correct',
-        lastResult: result
+        lastResult: result,
       };
 
       return {
         ...current,
         progress: {
           ...current.progress,
-          [cardId]: next
-        }
+          [cardId]: next,
+        },
       };
     });
   }
@@ -1683,8 +1756,8 @@ export class App {
         total: queue.length,
         correct: 0,
         incorrect: 0,
-        review: 0
-      } satisfies SessionSummary
+        review: 0,
+      } satisfies SessionSummary,
     );
 
     this.sessionSummary.set(summary);
@@ -1711,10 +1784,13 @@ export class App {
     }
   }
 
-  private playTone(kind: 'start' | 'next' | 'soft' | 'review' | 'correct' | 'incorrect' | 'finish'): void {
+  private playTone(
+    kind: 'start' | 'next' | 'soft' | 'review' | 'correct' | 'incorrect' | 'finish',
+  ): void {
     const AudioCtor =
       globalThis.AudioContext ||
-      (globalThis as typeof globalThis & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      (globalThis as typeof globalThis & { webkitAudioContext?: typeof AudioContext })
+        .webkitAudioContext;
 
     if (!AudioCtor) {
       return;
@@ -1728,34 +1804,33 @@ export class App {
         return;
       }
 
-      const patterns: Record<typeof kind, Array<{ frequency: number; duration: number; gain: number; type: OscillatorType }>> = {
+      const patterns: Record<
+        typeof kind,
+        Array<{ frequency: number; duration: number; gain: number; type: OscillatorType }>
+      > = {
         start: [
           { frequency: 440, duration: 0.05, gain: 0.05, type: 'triangle' },
-          { frequency: 660, duration: 0.08, gain: 0.06, type: 'triangle' }
+          { frequency: 660, duration: 0.08, gain: 0.06, type: 'triangle' },
         ],
-        next: [
-          { frequency: 520, duration: 0.04, gain: 0.04, type: 'sine' }
-        ],
-        soft: [
-          { frequency: 420, duration: 0.04, gain: 0.035, type: 'sine' }
-        ],
+        next: [{ frequency: 520, duration: 0.04, gain: 0.04, type: 'sine' }],
+        soft: [{ frequency: 420, duration: 0.04, gain: 0.035, type: 'sine' }],
         review: [
           { frequency: 320, duration: 0.05, gain: 0.04, type: 'triangle' },
-          { frequency: 260, duration: 0.07, gain: 0.04, type: 'triangle' }
+          { frequency: 260, duration: 0.07, gain: 0.04, type: 'triangle' },
         ],
         correct: [
           { frequency: 660, duration: 0.06, gain: 0.05, type: 'triangle' },
-          { frequency: 880, duration: 0.09, gain: 0.06, type: 'triangle' }
+          { frequency: 880, duration: 0.09, gain: 0.06, type: 'triangle' },
         ],
         incorrect: [
           { frequency: 300, duration: 0.06, gain: 0.04, type: 'sawtooth' },
-          { frequency: 220, duration: 0.08, gain: 0.04, type: 'sawtooth' }
+          { frequency: 220, duration: 0.08, gain: 0.04, type: 'sawtooth' },
         ],
         finish: [
           { frequency: 523.25, duration: 0.06, gain: 0.045, type: 'triangle' },
           { frequency: 659.25, duration: 0.08, gain: 0.05, type: 'triangle' },
-          { frequency: 783.99, duration: 0.1, gain: 0.055, type: 'triangle' }
-        ]
+          { frequency: 783.99, duration: 0.1, gain: 0.055, type: 'triangle' },
+        ],
       };
 
       let offset = 0;
@@ -1786,10 +1861,11 @@ export class App {
         examHistory: {
           verified: { attempts: 0, lastScorePercent: null },
           public: { attempts: 0, lastScorePercent: null },
-          updated: { attempts: 0, lastScorePercent: null }
+          updated: { attempts: 0, lastScorePercent: null },
         },
         quickQuizHistory: {},
-        trainingBookmarks: {}
+        trainingBookmarks: {},
+        persistentSimulatorAnswers: {},
       };
     }
 
@@ -1800,10 +1876,11 @@ export class App {
         examHistory: {
           verified: parsed.examHistory?.verified ?? { attempts: 0, lastScorePercent: null },
           public: parsed.examHistory?.public ?? { attempts: 0, lastScorePercent: null },
-          updated: parsed.examHistory?.updated ?? { attempts: 0, lastScorePercent: null }
+          updated: parsed.examHistory?.updated ?? { attempts: 0, lastScorePercent: null },
         },
         quickQuizHistory: parsed.quickQuizHistory ?? {},
-        trainingBookmarks: parsed.trainingBookmarks ?? {}
+        trainingBookmarks: parsed.trainingBookmarks ?? {},
+        persistentSimulatorAnswers: parsed.persistentSimulatorAnswers ?? {},
       };
     } catch {
       return {
@@ -1811,10 +1888,11 @@ export class App {
         examHistory: {
           verified: { attempts: 0, lastScorePercent: null },
           public: { attempts: 0, lastScorePercent: null },
-          updated: { attempts: 0, lastScorePercent: null }
+          updated: { attempts: 0, lastScorePercent: null },
         },
         quickQuizHistory: {},
-        trainingBookmarks: {}
+        trainingBookmarks: {},
+        persistentSimulatorAnswers: {},
       };
     }
   }
@@ -1856,7 +1934,19 @@ export class App {
       return;
     }
 
-    if (!this.cards().length || !this.conceptCards().length || !this.quickQuizBank().length || !this.simulatorBank().length || !this.simulatorBankEn().length || !this.publicSimulatorBank().length || !this.updatedSimulatorBank().length || !this.updatedSimulatorBankEn().length || !this.notes().length || !this.visualScenarios().length || !this.glossaryEntries().length) {
+    if (
+      !this.cards().length ||
+      !this.conceptCards().length ||
+      !this.quickQuizBank().length ||
+      !this.simulatorBank().length ||
+      !this.simulatorBankEn().length ||
+      !this.publicSimulatorBank().length ||
+      !this.updatedSimulatorBank().length ||
+      !this.updatedSimulatorBankEn().length ||
+      !this.notes().length ||
+      !this.visualScenarios().length ||
+      !this.glossaryEntries().length
+    ) {
       return;
     }
 
@@ -1892,6 +1982,7 @@ export class App {
       simulatorQueueIds: this.simulatorQueue().map((question) => question.id),
       simulatorIndex: this.simulatorIndex(),
       simulatorAnswers: this.simulatorAnswers(),
+      simulatorOptionOrders: this.simulatorOptionOrders(),
       simulatorSummary: this.simulatorSummary(),
       showSimulatorReview: this.showSimulatorReview(),
       remainingSeconds: this.remainingSeconds(),
@@ -1924,6 +2015,7 @@ export class App {
     this.sessionSummary.set(snapshot.sessionSummary ?? null);
     this.simulatorBankType.set(restoredBankType);
     this.simulatorAnswers.set(snapshot.simulatorAnswers ?? {});
+    this.simulatorOptionOrders.set(snapshot.simulatorOptionOrders ?? {});
     this.simulatorSummary.set(snapshot.simulatorSummary ?? null);
     this.showSimulatorReview.set(!!snapshot.showSimulatorReview);
     this.remainingSeconds.set(snapshot.remainingSeconds ?? SIMULATOR_DURATION_SECONDS);
@@ -1950,7 +2042,7 @@ export class App {
     this.currentIndex.set(
       restoredSessionQueue.length
         ? Math.min(Math.max(snapshot.currentIndex ?? 0, 0), restoredSessionQueue.length - 1)
-        : 0
+        : 0,
     );
 
     const simulatorSource = this.getSimulatorBank(restoredBankType);
@@ -1959,10 +2051,11 @@ export class App {
       .map((id) => simulatorById.get(id))
       .filter((question): question is SimulatorQuestion => !!question);
     this.simulatorQueue.set(restoredSimulatorQueue);
+    this.prepareSimulatorOptionOrders(restoredSimulatorQueue);
     this.simulatorIndex.set(
       restoredSimulatorQueue.length
         ? Math.min(Math.max(snapshot.simulatorIndex ?? 0, 0), restoredSimulatorQueue.length - 1)
-        : 0
+        : 0,
     );
 
     const activeNote = this.notes().find((note) => note.id === snapshot.activeNoteId) ?? null;
@@ -1971,7 +2064,8 @@ export class App {
       return;
     }
 
-    const glossaryEntry = this.glossaryEntries().find((entry) => entry.id === snapshot.activeGlossaryId) ?? null;
+    const glossaryEntry =
+      this.glossaryEntries().find((entry) => entry.id === snapshot.activeGlossaryId) ?? null;
     if (glossaryEntry) {
       this.activeGlossaryEntry.set(glossaryEntry);
     }
@@ -1979,7 +2073,11 @@ export class App {
     this.phase.set(snapshot.phase ?? 'home');
     this.syncQuickQuizRevealState();
 
-    if (snapshot.phase === 'simulator' && restoredSimulatorQueue.length && snapshot.assessmentMode !== 'quick-quiz') {
+    if (
+      snapshot.phase === 'simulator' &&
+      restoredSimulatorQueue.length &&
+      snapshot.assessmentMode !== 'quick-quiz'
+    ) {
       this.beginCurrentSimulatorQuestionTimer();
       this.syncRemainingSecondsFromDeadline();
       if (this.remainingSeconds() > 0) {
@@ -2002,7 +2100,7 @@ export class App {
 
     return this.glossaryEntries()
       .filter((entry) =>
-        this.glossarySearchTerms(entry).some((term) => normalizedHaystack.includes(term))
+        this.glossarySearchTerms(entry).some((term) => normalizedHaystack.includes(term)),
       )
       .sort((left, right) => {
         const leftLen = Math.max(...this.glossarySearchTerms(left).map((term) => term.length));
@@ -2029,7 +2127,7 @@ export class App {
         const stats = history[question.id] ?? { answered: 0, correct: 0, incorrect: 0 };
         return {
           question,
-          priority: stats.answered + Math.random() * 1.5
+          priority: stats.answered + Math.random() * 1.5,
         };
       })
       .sort((left, right) => left.priority - right.priority)
@@ -2042,7 +2140,7 @@ export class App {
       const previous = current.quickQuizHistory[questionId] ?? {
         answered: 0,
         correct: 0,
-        incorrect: 0
+        incorrect: 0,
       };
 
       return {
@@ -2052,9 +2150,9 @@ export class App {
           [questionId]: {
             answered: previous.answered + 1,
             correct: previous.correct + (isCorrect ? 1 : 0),
-            incorrect: previous.incorrect + (isCorrect ? 0 : 1)
-          }
-        }
+            incorrect: previous.incorrect + (isCorrect ? 0 : 1),
+          },
+        },
       };
     });
   }
@@ -2065,6 +2163,40 @@ export class App {
     this.simulatorNotesOpen.set({});
     this.simulatorQuestionTimeSeconds.set({});
     this.simulatorQuestionStartedAt.set(null);
+  }
+
+  private resetSimulatorAnswersForQueue(queue: SimulatorQuestion[]): void {
+    const persistentAnswers = this.state().persistentSimulatorAnswers;
+    const nextAnswers = queue.reduce<Record<number, string[]>>((answers, question) => {
+      const validOptions = new Set(Object.keys(question.options));
+      const savedAnswers = (persistentAnswers[question.id] ?? []).filter((optionId) =>
+        validOptions.has(optionId),
+      );
+      if (savedAnswers.length) {
+        answers[question.id] = [...savedAnswers].sort();
+      }
+      return answers;
+    }, {});
+
+    this.simulatorAnswers.set(nextAnswers);
+  }
+
+  private persistSimulatorAnswer(questionId: number, answers: string[]): void {
+    this.state.update((current) => {
+      const nextPersistentAnswers = { ...current.persistentSimulatorAnswers };
+      const normalizedAnswers = [...new Set(answers)].sort();
+
+      if (normalizedAnswers.length) {
+        nextPersistentAnswers[questionId] = normalizedAnswers;
+      } else {
+        delete nextPersistentAnswers[questionId];
+      }
+
+      return {
+        ...current,
+        persistentSimulatorAnswers: nextPersistentAnswers,
+      };
+    });
   }
 
   private beginCurrentSimulatorQuestionTimer(): void {
@@ -2086,13 +2218,13 @@ export class App {
     const elapsedSeconds = Math.max(0, Math.round((Date.now() - startedAt) / 1000));
     this.simulatorQuestionTimeSeconds.update((current) => ({
       ...current,
-      [question.id]: (current[question.id] ?? 0) + elapsedSeconds
+      [question.id]: (current[question.id] ?? 0) + elapsedSeconds,
     }));
     this.simulatorQuestionStartedAt.set(null);
   }
 
   private buildCurrentSimulatorSessionExport(
-    summary: SimulatorSummary | null = this.simulatorSummary()
+    summary: SimulatorSummary | null = this.simulatorSummary(),
   ): SimulatorSessionExport | null {
     if (!summary) {
       return null;
@@ -2112,7 +2244,7 @@ export class App {
       startedAt,
       completedAt,
       summary,
-      answers: this.buildSimulatorExportRecords()
+      answers: this.buildSimulatorExportRecords(),
     };
   }
 
@@ -2140,31 +2272,30 @@ export class App {
     const notes = this.simulatorNotes();
     const timeSeconds = this.simulatorQuestionTimeSeconds();
 
-    return this.simulatorQueue()
-      .map((question) => {
-        const selected = [...(answers[question.id] ?? [])].sort();
-        const expected = [...question.correctAnswers].sort();
-        const isCorrect =
-          selected.length === expected.length &&
-          selected.every((value, index) => value === expected[index]);
+    return this.simulatorQueue().map((question) => {
+      const selected = [...(answers[question.id] ?? [])].sort();
+      const expected = [...question.correctAnswers].sort();
+      const isCorrect =
+        selected.length === expected.length &&
+        selected.every((value, index) => value === expected[index]);
 
-        return {
-          question: question.id,
-          question_text: question.question,
-          topic: question.topic,
-          domain_name: question.domainName,
-          question_type: question.questionType,
-          selected_answers: selected,
-          correct_answers: expected,
-          answer: selected,
-          correct_answer: expected,
-          answered: selected.length > 0,
-          is_correct: isCorrect,
-          confidence: confidence[question.id] ?? null,
-          time_seconds: timeSeconds[question.id] ?? 0,
-          notes: notes[question.id]?.trim() ?? ''
-        };
-      });
+      return {
+        question: question.id,
+        question_text: question.question,
+        topic: question.topic,
+        domain_name: question.domainName,
+        question_type: question.questionType,
+        selected_answers: selected,
+        correct_answers: expected,
+        answer: selected,
+        correct_answer: expected,
+        answered: selected.length > 0,
+        is_correct: isCorrect,
+        confidence: confidence[question.id] ?? null,
+        time_seconds: timeSeconds[question.id] ?? 0,
+        notes: notes[question.id]?.trim() ?? '',
+      };
+    });
   }
 
   private formatDateStamp(date: Date): string {
@@ -2212,6 +2343,26 @@ export class App {
     return copy;
   }
 
+  private prepareSimulatorOptionOrders(queue: SimulatorQuestion[]): void {
+    this.simulatorOptionOrders.update((current) => {
+      const next = { ...current };
+
+      for (const question of queue) {
+        const optionKeys = Object.keys(question.options);
+        const currentOrder = next[question.id] ?? [];
+        const validCurrentOrder = currentOrder.filter((key) => optionKeys.includes(key));
+        const missingKeys = optionKeys.filter((key) => !validCurrentOrder.includes(key));
+
+        next[question.id] =
+          validCurrentOrder.length === optionKeys.length
+            ? validCurrentOrder
+            : this.shuffle([...validCurrentOrder, ...missingKeys]);
+      }
+
+      return next;
+    });
+  }
+
   private submitQuickQuizAnswer(question: SimulatorQuestion, selectedAnswers: string[]): void {
     const expected = [...question.correctAnswers].sort();
     const selected = [...selectedAnswers].sort();
@@ -2232,7 +2383,9 @@ export class App {
     }
 
     if (bankType === 'updated') {
-      return this.appLanguage() === 'en' ? this.updatedSimulatorBankEn() : this.updatedSimulatorBank();
+      return this.appLanguage() === 'en'
+        ? this.updatedSimulatorBankEn()
+        : this.updatedSimulatorBank();
     }
 
     return this.publicSimulatorBank();
@@ -2251,7 +2404,23 @@ export class App {
 
     if (remapped.length === this.simulatorQueue().length) {
       this.simulatorQueue.set(remapped);
+      this.prepareSimulatorOptionOrders(remapped);
     }
+  }
+
+  private simulatorQuestionResult(
+    question: SimulatorQuestion,
+  ): 'correct' | 'incorrect' | 'unanswered' {
+    const selected = [...(this.simulatorAnswers()[question.id] ?? [])].sort();
+    if (!selected.length) {
+      return 'unanswered';
+    }
+
+    const expected = [...question.correctAnswers].sort();
+    return selected.length === expected.length &&
+      selected.every((value, index) => value === expected[index])
+      ? 'correct'
+      : 'incorrect';
   }
 
   private countQuestionsByModule(questions: SimulatorQuestion[]): Map<string, number> {
@@ -2267,10 +2436,12 @@ export class App {
 
   private buildModuleQueue(
     moduleName: string,
-    bankType: Extract<SimulatorBankType, 'verified' | 'updated'>
+    bankType: Extract<SimulatorBankType, 'verified' | 'updated'>,
   ): SimulatorQuestion[] {
     return this.shuffle(
-      this.getSimulatorBank(bankType).filter((question) => this.normalizeSystemName(question.domainName) === moduleName)
+      this.getSimulatorBank(bankType).filter(
+        (question) => this.normalizeSystemName(question.domainName) === moduleName,
+      ),
     );
   }
 
@@ -2279,7 +2450,7 @@ export class App {
     assessmentMode: AssessmentMode,
     bankType: SimulatorBankType,
     timed: boolean,
-    scope: SimulatorScope
+    scope: SimulatorScope,
   ): void {
     this.closeReportPanel();
     this.clearSimulatorTimer();
@@ -2288,7 +2459,8 @@ export class App {
     this.simulatorBankType.set(bankType);
     this.simulatorQueue.set(queue);
     this.simulatorIndex.set(0);
-    this.simulatorAnswers.set({});
+    this.resetSimulatorAnswersForQueue(queue);
+    this.prepareSimulatorOptionOrders(queue);
     this.simulatorSummary.set(null);
     this.showSimulatorReview.set(false);
     const durationSeconds = timed ? this.simulatorDurationSecondsForQueue(queue, scope) : 0;
@@ -2319,9 +2491,7 @@ export class App {
         variants.add(normalized);
       }
 
-      const strippedPrefix = this.normalizeGlossaryText(
-        term.replace(/^(Amazon|AWS)\s+/i, '')
-      );
+      const strippedPrefix = this.normalizeGlossaryText(term.replace(/^(Amazon|AWS)\s+/i, ''));
       if (strippedPrefix) {
         variants.add(strippedPrefix);
       }
@@ -2349,12 +2519,17 @@ export class App {
     return this.simulatorDurationSecondsForQueue(this.simulatorQueue(), this.simulatorScope());
   }
 
-  private simulatorDurationSecondsForQueue(queue: SimulatorQuestion[], scope: SimulatorScope): number {
+  private simulatorDurationSecondsForQueue(
+    queue: SimulatorQuestion[],
+    scope: SimulatorScope,
+  ): number {
     if (scope !== 'module') {
       return SIMULATOR_DURATION_SECONDS;
     }
 
-    return Math.ceil((SIMULATOR_DURATION_SECONDS * queue.length) / SIMULATOR_FULL_EXAM_QUESTION_COUNT);
+    return Math.ceil(
+      (SIMULATOR_DURATION_SECONDS * queue.length) / SIMULATOR_FULL_EXAM_QUESTION_COUNT,
+    );
   }
 
   private normalizeOfficialCategory(category: string): string {

@@ -5,9 +5,10 @@ import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
+    localStorage.clear();
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideHttpClient(), provideHttpClientTesting()]
+      providers: [provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
   });
 
@@ -46,7 +47,9 @@ describe('App', () => {
     await fixture.whenStable();
 
     expect(app.phase()).toBe('personalized-training');
-    expect((fixture.nativeElement as HTMLElement).querySelector('app-personalized-training-shell')).not.toBeNull();
+    expect(
+      (fixture.nativeElement as HTMLElement).querySelector('app-personalized-training-shell'),
+    ).not.toBeNull();
 
     app.goHome();
 
@@ -67,7 +70,7 @@ describe('App', () => {
         correctAnswers: ['B', 'D', 'E'],
         explanation: 'Use staged controls.',
         domainName: 'Deployment',
-        topic: 'CI/CD'
+        topic: 'CI/CD',
       },
       {
         id: 37,
@@ -77,8 +80,8 @@ describe('App', () => {
         correctAnswers: ['A'],
         explanation: 'SNS is a target.',
         domainName: 'Monitoring',
-        topic: 'Alarms'
-      }
+        topic: 'Alarms',
+      },
     ]);
     app.simulatorAnswers.set({ 36: ['D', 'B'], 37: ['A'] });
     app.simulatorConfidence.set({ 36: 4 });
@@ -98,7 +101,7 @@ describe('App', () => {
       is_correct: false,
       confidence: 4,
       time_seconds: 42,
-      notes: 'Review E'
+      notes: 'Review E',
     });
     expect(records[1].selected_answers).toEqual(['A']);
     expect(records[1].correct_answers).toEqual(['A']);
@@ -121,26 +124,30 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
 
-    expect(app.simulatorSelectionInstruction({
-      id: 1,
-      questionType: 'multi',
-      question: 'Choose safeguards.',
-      options: { A: 'A', B: 'B', C: 'C' },
-      correctAnswers: ['A', 'C'],
-      explanation: '',
-      domainName: null,
-      topic: null
-    })).toBe('Selecciona 2 opciones.');
-    expect(app.simulatorSelectionInstruction({
-      id: 2,
-      questionType: 'single',
-      question: 'Choose one.',
-      options: { A: 'A' },
-      correctAnswers: ['A'],
-      explanation: '',
-      domainName: null,
-      topic: null
-    })).toBe('Selecciona una opcion.');
+    expect(
+      app.simulatorSelectionInstruction({
+        id: 1,
+        questionType: 'multi',
+        question: 'Choose safeguards.',
+        options: { A: 'A', B: 'B', C: 'C' },
+        correctAnswers: ['A', 'C'],
+        explanation: '',
+        domainName: null,
+        topic: null,
+      }),
+    ).toBe('Selecciona 2 opciones.');
+    expect(
+      app.simulatorSelectionInstruction({
+        id: 2,
+        questionType: 'single',
+        question: 'Choose one.',
+        options: { A: 'A' },
+        correctAnswers: ['A'],
+        explanation: '',
+        domainName: null,
+        topic: null,
+      }),
+    ).toBe('Selecciona una opcion.');
   });
 
   it('uses proportional timed training for module simulator sessions', () => {
@@ -154,7 +161,7 @@ describe('App', () => {
       correctAnswers: ['A'],
       explanation: '',
       domainName: 'Monitoring and Logging',
-      topic: null
+      topic: null,
     }));
 
     app.simulatorBank.set(questions);
@@ -194,6 +201,105 @@ describe('App', () => {
     expect(app.simulatorNotesValue(10)).toBe('Compare A and C');
   });
 
+  it('keeps simulator selections marked across completed sessions until deselected', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    const questions = [
+      {
+        id: 10,
+        questionType: 'multi' as const,
+        question: 'Choose safeguards.',
+        options: { A: 'A', B: 'B', C: 'C' },
+        correctAnswers: ['A', 'C'],
+        explanation: '',
+        domainName: null,
+        topic: null,
+      },
+    ];
+
+    app.simulatorBank.set(questions);
+    app.startTraining('verified');
+    app.selectSimulatorOption(questions[0], 'B');
+    app.finishSimulator();
+    app.startTraining('verified');
+
+    expect(app.isSimulatorSelected(10, 'B')).toBe(true);
+
+    app.selectSimulatorOption(questions[0], 'B');
+
+    expect(app.isSimulatorSelected(10, 'B')).toBe(false);
+    expect(app.state().persistentSimulatorAnswers[10]).toBeUndefined();
+  });
+
+  it('uses randomized visual option letters without changing stored answer ids', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    const question = {
+      id: 20,
+      questionType: 'single' as const,
+      question: 'Choose one.',
+      options: { A: 'Original A', B: 'Original B', C: 'Original C' },
+      correctAnswers: ['A'],
+      explanation: '',
+      domainName: null,
+      topic: null,
+    };
+
+    app.simulatorQueue.set([question]);
+    app.simulatorOptionOrders.set({ 20: ['C', 'A', 'B'] });
+    app.simulatorAnswers.set({ 20: ['A'] });
+
+    expect(app.simulatorOptionKeys(question)).toEqual(['C', 'A', 'B']);
+    expect(app.simulatorOptionLabel(question, 'A')).toBe('B');
+    expect(app.simulatorCorrectAnswerLabels(question)).toBe('B');
+    expect(app.simulatorExportRecords()[0].correct_answers).toEqual(['A']);
+    expect(app.simulatorExportRecords()[0].selected_answers).toEqual(['A']);
+  });
+
+  it('marks simulator navigation by correctness', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+
+    app.simulatorQueue.set([
+      {
+        id: 1,
+        questionType: 'single',
+        question: 'First?',
+        options: { A: 'A' },
+        correctAnswers: ['A'],
+        explanation: '',
+        domainName: null,
+        topic: null,
+      },
+      {
+        id: 2,
+        questionType: 'single',
+        question: 'Second?',
+        options: { A: 'A', B: 'B' },
+        correctAnswers: ['A'],
+        explanation: '',
+        domainName: null,
+        topic: null,
+      },
+      {
+        id: 3,
+        questionType: 'single',
+        question: 'Third?',
+        options: { A: 'A' },
+        correctAnswers: ['A'],
+        explanation: '',
+        domainName: null,
+        topic: null,
+      },
+    ]);
+    app.simulatorIndex.set(2);
+    app.simulatorAnswers.set({ 1: ['A'], 2: ['B'] });
+
+    expect(app.simulatorQuestionState(0)).toBe('correct');
+    expect(app.simulatorQuestionState(1)).toBe('incorrect');
+    expect(app.simulatorQuestionState(2)).toBe('current');
+  });
+
   it('shows unanswered count before confirmed exam finish', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
@@ -208,7 +314,7 @@ describe('App', () => {
         correctAnswers: ['A'],
         explanation: '',
         domainName: null,
-        topic: null
+        topic: null,
       },
       {
         id: 2,
@@ -218,15 +324,15 @@ describe('App', () => {
         correctAnswers: ['A'],
         explanation: '',
         domainName: null,
-        topic: null
-      }
+        topic: null,
+      },
     ]);
     app.simulatorAnswers.set({ 1: ['A'] });
 
     app.confirmFinishSimulator();
 
     expect(confirmSpy).toHaveBeenCalledWith(
-      'Te falta 1 pregunta sin responder. ¿Quieres entregar el examen ahora?'
+      'Te falta 1 pregunta sin responder. ¿Quieres entregar el examen ahora?',
     );
     expect(app.phase()).toBe('home');
 
@@ -248,7 +354,7 @@ describe('App', () => {
         correctAnswers: ['A'],
         explanation: '',
         domainName: null,
-        topic: null
+        topic: null,
       },
       {
         id: 2,
@@ -258,7 +364,7 @@ describe('App', () => {
         correctAnswers: ['A'],
         explanation: '',
         domainName: null,
-        topic: null
+        topic: null,
       },
       {
         id: 3,
@@ -268,8 +374,8 @@ describe('App', () => {
         correctAnswers: ['A'],
         explanation: '',
         domainName: null,
-        topic: null
-      }
+        topic: null,
+      },
     ]);
     app.simulatorIndex.set(0);
     app.simulatorQuestionStartedAt.set(Date.now() - 2500);
