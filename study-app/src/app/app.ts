@@ -253,7 +253,7 @@ export class App {
   private readonly simulatorTrainingBridge = inject(SimulatorTrainingBridgeService);
   private audioContext: AudioContext | null = null;
   private simulatorNavigationPending = false;
-  readonly appVersion = 'v1.3.15';
+  readonly appVersion = 'v1.3.16';
   readonly confidenceOptions = [
     { value: 1, label: 'Guessing' },
     { value: 2, label: 'Low' },
