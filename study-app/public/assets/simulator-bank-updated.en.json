@@ -513,7 +513,7 @@
       "A"
     ],
     "explanation": "A.\nYou can use EventBridge to detect and react to AWS Health events. Based on the rules you create, EventBridge\ninvokes one or more target actions when an event matches the values you specify. Depending on the type of\nevent, you can capture event information, initiate additional events, send notifications, and take action\ncorrectives.\nKEY IDEA: AWS Health announces runtime obsolescence; EventBridge filters those events and delivers them to the SNS\nexisting.\nWHY NOT THE OTHERS\nB. This solution is not the most operationally efficient approach because the managed rule\nLAMBDA_FUNCTION_SETTINGS_CHECK in AWS Config requires that you provide a list of EOL runtimes.\nC. Trusted Advisor can detect EOL execution times. However, this functionality is not available with the plan.\nbasic AWS technical support. Additionally, Trusted Advisor cannot send notifications to an SNS topic.\nD. You cannot access the AWS Health API using the AWS Basic Support plan.",
-    "domainName": "Configuration Management and IaC",
+    "domainName": "Monitoring and Logging",
     "topic": "LAMBDA EOL RUNTIME"
   },
   {
@@ -704,7 +704,7 @@
       "B"
     ],
     "explanation": "b.\nUsing template restrictions at the AWS Service Catalog level minimizes overhead, provides restricted access to\ntemplates for beginners and provides unrestricted access for experts. Beginners will implement\nusing AWS Service Catalog products with template restrictions. Experts will be deployed directly\nusing CloudFormation without restrictions.\nKEY IDEA: Service Catalog publishes governed products for beginners; experts retain direct access to\ntemplates and CloudFormation.\nWHY NOT THE OTHERS\nA. With this solution, experts would have access only to the AWS Service Catalog portfolio and would not be able to deploy the templates.\nCloudFormation without restrictions. A startup restriction specifies the IAM role that AWS Service Catalog assumes when a\nend user starts, updates or terminates a product.\nC. Parameter restrictions would restrict experts and limit available VPCs to VPCs within the property\nParameters AllowedValues. This solution does not meet the requirement of allowing experts to create AWS resources without\nrestrictions.\nD. CloudFormation does not directly support using DynamoDB as a template source. With CloudFormation, you can provide\nthe template in the body or store the template in an S3 bucket and provide the S3 URL.",
-    "domainName": "Security and Compliance",
+    "domainName": "Configuration Management and IaC",
     "topic": "BEGINNERS RESTRICTED"
   },
   {
@@ -1205,7 +1205,7 @@
       "A"
     ],
     "explanation": "A.\nThe .ebextensions folder within the application source package may contain configuration files\ncustomized with any name if the files have a .config extension. Files may contain a key\nresource that describes any resource that CloudFormation supports, including SQS queues and S3 buckets. The\nResources are created, updated, and deleted at the same time in the Elastic Beanstalk environment.\nLearn more about how to use .ebextensions for customization.\nLearn more about creating custom resources within Elastic Beanstalk.\nKEY IDEA: The CloudFormation definitions within the bundle cause Beanstalk to create and manage resources along with\nthe environment.\nWHY NOT THE OTHERS\nB. Elastic Beanstalk will not recognize or execute a .sh file in .ebextensions. Elastic Beanstalk only recognizes files with a\nextension.config.\nC. The.ebextensions folder within the application source package may contain custom configuration files\nwith any name if the files have a .config extension.\nD. You need a single automatic solution, not two parallel solutions. A CloudFormation stack would not be part of the environment\nElastic Beanstalk. Instead, you must place the CloudFormation resource definitions in an Elastic .config file\nBeanstalk.",
-    "domainName": "SDLC Automation",
+    "domainName": "Configuration Management and IaC",
     "topic": "ELASTIC BEANSTALK"
   },
   {

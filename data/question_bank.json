@@ -27,11 +27,11 @@
                                 },
         "error_pattern":  null,
         "notes":  null,
-        "domain_number":  6,
-        "domain":  "d6_security_compliance",
-        "domain_name":  "Security and Compliance",
-        "domain_source":  "inferred_from_question_content_and_legacy_classification",
-        "domain_confidence":  "inferred"
+        "domain_number":  2,
+        "domain":  "d2_configuration_management_iac",
+        "domain_name":  "Configuration Management and IaC",
+        "domain_source":  "inferred_from_question_content_and_dop_c02_blueprint",
+        "domain_confidence":  "high"
     },
     {
         "id":  2,
@@ -387,9 +387,9 @@
         "options":  {
                         "A":  "Utilizar el CloudWatch Logs agent para recopilar todos los logs de AWS SDK. Buscar los datos de logs usando un conjunto predefinido de patrones de filtro que coincidan con llamadas de API mutating. Usar CloudWatch alarms para enviar notificaciones en SNS cuando se realicen cambios no intencionados. Archivar los logs export?ndolos en batch a Amazon S3 y analizarlos con Amazon Athena.",
                         "B":  "Utilizar AWS Config rules para auditar cambios en los recursos de AWS y monitorear el cumplimiento de las configuraciones ejecutando evaluaciones de las reglas a una frecuencia que elijas. Desarrollar reglas personalizadas de AWS Config para establecer un enfoque de desarrollo test-driven activando la evaluaci?n cuando cualquier recurso dentro del alcance de la regla cambie su configuraci?n.",
-                        "C":  "Utilizar la integraci?n de CloudTrail con SNS para notificar autom?ticamente actividades de API no autorizadas. Asegurar que CloudTrail est? habilitado para todas las cuentas y servicios disponibles de AWS. Usar funciones Lambda para revertir autom?ticamente cambios no autorizados en los recursos de AWS.",
-                        "D":  "Habilitar CloudTrail trails y configurar eventos de CloudTrail para revisar y monitorear actividades de gesti?n de todas las cuentas de AWS registrando estas actividades en CloudWatch Logs usando una clave KMS. Asegurar que CloudTrail est? habilitado para todas las cuentas y servicios disponibles de AWS.",
-                        "E":  "Utilizar eventos de EventBridge para aprovechar capacidades en tiempo casi real para monitorear patrones de eventos del sistema y activar funciones Lambda para revertir autom?ticamente cambios no autorizados en recursos de AWS. Enviar notificaciones mediante SNS topics para mejorar el tiempo de respuesta ante incidentes."
+                        "C":  "Utilizar la integración de CloudTrail con SNS para notificar automáticamente actividades de API no autorizadas. Asegurar que CloudTrail esté habilitado para todas las cuentas y servicios disponibles de AWS. Usar funciones Lambda para revertir automáticamente cambios no autorizados en los recursos de AWS.",
+                        "D":  "Habilitar CloudTrail trails y configurar eventos de CloudTrail para revisar y monitorear actividades de gestión de todas las cuentas de AWS registrando estas actividades en CloudWatch Logs usando una clave KMS. Asegurar que CloudTrail esté habilitado para todas las cuentas y servicios disponibles de AWS.",
+                        "E":  "Utilizar eventos de EventBridge para aprovechar capacidades en tiempo casi real para monitorear patrones de eventos del sistema y activar funciones Lambda para revertir automáticamente cambios no autorizados en recursos de AWS. Enviar notificaciones mediante SNS topics para mejorar el tiempo de respuesta ante incidentes."
                     },
         "correct_answers":  [
                                 "B",
@@ -484,11 +484,11 @@
         "user_answer_history":  null,
         "error_pattern":  null,
         "notes":  null,
-        "domain_number":  3,
-        "domain":  "d3_resilient_cloud_solutions",
-        "domain_name":  "Resilient Cloud Solutions",
-        "domain_source":  "inferred_from_question_content_and_legacy_classification",
-        "domain_confidence":  "inferred"
+        "domain_number":  6,
+        "domain":  "d6_security_compliance",
+        "domain_name":  "Security and Compliance",
+        "domain_source":  "inferred_from_question_content_and_dop_c02_blueprint",
+        "domain_confidence":  "high"
     },
     {
         "id":  16,
@@ -1404,11 +1404,11 @@
         "error_pattern":  null,
         "notes":  null,
         "id":  49,
-        "domain_number":  2,
-        "domain":  "d2_configuration_management_iac",
-        "domain_name":  "Configuration Management and IaC",
-        "domain_source":  "prompts/preguntas2.md",
-        "domain_confidence":  "official_source"
+        "domain_number":  1,
+        "domain":  "d1_sdlc_automation",
+        "domain_name":  "SDLC Automation",
+        "domain_source":  "inferred_from_question_content_and_dop_c02_blueprint",
+        "domain_confidence":  "high"
     },
     {
         "system":  "1_ci_cd",
@@ -1479,11 +1479,11 @@
         "error_pattern":  null,
         "notes":  null,
         "id":  52,
-        "domain_number":  2,
-        "domain":  "d2_configuration_management_iac",
-        "domain_name":  "Configuration Management and IaC",
-        "domain_source":  "prompts/preguntas2.md",
-        "domain_confidence":  "official_source"
+        "domain_number":  1,
+        "domain":  "d1_sdlc_automation",
+        "domain_name":  "SDLC Automation",
+        "domain_source":  "inferred_from_question_content_and_dop_c02_blueprint",
+        "domain_confidence":  "high"
     },
     {
         "system":  "5_resilience_dr",
@@ -1504,11 +1504,11 @@
         "error_pattern":  null,
         "notes":  null,
         "id":  53,
-        "domain_number":  3,
-        "domain":  "d3_resilient_cloud_solutions",
-        "domain_name":  "Resilient Cloud Solutions",
-        "domain_source":  "prompts/preguntas2.md",
-        "domain_confidence":  "official_source"
+        "domain_number":  2,
+        "domain":  "d2_configuration_management_iac",
+        "domain_name":  "Configuration Management and IaC",
+        "domain_source":  "inferred_from_question_content_and_dop_c02_blueprint",
+        "domain_confidence":  "high"
     },
     {
         "system":  "1_ci_cd",
