@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, computed, effect, inject, signal } from '@angular/core';
+import { Component, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PersonalizedTrainingShellComponent } from './personalized-training/ui/personalized-training-shell/personalized-training-shell.component';
 import { SimulatorTrainingBridgeService } from './personalized-training/adapters/simulator-training-bridge.service';
@@ -196,7 +196,10 @@ const RUNTIME_STORAGE_KEY = 'dop-c02-runtime-state-v1';
 const REPORTS_STORAGE_KEY = 'dop-c02-content-reports-v1';
 const SIMULATOR_HISTORY_STORAGE_KEY = 'dop-c02-simulator-session-history-v1';
 const LANGUAGE_STORAGE_KEY = 'dop-c02-language-v1';
-const SIMULATOR_DURATION_SECONDS = 210 * 60;
+const OFFICIAL_EXAM_DURATION_SECONDS = 180 * 60;
+const LANGUAGE_ACCOMMODATION_SECONDS = 30 * 60;
+const SIMULATOR_DURATION_SECONDS =
+  OFFICIAL_EXAM_DURATION_SECONDS + LANGUAGE_ACCOMMODATION_SECONDS;
 const SIMULATOR_FULL_EXAM_QUESTION_COUNT = 75;
 const MODULE_STUDY_ORDER = [
   'SDLC Automation',
@@ -253,7 +256,7 @@ export class App {
   private readonly simulatorTrainingBridge = inject(SimulatorTrainingBridgeService);
   private audioContext: AudioContext | null = null;
   private simulatorNavigationPending = false;
-  readonly appVersion = 'v1.3.23';
+  readonly appVersion = 'v1.3.24';
   readonly confidenceOptions = [
     { value: 1, label: 'Guessing' },
     { value: 2, label: 'Low' },
@@ -791,7 +794,7 @@ export class App {
     const queue = [...this.getSimulatorBank(bankType)];
     this.simulatorQueue.set(queue);
     this.simulatorIndex.set(0);
-    this.resetSimulatorAnswersForQueue(queue);
+    this.simulatorAnswers.set({});
     this.prepareSimulatorOptionOrders(queue);
     this.simulatorSummary.set(null);
     this.showSimulatorReview.set(false);
@@ -1097,7 +1100,7 @@ export class App {
 
   startSimulator(bankType: SimulatorBankType = 'verified'): void {
     const sourceBank = this.getSimulatorBank(bankType);
-    const queue = this.shuffle(sourceBank).slice(0, Math.min(75, sourceBank.length));
+    const queue = this.buildFullExamQueue(sourceBank, bankType);
     this.startSimulatorWithQueue(queue, 'exam', bankType, true, 'full');
   }
 
@@ -1202,7 +1205,6 @@ export class App {
         ...current,
         [question.id]: next,
       }));
-      this.persistSimulatorAnswer(question.id, next);
 
       if (question.questionType === 'single') {
         this.submitQuickQuizAnswer(question, next);
@@ -1231,7 +1233,6 @@ export class App {
         ...current,
         [question.id]: next,
       }));
-      this.persistSimulatorAnswer(question.id, next);
 
       if (question.questionType === 'single' && !this.isModuleSimulator() && next.length) {
         this.trainingChecked.update((current) => ({
@@ -1242,10 +1243,6 @@ export class App {
       }
 
       this.playTone('soft');
-      return;
-    }
-
-    if (this.assessmentMode() === 'exam' && this.isExamQuestionChecked(question.id)) {
       return;
     }
 
@@ -1263,8 +1260,11 @@ export class App {
       ...current,
       [question.id]: next,
     }));
-    this.persistSimulatorAnswer(question.id, next);
     this.playTone('soft');
+
+    if (next.length === question.correctAnswers.length) {
+      this.advanceAfterExamAnswer();
+    }
   }
 
   prevSimulatorQuestion(): void {
@@ -1276,11 +1276,37 @@ export class App {
       this.setSimulatorIndex(this.simulatorIndex() + 1);
       return;
     }
+    if (this.assessmentMode() === 'exam') {
+      this.confirmFinishSimulator();
+      return;
+    }
     this.finishSimulator();
   }
 
   goToSimulatorQuestion(index: number): void {
     this.setSimulatorIndex(index);
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleExamKeyboardNavigation(event: KeyboardEvent): void {
+    if (this.phase() !== 'simulator' || this.assessmentMode() !== 'exam') {
+      return;
+    }
+
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('input, textarea, select, button')) {
+      return;
+    }
+
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      this.prevSimulatorQuestion();
+    }
+
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      this.nextSimulatorQuestion();
+    }
   }
 
   confirmFinishSimulator(): void {
@@ -1294,11 +1320,18 @@ export class App {
     }
   }
 
-  simulatorQuestionState(index: number): 'current' | 'correct' | 'incorrect' | 'unanswered' {
+  simulatorQuestionState(
+    index: number,
+  ): 'current' | 'answered' | 'correct' | 'incorrect' | 'unanswered' {
     if (index === this.simulatorIndex()) {
       return 'current';
     }
+
     const question = this.simulatorQueue()[index];
+    if (this.assessmentMode() === 'exam') {
+      return (this.simulatorAnswers()[question.id] ?? []).length ? 'answered' : 'unanswered';
+    }
+
     return this.simulatorQuestionResult(question);
   }
 
@@ -1447,19 +1480,7 @@ export class App {
     }
 
     if (this.assessmentMode() === 'exam') {
-      if (!this.isExamQuestionChecked(question.id)) {
-        return this.isSimulatorSelected(question.id, optionId) ? 'selected' : '';
-      }
-
-      if (question.correctAnswers.includes(optionId)) {
-        return 'correct';
-      }
-
-      if (this.isSimulatorSelected(question.id, optionId)) {
-        return 'incorrect';
-      }
-
-      return '';
+      return this.isSimulatorSelected(question.id, optionId) ? 'selected' : '';
     }
 
     if (!this.isQuickQuiz() || !this.quickQuizRevealed()) {
@@ -1490,26 +1511,7 @@ export class App {
   }
 
   verifyCurrentExamAnswer(): void {
-    if (this.assessmentMode() !== 'exam') {
-      return;
-    }
-
-    const question = this.currentSimulatorQuestion();
-    if (!question) {
-      return;
-    }
-
-    const selected = this.simulatorAnswers()[question.id] ?? [];
-    if (!selected.length) {
-      return;
-    }
-
-    this.examChecked.update((current) => ({
-      ...current,
-      [question.id]: true,
-    }));
-    this.captureCurrentSimulatorQuestionTime();
-    this.playTone(this.isCurrentExamAnswerCorrect() ? 'correct' : 'incorrect');
+    return;
   }
 
   verifyCurrentTrainingAnswer(): void {
@@ -1620,6 +1622,18 @@ export class App {
       window.scrollTo({ top: 0, behavior: 'auto' });
       this.simulatorNavigationPending = false;
     }, 0);
+  }
+
+  private advanceAfterExamAnswer(): void {
+    if (this.assessmentMode() !== 'exam') {
+      return;
+    }
+
+    if (this.simulatorIndex() >= this.simulatorQueue().length - 1) {
+      return;
+    }
+
+    window.setTimeout(() => this.nextSimulatorQuestion(), 120);
   }
 
   isCurrentTrainingAnswerCorrect(): boolean {
@@ -2445,6 +2459,23 @@ export class App {
     );
   }
 
+  private buildFullExamQueue(
+    sourceBank: SimulatorQuestion[],
+    bankType: SimulatorBankType,
+  ): SimulatorQuestion[] {
+    if (sourceBank.length <= SIMULATOR_FULL_EXAM_QUESTION_COUNT) {
+      return [...sourceBank];
+    }
+
+    const attempts = this.state().examHistory[bankType]?.attempts ?? 0;
+    const startIndex = (attempts * SIMULATOR_FULL_EXAM_QUESTION_COUNT) % sourceBank.length;
+
+    return Array.from(
+      { length: SIMULATOR_FULL_EXAM_QUESTION_COUNT },
+      (_, offset) => sourceBank[(startIndex + offset) % sourceBank.length],
+    );
+  }
+
   private startSimulatorWithQueue(
     queue: SimulatorQuestion[],
     assessmentMode: AssessmentMode,
@@ -2459,7 +2490,7 @@ export class App {
     this.simulatorBankType.set(bankType);
     this.simulatorQueue.set(queue);
     this.simulatorIndex.set(0);
-    this.resetSimulatorAnswersForQueue(queue);
+    this.simulatorAnswers.set({});
     this.prepareSimulatorOptionOrders(queue);
     this.simulatorSummary.set(null);
     this.showSimulatorReview.set(false);

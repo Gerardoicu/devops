@@ -201,7 +201,7 @@ describe('App', () => {
     expect(app.simulatorNotesValue(10)).toBe('Compare A and C');
   });
 
-  it('keeps simulator selections marked across completed sessions until deselected', () => {
+  it('starts new simulator sessions without carrying previous selections', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
     const questions = [
@@ -222,10 +222,6 @@ describe('App', () => {
     app.selectSimulatorOption(questions[0], 'B');
     app.finishSimulator();
     app.startTraining('verified');
-
-    expect(app.isSimulatorSelected(10, 'B')).toBe(true);
-
-    app.selectSimulatorOption(questions[0], 'B');
 
     expect(app.isSimulatorSelected(10, 'B')).toBe(false);
     expect(app.state().persistentSimulatorAnswers[10]).toBeUndefined();
@@ -256,7 +252,7 @@ describe('App', () => {
     expect(app.simulatorExportRecords()[0].selected_answers).toEqual(['A']);
   });
 
-  it('marks simulator navigation by correctness', () => {
+  it('marks exam navigation by answered state without exposing correctness', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
 
@@ -295,9 +291,38 @@ describe('App', () => {
     app.simulatorIndex.set(2);
     app.simulatorAnswers.set({ 1: ['A'], 2: ['B'] });
 
-    expect(app.simulatorQuestionState(0)).toBe('correct');
-    expect(app.simulatorQuestionState(1)).toBe('incorrect');
+    expect(app.simulatorQuestionState(0)).toBe('answered');
+    expect(app.simulatorQuestionState(1)).toBe('answered');
     expect(app.simulatorQuestionState(2)).toBe('current');
+  });
+
+  it('splits a long verified bank into 75-question exam attempts', () => {
+    const fixture = TestBed.createComponent(App);
+    const app = fixture.componentInstance;
+    const questions = Array.from({ length: 120 }, (_, index) => ({
+      id: index + 1,
+      questionType: 'single' as const,
+      question: `Question ${index + 1}?`,
+      options: { A: 'A' },
+      correctAnswers: ['A'],
+      explanation: '',
+      domainName: 'SDLC Automation',
+      topic: null,
+    }));
+
+    app.simulatorBank.set(questions);
+    app.startSimulator('verified');
+
+    expect(app.simulatorTotal()).toBe(75);
+    expect(app.simulatorQueue()[0].id).toBe(1);
+    expect(app.simulatorQueue().at(-1)?.id).toBe(75);
+
+    app.finishSimulator();
+    app.startSimulator('verified');
+
+    expect(app.simulatorTotal()).toBe(75);
+    expect(app.simulatorQueue()[0].id).toBe(76);
+    expect(app.simulatorQueue().at(-1)?.id).toBe(30);
   });
 
   it('shows unanswered count before confirmed exam finish', () => {
