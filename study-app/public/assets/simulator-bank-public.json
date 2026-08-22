@@ -182,7 +182,7 @@
   {
     "id": 1013,
     "questionType": "single",
-    "question": "Un grupo Auto Scaling debe mantener una metrica alrededor de un valor objetivo cuando cambia la carga. ¿Que politica de escalado encaja mejor?",
+    "question": "Un Auto Scaling group debe mantener una métrica alrededor de un valor objetivo cuando cambia la carga. ¿Qué política de escalado encaja mejor?",
     "options": {
       "A": "Scheduled scaling",
       "B": "Target tracking scaling",
