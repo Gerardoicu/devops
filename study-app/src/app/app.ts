@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import packageInfo from '../../package.json';
 import { PersonalizedTrainingShellComponent } from './personalized-training/ui/personalized-training-shell/personalized-training-shell.component';
 import { SimulatorTrainingBridgeService } from './personalized-training/adapters/simulator-training-bridge.service';
 
@@ -256,7 +257,7 @@ export class App {
   private readonly simulatorTrainingBridge = inject(SimulatorTrainingBridgeService);
   private audioContext: AudioContext | null = null;
   private simulatorNavigationPending = false;
-  readonly appVersion = 'v1.3.24';
+  readonly appVersion = `v${packageInfo.version}`;
   readonly confidenceOptions = [
     { value: 1, label: 'Guessing' },
     { value: 2, label: 'Low' },
