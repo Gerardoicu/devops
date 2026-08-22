@@ -18,6 +18,38 @@ function normalizeAnswers(value) {
     .filter(Boolean);
 }
 
+function expectedAnswerCount(question) {
+  const text = question.question || '';
+  if (/Selecciona dos|Select two/i.test(text)) {
+    return 2;
+  }
+  if (/Selecciona tres|Select three/i.test(text)) {
+    return 3;
+  }
+  if (/Selecciona cuatro|Select four/i.test(text)) {
+    return 4;
+  }
+
+  return question.questionType === 'single' || question.question_type === 'single' ? 1 : null;
+}
+
+function hasMojibake(value) {
+  return typeof value === 'string' && /Ã|Â|â[^\s]/.test(value);
+}
+
+function scanStrings(value, predicate) {
+  if (typeof value === 'string') {
+    return predicate(value);
+  }
+  if (Array.isArray(value)) {
+    return value.some((item) => scanStrings(item, predicate));
+  }
+  if (value && typeof value === 'object') {
+    return Object.values(value).some((item) => scanStrings(item, predicate));
+  }
+  return false;
+}
+
 function auditBank(bank, fileLabel) {
   const stats = {
     file: fileLabel,
@@ -27,6 +59,8 @@ function auditBank(bank, fileLabel) {
     emptyQuestion: 0,
     missingExplanation: 0,
     invalidAnswers: 0,
+    answerCountMismatch: 0,
+    mojibake: 0,
   };
 
   const issues = [];
@@ -50,7 +84,23 @@ function auditBank(bank, fileLabel) {
       issues.push({ id: question.id, issue: 'explanation vacia' });
     }
 
-    for (const answer of normalizeAnswers(question.correctAnswers)) {
+    const answers = normalizeAnswers(question.correctAnswers ?? question.correct_answers);
+    const expectedCount = expectedAnswerCount(question);
+
+    if (expectedCount !== null && answers.length !== expectedCount) {
+      stats.answerCountMismatch += 1;
+      issues.push({
+        id: question.id,
+        issue: `cantidad de respuestas invalida: expected=${expectedCount}, actual=${answers.length}`,
+      });
+    }
+
+    if (scanStrings(question, hasMojibake)) {
+      stats.mojibake += 1;
+      issues.push({ id: question.id, issue: 'texto posiblemente corrupto/mojibake' });
+    }
+
+    for (const answer of answers) {
       if (!question.options || !question.options[answer]) {
         stats.invalidAnswers += 1;
         issues.push({ id: question.id, issue: `respuesta ${answer} no existe en options` });
