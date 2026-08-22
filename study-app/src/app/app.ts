@@ -448,6 +448,7 @@ export class App {
   readonly simulatorExportRecords = computed(() => this.buildSimulatorExportRecords());
   readonly simulatorHistoryCount = computed(() => this.simulatorHistory().length);
   readonly latestSimulatorSession = computed(() => this.simulatorHistory().at(-1) ?? null);
+  readonly recentSimulatorSessions = computed(() => [...this.simulatorHistory()].reverse().slice(0, 5));
   readonly progressByCard = computed(() => this.state().progress);
   readonly verifiedExamHistory = computed(
     () => this.state().examHistory.verified ?? { attempts: 0, lastScorePercent: null },
@@ -1097,6 +1098,46 @@ export class App {
   clearSimulatorHistory(): void {
     this.simulatorHistory.set([]);
     localStorage.removeItem(SIMULATOR_HISTORY_STORAGE_KEY);
+  }
+
+  reviewSimulatorHistory(session: SimulatorSessionExport): void {
+    const bank = this.getSimulatorBank(session.bankType);
+    const questionsById = new Map(bank.map((question) => [question.id, question]));
+    const queue = session.answers
+      .map((answer) => questionsById.get(answer.question))
+      .filter((question): question is SimulatorQuestion => !!question);
+
+    if (!queue.length) {
+      window.alert('No se pudo reconstruir este intento porque las preguntas ya no estan en el banco local.');
+      return;
+    }
+
+    const answers = session.answers.reduce<Record<number, string[]>>((current, answer) => {
+      const selected = answer.selected_answers ?? answer.answer ?? [];
+      current[answer.question] = [...selected].sort();
+      return current;
+    }, {});
+
+    this.closeReportPanel();
+    this.clearSimulatorTimer();
+    this.assessmentMode.set(session.assessmentMode);
+    this.simulatorBankType.set(session.bankType);
+    this.simulatorScope.set('full');
+    this.simulatorQueue.set(queue);
+    this.prepareSimulatorOptionOrders(queue);
+    this.simulatorAnswers.set(answers);
+    this.simulatorIndex.set(0);
+    this.simulatorSummary.set(session.summary);
+    this.showSimulatorReview.set(true);
+    this.remainingSeconds.set(0);
+    this.simulatorStartedAt.set(session.startedAt ? Date.parse(session.startedAt) : null);
+    this.simulatorDeadlineAt.set(null);
+    this.resetSimulatorResponseTracking();
+    this.quickQuizRevealed.set(false);
+    this.quickQuizLastCorrect.set(null);
+    this.examChecked.set({});
+    this.trainingChecked.set({});
+    this.phase.set('simulator-complete');
   }
 
   startSimulator(bankType: SimulatorBankType = 'verified'): void {

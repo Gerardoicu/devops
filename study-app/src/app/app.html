@@ -54,6 +54,26 @@
             <span class="meta">Intentos: {{ updatedExamHistory().attempts }}</span>
           </div>
         </div>
+        @if (recentSimulatorSessions().length) {
+          <div class="simulator-home-stats">
+            @for (session of recentSimulatorSessions(); track session.id) {
+              <article class="simulator-home-stat">
+                <div>
+                  <strong>{{ session.summary.scorePercent }}%</strong>
+                  <span class="meta">
+                    {{ simulatorBankLabel(session.bankType) }} -
+                    {{ session.summary.correct }}/{{ session.summary.total }} correctas,
+                    {{ session.summary.incorrect }} incorrectas,
+                    {{ session.summary.unanswered }} sin responder
+                  </span>
+                </div>
+                <button type="button" class="ghost compact-ghost" (click)="reviewSimulatorHistory(session)">
+                  Revisar
+                </button>
+              </article>
+            }
+          </div>
+        }
         <div class="simulator-bank-actions">
           @if (hasAnySimulatorInProgress()) {
             <button type="button" class="primary" (click)="continueSimulator()">
@@ -970,9 +990,9 @@
         {{
           isQuickQuiz()
             ? 'Resultado del quiz'
-            : isTraining()
-              ? 'Resultado del entrenamiento'
-              : 'Resultado total'
+              : isTraining()
+                ? 'Resultado del entrenamiento'
+                : 'Resultado del examen'
         }}
       </h2>
       <p class="summary-copy">
@@ -993,6 +1013,10 @@
         <div class="stat">
           <span class="label">Correctas</span>
           <strong>{{ simSummary.correct }}/{{ simSummary.total }}</strong>
+        </div>
+        <div class="stat">
+          <span class="label">Incorrectas</span>
+          <strong>{{ simSummary.incorrect }}</strong>
         </div>
         <div class="stat">
           <span class="label">Porcentaje total</span>
@@ -1021,8 +1045,8 @@
                   <div class="progress-fill" [style.width.%]="item.scorePercent"></div>
                 </div>
                 <p class="body">
-                  {{ item.correct }}/{{ item.total }} correctas Â· {{ item.incorrect }} incorrectas
-                  Â· {{ item.unanswered }} sin responder
+                  Correctas: {{ item.correct }}/{{ item.total }} | Incorrectas:
+                  {{ item.incorrect }} | Sin responder: {{ item.unanswered }}
                 </p>
               </article>
             }
