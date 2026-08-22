@@ -89,6 +89,7 @@ interface SessionSummary {
 
 interface SimulatorSummary {
   bankType: SimulatorBankType;
+  language?: AppLanguage;
   total: number;
   answered: number;
   unanswered: number;
@@ -129,6 +130,7 @@ interface SimulatorSessionExport {
   appVersion: string;
   assessmentMode: AssessmentMode;
   bankType: SimulatorBankType;
+  language?: AppLanguage;
   startedAt: string | null;
   completedAt: string;
   summary: SimulatorSummary;
@@ -1233,6 +1235,18 @@ export class App {
     return 'Banco publico suplementario';
   }
 
+  simulatorLanguageLabel(language: AppLanguage | null | undefined): string {
+    if (language === 'es') {
+      return 'Español';
+    }
+
+    if (language === 'en') {
+      return 'Ingles';
+    }
+
+    return 'No registrado';
+  }
+
   isSimulatorNotesOpen(questionId: number): boolean {
     return (
       !!this.simulatorNotesOpen()[questionId] ||
@@ -1491,6 +1505,7 @@ export class App {
 
     const summary: SimulatorSummary = {
       bankType: this.simulatorBankType(),
+      language: this.appLanguage(),
       total,
       answered,
       unanswered,
@@ -2334,6 +2349,7 @@ export class App {
       appVersion: this.appVersion,
       assessmentMode: this.assessmentMode(),
       bankType: this.simulatorBankType(),
+      language: summary.language ?? this.appLanguage(),
       startedAt,
       completedAt,
       summary,

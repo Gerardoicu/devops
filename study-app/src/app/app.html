@@ -62,6 +62,7 @@
                   <strong>{{ session.summary.scorePercent }}%</strong>
                   <span class="meta">
                     {{ simulatorBankLabel(session.bankType) }} -
+                    {{ simulatorLanguageLabel(session.summary.language ?? session.language) }} -
                     {{ session.summary.correct }}/{{ session.summary.total }} correctas,
                     {{ session.summary.incorrect }} incorrectas,
                     {{ session.summary.unanswered }} sin responder
@@ -283,7 +284,8 @@
             </strong>
             <span class="meta">
               @if (latestSimulatorSession(); as session) {
-                {{ session.summary.correct }}/{{ session.summary.total }} correctas
+                {{ session.summary.correct }}/{{ session.summary.total }} correctas -
+                {{ simulatorLanguageLabel(session.summary.language ?? session.language) }}
               } @else {
                 Termina una sesion
               }
@@ -1004,7 +1006,8 @@
           pregunta.
         } @else {
           Banco usado:
-          {{ simulatorBankLabel(simSummary.bankType) }}. Este resultado es una referencia de
+          {{ simulatorBankLabel(simSummary.bankType) }}. Idioma:
+          {{ simulatorLanguageLabel(simSummary.language) }}. Este resultado es una referencia de
           entrenamiento y no equivale al score escalado oficial de AWS.
         }
       </p>
@@ -1025,6 +1028,10 @@
         <div class="stat">
           <span class="label">Sin responder</span>
           <strong>{{ simSummary.unanswered }}</strong>
+        </div>
+        <div class="stat">
+          <span class="label">Idioma</span>
+          <strong>{{ simulatorLanguageLabel(simSummary.language) }}</strong>
         </div>
       </div>
 
