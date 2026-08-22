@@ -1086,7 +1086,48 @@
 
     @if (showSimulatorReview()) {
       <section class="review-list">
-        @for (item of simulatorReviewItems(); track item.question.id) {
+        <div class="simulator-home-stats">
+          <label>
+            <span>Resultado</span>
+            <select
+              [value]="reviewResultFilter()"
+              (change)="reviewResultFilter.set($any($event.target).value)"
+            >
+              <option value="all">Todas</option>
+              <option value="incorrect">Incorrectas</option>
+              <option value="unanswered">Sin responder</option>
+              <option value="correct">Correctas</option>
+            </select>
+          </label>
+          <label>
+            <span>Modulo</span>
+            <select
+              [value]="reviewModuleFilter()"
+              (change)="reviewModuleFilter.set($any($event.target).value)"
+            >
+              <option value="all">Todos</option>
+              @for (module of simulatorReviewModules(); track module) {
+                <option [value]="module">{{ module }}</option>
+              }
+            </select>
+          </label>
+          <label>
+            <span>Tipo</span>
+            <select
+              [value]="reviewQuestionTypeFilter()"
+              (change)="reviewQuestionTypeFilter.set($any($event.target).value)"
+            >
+              <option value="all">Todas</option>
+              <option value="single">Una opcion</option>
+              <option value="multi">Multi-select</option>
+            </select>
+          </label>
+        </div>
+        <p class="body">
+          Mostrando {{ filteredSimulatorReviewItems().length }} de {{ simulatorReviewItems().length }}
+          preguntas.
+        </p>
+        @for (item of filteredSimulatorReviewItems(); track item.question.id) {
           <article
             class="review-card"
             [class.review-correct]="item.isCorrect"
@@ -1094,7 +1135,9 @@
           >
             <div class="review-head">
               <span class="pill">Pregunta {{ item.question.id }}</span>
-              <span class="pill">{{ item.isCorrect ? 'correcta' : 'revisar' }}</span>
+              <span class="pill">{{ item.result === 'unanswered' ? 'sin responder' : item.isCorrect ? 'correcta' : 'incorrecta' }}</span>
+              <span class="pill">{{ item.moduleName }}</span>
+              <span class="pill">{{ item.question.questionType === 'multi' ? 'multi-select' : 'una opcion' }}</span>
             </div>
             <h3>{{ item.question.topic || 'Sin tema' }}</h3>
             <p class="prompt question-text">{{ item.question.question }}</p>
@@ -1117,7 +1160,22 @@
             </p>
             <p class="body">Correcta: {{ simulatorAnswerLabels(item.question, item.expected) }}</p>
             <p class="body">{{ item.question.explanation }}</p>
+            <button
+              type="button"
+              class="ghost compact-ghost bookmark-button"
+              [class.bookmark-active]="isTrainingBookmarked(item.question.id)"
+              (click)="toggleTrainingBookmark(item.question.id)"
+            >
+              <span
+                class="bookmark-icon"
+                [class.bookmark-icon-filled]="isTrainingBookmarked(item.question.id)"
+                aria-hidden="true"
+              ></span>
+              <span>{{ isTrainingBookmarked(item.question.id) ? 'Marcada para repaso' : 'Marcar para repaso' }}</span>
+            </button>
           </article>
+        } @empty {
+          <p class="empty-state">No hay preguntas con estos filtros.</p>
         }
       </section>
     }

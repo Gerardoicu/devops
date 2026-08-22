@@ -22,6 +22,8 @@ type SimulatorBankType = 'verified' | 'public' | 'updated';
 type AssessmentMode = 'quick-quiz' | 'exam' | 'training';
 type SimulatorScope = 'full' | 'module';
 type AppLanguage = 'es' | 'en';
+type ReviewResultFilter = 'all' | 'correct' | 'incorrect' | 'unanswered';
+type ReviewQuestionTypeFilter = 'all' | 'single' | 'multi';
 
 interface CardOption {
   id: string;
@@ -304,6 +306,9 @@ export class App {
   readonly simulatorOptionOrders = signal<Record<number, string[]>>({});
   readonly simulatorSummary = signal<SimulatorSummary | null>(null);
   readonly showSimulatorReview = signal(false);
+  readonly reviewResultFilter = signal<ReviewResultFilter>('all');
+  readonly reviewModuleFilter = signal('all');
+  readonly reviewQuestionTypeFilter = signal<ReviewQuestionTypeFilter>('all');
   readonly remainingSeconds = signal(SIMULATOR_DURATION_SECONDS);
   readonly simulatorStartedAt = signal<number | null>(null);
   readonly simulatorDeadlineAt = signal<number | null>(null);
@@ -433,6 +438,7 @@ export class App {
     this.simulatorQueue().map((question) => {
       const selected = this.simulatorAnswers()[question.id] ?? [];
       const expected = question.correctAnswers;
+      const result = this.simulatorQuestionResult(question);
       const isCorrect =
         selected.length === expected.length &&
         [...selected].sort().every((value, index) => value === [...expected].sort()[index]);
@@ -441,10 +447,27 @@ export class App {
         question,
         selected,
         expected,
+        result,
+        moduleName: this.normalizeSystemName(question.domainName),
         isCorrect,
       };
     }),
   );
+  readonly simulatorReviewModules = computed(() =>
+    [...new Set(this.simulatorReviewItems().map((item) => item.moduleName))].sort(),
+  );
+  readonly filteredSimulatorReviewItems = computed(() => {
+    const resultFilter = this.reviewResultFilter();
+    const moduleFilter = this.reviewModuleFilter();
+    const questionTypeFilter = this.reviewQuestionTypeFilter();
+
+    return this.simulatorReviewItems().filter(
+      (item) =>
+        (resultFilter === 'all' || item.result === resultFilter) &&
+        (moduleFilter === 'all' || item.moduleName === moduleFilter) &&
+        (questionTypeFilter === 'all' || item.question.questionType === questionTypeFilter),
+    );
+  });
   readonly simulatorExportRecords = computed(() => this.buildSimulatorExportRecords());
   readonly simulatorHistoryCount = computed(() => this.simulatorHistory().length);
   readonly latestSimulatorSession = computed(() => this.simulatorHistory().at(-1) ?? null);
@@ -1129,6 +1152,7 @@ export class App {
     this.simulatorIndex.set(0);
     this.simulatorSummary.set(session.summary);
     this.showSimulatorReview.set(true);
+    this.resetSimulatorReviewFilters();
     this.remainingSeconds.set(0);
     this.simulatorStartedAt.set(session.startedAt ? Date.parse(session.startedAt) : null);
     this.simulatorDeadlineAt.set(null);
@@ -1478,6 +1502,7 @@ export class App {
     };
 
     this.simulatorSummary.set(summary);
+    this.resetSimulatorReviewFilters();
     this.saveSimulatorSessionHistory(summary);
     if (this.assessmentMode() === 'exam' && this.simulatorScope() === 'full') {
       this.state.update((current) => {
@@ -1541,7 +1566,13 @@ export class App {
   }
 
   toggleSimulatorReview(): void {
-    this.showSimulatorReview.update((value) => !value);
+    this.showSimulatorReview.update((value) => {
+      const next = !value;
+      if (next) {
+        this.resetSimulatorReviewFilters();
+      }
+      return next;
+    });
   }
 
   isTrainingQuestionChecked(questionId: number): boolean {
@@ -2219,6 +2250,12 @@ export class App {
     this.simulatorNotesOpen.set({});
     this.simulatorQuestionTimeSeconds.set({});
     this.simulatorQuestionStartedAt.set(null);
+  }
+
+  private resetSimulatorReviewFilters(): void {
+    this.reviewResultFilter.set('all');
+    this.reviewModuleFilter.set('all');
+    this.reviewQuestionTypeFilter.set('all');
   }
 
   private resetSimulatorAnswersForQueue(queue: SimulatorQuestion[]): void {
