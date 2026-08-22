@@ -253,7 +253,7 @@ export class App {
   private readonly simulatorTrainingBridge = inject(SimulatorTrainingBridgeService);
   private audioContext: AudioContext | null = null;
   private simulatorNavigationPending = false;
-  readonly appVersion = 'v1.3.22';
+  readonly appVersion = 'v1.3.23';
   readonly confidenceOptions = [
     { value: 1, label: 'Guessing' },
     { value: 2, label: 'Low' },
@@ -2645,6 +2645,7 @@ export class App {
     const html: string[] = [];
     let inList = false;
     let paragraphBuffer: string[] = [];
+    let index = 0;
 
     const flushParagraph = () => {
       if (!paragraphBuffer.length) {
@@ -2661,13 +2662,67 @@ export class App {
       }
     };
 
-    for (const rawLine of lines) {
+    const isTableSeparator = (value: string): boolean =>
+      /^\|?\s*:?-{3,}:?\s*(\|\s*:?-{3,}:?\s*)+\|?$/.test(value);
+
+    const parseTableCells = (value: string): string[] => {
+      const normalized = value.trim().replace(/^\|/, '').replace(/\|$/, '');
+      return normalized.split('|').map((cell) => cell.trim());
+    };
+
+    const renderTable = (startIndex: number): number | null => {
+      const headerLine = lines[startIndex]?.trim();
+      const separatorLine = lines[startIndex + 1]?.trim();
+
+      if (!headerLine?.includes('|') || !separatorLine || !isTableSeparator(separatorLine)) {
+        return null;
+      }
+
+      const headers = parseTableCells(headerLine);
+      const rows: string[][] = [];
+      let nextIndex = startIndex + 2;
+
+      while (nextIndex < lines.length && lines[nextIndex].trim().includes('|')) {
+        rows.push(parseTableCells(lines[nextIndex]));
+        nextIndex += 1;
+      }
+
+      if (!headers.length || !rows.length) {
+        return null;
+      }
+
+      html.push(
+        '<div style="overflow-x:auto"><table style="width:100%;min-width:720px;border-collapse:collapse"><thead><tr>'
+      );
+      for (const header of headers) {
+        html.push(
+          `<th style="padding:8px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(255,255,255,.12);color:#fff3da">${this.escapeHtml(header)}</th>`
+        );
+      }
+      html.push('</tr></thead><tbody>');
+      for (const row of rows) {
+        html.push('<tr>');
+        for (let cellIndex = 0; cellIndex < headers.length; cellIndex += 1) {
+          html.push(
+            `<td style="padding:8px;text-align:left;vertical-align:top;border-bottom:1px solid rgba(255,255,255,.12)">${this.escapeHtml(row[cellIndex] ?? '')}</td>`
+          );
+        }
+        html.push('</tr>');
+      }
+      html.push('</tbody></table></div>');
+
+      return nextIndex;
+    };
+
+    while (index < lines.length) {
+      const rawLine = lines[index];
       const line = rawLine.trimEnd();
       const trimmed = line.trim();
 
       if (!trimmed) {
         flushParagraph();
         closeList();
+        index += 1;
         continue;
       }
 
@@ -2677,6 +2732,15 @@ export class App {
         closeList();
         const level = headingMatch[1].length;
         html.push(`<h${level}>${this.escapeHtml(headingMatch[2])}</h${level}>`);
+        index += 1;
+        continue;
+      }
+
+      const tableEndIndex = renderTable(index);
+      if (tableEndIndex !== null) {
+        flushParagraph();
+        closeList();
+        index = tableEndIndex;
         continue;
       }
 
@@ -2688,11 +2752,13 @@ export class App {
           inList = true;
         }
         html.push(`<li>${this.escapeHtml(bulletMatch[1])}</li>`);
+        index += 1;
         continue;
       }
 
       closeList();
       paragraphBuffer.push(trimmed);
+      index += 1;
     }
 
     flushParagraph();
